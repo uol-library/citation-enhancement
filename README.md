@@ -1,5 +1,9 @@
 # Introduction 
-TODO: Give a short introduction of your project. Let this section explain the objectives or the motivation behind this project. 
+To enhance the metadata in citations from reading lists in the Leganto system using data from various external systems. 
+Initially one focus will be on collecting geographical affiliation of authors. 
+The starting point for this is the software developed at Imperial College, London, to collect author information for journal articles from the WoS API Enhanced: 
+https://osf.io/cyj2x/  
+We plan to extend this with other material types and data sources. 
 
 # Getting Started
 TODO: Guide users through getting your code up and running on their own system. In this section you can talk about:
