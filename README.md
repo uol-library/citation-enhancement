@@ -1,8 +1,11 @@
 # Introduction 
 To enhance the metadata in citations from reading lists in the Leganto system using data from various external systems. 
+
 Initially one focus will be on collecting geographical affiliation of authors. 
+
 The starting point for this is the software developed at Imperial College, London, to collect author information for journal articles from the WoS API Enhanced: 
 https://osf.io/cyj2x/  
+
 We plan to extend this with other material types and data sources. 
 
 # Getting Started
