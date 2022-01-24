@@ -1,0 +1,2775 @@
+[
+    {
+        "Leganto": {
+            "id": "11875896830005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Karnath, Hans-Otto ; Karnath, Hans-Otto",
+                "isbn": null,
+                "issn": "09628436",
+                "editor": null,
+                "doi": "10.1098\/rstb.1997.0127"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11875930770005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Goodale, Melvyn A ; Milner, A.David",
+                "isbn": null,
+                "issn": "01662236",
+                "editor": null,
+                "doi": "10.1016\/0166-2236(92)90344-8"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11875932070005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Mishkin, Mortimer ; Ungerleider, Leslie G ; Macko, Kathleen A",
+                "isbn": null,
+                "issn": "01662236",
+                "editor": null,
+                "doi": "10.1016\/0166-2236(83)90190-X"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "10968867660005181",
+            "secondary_type": {
+                "value": "BK",
+                "desc": "Book"
+            },
+            "type": {
+                "value": "BK",
+                "desc": "Physical Book"
+            },
+            "metadata": {
+                "title": "Sensorimotor control and learning : an introduction to the behavioral neuroscience of action ",
+                "author": "Tresilian, James.",
+                "isbn": "9780230371057",
+                "issn": null,
+                "mms_id": "991004792109705181",
+                "editor": null,
+                "doi": null
+            }
+        },
+        "Alma": {
+            "titles": [
+                "Sensorimotor control and learning : an introduction to the behavioral neuroscience of action"
+            ],
+            "creators": [
+                "Tresilian, James."
+            ],
+            "isbns": [
+                "9780230371057 (cased) :",
+                "0230371051 (cased) :"
+            ],
+            "issns": [],
+            "lccns": []
+        },
+        "VIAF": [
+            {
+                "search": "Tresilian, James.",
+                "records": 4,
+                "best-match": {
+                    "heading": "Tresilian, James.",
+                    "about": "http:\/\/viaf.org\/viaf\/232571934\/",
+                    "confidence-title": 56,
+                    "titles": [
+                        "How you feel : the story of the mind as told by the body",
+                        "Sensorimotor control and learning, 2012:"
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "Leganto": {
+            "id": "11859960070005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Donges (1978)",
+                "isbn": null,
+                "issn": null,
+                "editor": null,
+                "doi": null
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11859933140005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Salvucci, Dario D ; Gray, Rob",
+                "isbn": null,
+                "issn": "03010066",
+                "editor": null,
+                "doi": "10.1068\/p5343"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11859968170005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Wallis, Guy ; Chatziastros, Astros ; Tresilian, James ; Tomasevic, Nebojsa",
+                "isbn": null,
+                "issn": "00961523",
+                "editor": null,
+                "doi": "10.1037\/0096-1523.33.5.1127"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11859982430005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Cloete, Steven R ; Wallis, Guy",
+                "isbn": null,
+                "issn": "00144819",
+                "editor": null,
+                "doi": "10.1007\/s00221-009-1813-6"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11859985860005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Vallar, Giuseppe ; Perani, Daniela",
+                "isbn": null,
+                "issn": "00283932",
+                "editor": null,
+                "doi": "10.1016\/0028-3932(86)90001-1"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11859986880005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Vallar, Giuseppe ; Vallar, Giuseppe",
+                "isbn": null,
+                "issn": "09628436",
+                "editor": null,
+                "doi": "10.1098\/rstb.1997.0126"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "10968867750005181",
+            "secondary_type": {
+                "value": "BK",
+                "desc": "Book"
+            },
+            "type": {
+                "value": "BK",
+                "desc": "Physical Book"
+            },
+            "metadata": {
+                "title": "Brain, mind, and behavior ",
+                "author": "Bloom, Floyd E.",
+                "isbn": "0716723891",
+                "issn": null,
+                "mms_id": "991013589119705181",
+                "editor": null,
+                "doi": null
+            }
+        },
+        "Alma": {
+            "titles": [
+                "Brain, mind, and behavior"
+            ],
+            "creators": [
+                "Bloom, Floyd E.",
+                "Nelson, Charles A.,.",
+                "Lazerson, Arlyne."
+            ],
+            "isbns": [
+                "0716723891"
+            ],
+            "issns": [],
+            "lccns": [
+                "lc 00042248"
+            ]
+        },
+        "VIAF": [
+            {
+                "search": "Bloom, Floyd E.",
+                "records": 2,
+                "best-match": {
+                    "heading": "Bloom, Floyd E., 1936-....",
+                    "about": "http:\/\/viaf.org\/viaf\/51750189\/",
+                    "confidence-title": 100,
+                    "titles": [
+                        "Best of the brain from Scientific American",
+                        "Beta-carbolines and tetrahydroisoquinolines : proceedings of a workshop held at the Salk Institute, La Jolla, California, December, 12 and 13, 1981",
+                        "The biochemical basis of neuropharmacology",
+                        "Brain browser a Spinnaker plus based Hypertext application for Microsoft Windows",
+                        "Brain, mind, and behavior",
+                        "Brain, nerves, and synapses; proceedings.",
+                        "Cerebral decay : pathophysiological and clinical aspects",
+                        "Le cerveau, la pens\u00e9e et le comportement",
+                        "Current topics in neurobiology.",
+                        "The Dana Alliance's 2009 progress report on brain research \/ Perspectives on substance abuse research",
+                        "The Dana guide to brain health, 2003:",
+                        "Development and chemical specificity of neurons : proceedings of the Schatzalp Symposium, September, 1978",
+                        "Dynamics of synaptic modulation",
+                        "Fifth International Congress on Pharmacology",
+                        "Fundamental neuroscience",
+                        "Funding health sciences research : a strategy to restore balance",
+                        "Handbook of Chemical Neuroanatomy.",
+                        "Handbook of physiology a critical, comprehensive presentation of physiological knowledge and concepts",
+                        "Hersenen en gedrag",
+                        "Intrinsic regulatory systems of the brain",
+                        "Knockouts and mutants : genetically dissecting brain and behavior : proceedings of the First Brain Research Interactive Symposium, held in San Diego, CA, USA, on 4-6 November 1998 \/ ed. Floyd E. Bloom. - Amsterdam, 1999",
+                        "Lexicon of psychiatry, neurology and the neurosciences",
+                        "Molecular and cellular interactions underlying higher brain functions : proceedings of the 9th Meeting of the International Neurobiology Society, held at the Abbaye Royale de Fontevraud (France), on September 1-4, 1981",
+                        "Molecular and cellular mechanisms of neural-immune interactions : a report of the 1992 FESN Study Group on Molecular and Cellular Mechanisms of Neural-Immune Interactions",
+                        "Molecular kinesis in cellular function and plasticity",
+                        "Mozg, razum i povedenie",
+                        "Neuronal and neurochemical substrates of reinforcement : based on an NRP work session, June 8-10, 1975",
+                        "Neuroscience : from the molecular to the cognitive",
+                        "The organisation of the cerebral cortex : proceedings of a neurosciences research program colloquium",
+                        "Peptides : integrators of cell and tissue function",
+                        "Pharmacology and the future of man",
+                        "The primate nervous system",
+                        "Psychopharmacology : the fourth generation of progress",
+                        "Regulatory peptides.",
+                        "The role of cyclic nucleotides in central synaptic function \/ renal transport of amino acids \/ S. Silbernagl ... [et al.].",
+                        "The science of mind",
+                        "Shin no\u0304 no tanken.",
+                        "Shinkei yakurigaku : Seikagaku karano apuro\u0304chi",
+                        "Towards 2010 - a brain Odyssey : full papers related to presentations at the 3rd Brain Research Interactive Symposium, held in New Orleans, LA, USA, on 2-3 November 2000",
+                        "\u041c\u043e\u0437\u0433, \u0440\u0430\u0437\u0443\u043c \u0438 \u043f\u043e\u0432\u0435\u0434\u0435\u043d\u0438\u0435, 1988:",
+                        "\u8133\u30fb\u795e\u7d4c\u7cfb\u306e\u57fa\u672c\u5730\u56f3\u3092\u305f\u3069\u308b",
+                        "\u8133\u304b\u3089\u300c\u5fc3\u300d\u3068\u300c\u884c\u52d5\u300d\u3092\u898b\u308b",
+                        "\u8133\u304b\u3089\u7cbe\u795e\u3068\u884c\u52d5\u3092\u898b\u308b",
+                        "\u8133\u306e\u63a2\u691c.",
+                        "\u8133\u306e\u85ac\u7406\u3068\u751f\u5316\u5b66",
+                        "\u795e\u7d4c\u85ac\u7406\u5b66 : \u751f\u5316\u5b66\u304b\u3089\u306e\u30a2\u30d7\u30ed\u30fc\u30c1"
+                    ],
+                    "nationalities": [
+                        {
+                            "value": "US"
+                        }
+                    ]
+                }
+            },
+            {
+                "search": "Nelson, Charles A.,.",
+                "records": 4,
+                "best-match": {
+                    "heading": "Nelson, Charles A.",
+                    "about": "http:\/\/viaf.org\/viaf\/44465801\/",
+                    "confidence-title": 88,
+                    "titles": [
+                        "Basic and applied perspectives on learning, cognition, and development",
+                        "Brain, mind, and behavior, c2001:",
+                        "The Effects of early adversity on neurobehavioral development",
+                        "Ethics, leadership, and the bottom line",
+                        "Handbook of developmental cognitive neuroscience",
+                        "High-frequency and microwave circuit design",
+                        "Memory and affect in development",
+                        "Minnesota symposia on child psychology",
+                        "n94054092",
+                        "Romania's abandoned children : deprivation, brain development, and the struggle for recovery",
+                        "Rumania no iki sareta kodomotachi no hattatsu eno eikyo to kaifuku eno torikumi : Shisetsu yoikuji eno satoya yoiku ni yoru soki kainyu kenkyu biiaipi kara no keisho.",
+                        "SU(3)-excitation in baryon resonances",
+                        "Threats to optimal development : integrating biological, psychological, and social risk factors",
+                        "\u30eb\u30fc\u30de\u30cb\u30a2\u306e\u907a\u68c4\u3055\u308c\u305f\u5b50\u3069\u3082\u305f\u3061\u306e\u767a\u9054\u3078\u306e\u5f71\u97ff\u3068\u56de\u5fa9\u3078\u306e\u53d6\u308a\u7d44\u307f : \u65bd\u8a2d\u990a\u80b2\u5150\u3078\u306e\u91cc\u89aa\u990a\u80b2\u306b\u3088\u308b\u65e9\u671f\u4ecb\u5165\u7814\u7a76\u3008BEIP\u3009\u304b\u3089\u306e\u8b66\u9418"
+                    ],
+                    "nationalities": [
+                        {
+                            "value": "US"
+                        },
+                        {
+                            "value": "Stany Zjednoczone."
+                        },
+                        {
+                            "value": "Spojen\u00e9 st\u00e1ty americk\u00e9"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "value": "Boston, Mass."
+                        },
+                        {
+                            "value": "Minneapolis, Minn."
+                        }
+                    ],
+                    "affiliations": [
+                        {
+                            "value": "Children's Hospital Medical Center",
+                            "$e": "Affiliation"
+                        },
+                        {
+                            "value": "Harvard Medical School",
+                            "$e": "Affiliation"
+                        },
+                        {
+                            "value": "University of Minnesota",
+                            "$e": "Affiliation"
+                        }
+                    ]
+                }
+            },
+            {
+                "search": "Lazerson, Arlyne.",
+                "records": 2,
+                "best-match": {
+                    "heading": "Lazerson, Arlyne.",
+                    "about": "http:\/\/viaf.org\/viaf\/49285872\/",
+                    "confidence-title": 100,
+                    "titles": [
+                        "Brain, mind, and behavior",
+                        "Le cerveau, la pense\u0301e et le comportement",
+                        "Human development from conception through adolescence",
+                        "Mozg, razum i povedenie",
+                        "Psychology today : an introduction",
+                        "\u041c\u043e\u0437\u0433, \u0440\u0430\u0437\u0443\u043c \u0438 \u043f\u043e\u0432\u0435\u0434\u0435\u043d\u0438\u0435, 1988:"
+                    ],
+                    "nationalities": [
+                        {
+                            "value": "US"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "Leganto": {
+            "id": "11859988430005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Fink, Gereon R ; Marshall, J.C ; Shah, N.J ; Weiss, P.H ; Halligan, P.W ; Grosse-Ruyken, M ; Ziemons, K ; Zilles, K ; Freund, H.-J",
+                "isbn": null,
+                "issn": "00283878",
+                "editor": null,
+                "doi": "10.1212\/WNL.54.6.1324"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11860095190005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Niemeier, Matthias ; Karnath, Hans-Otto",
+                "isbn": null,
+                "issn": "00144819",
+                "editor": null,
+                "doi": "10.1007\/s00221-002-1132-7"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11860097250005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Niemeier, Matthias ; Karnath, Hans-Otto",
+                "isbn": null,
+                "issn": "09609822",
+                "editor": null,
+                "doi": "10.1016\/S0960-9822(03)00171-4"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11860099800005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Bisiach & Luzzatti",
+                "isbn": null,
+                "issn": null,
+                "editor": null,
+                "doi": "https:\/\/doi.org\/10.1016\/S0010-9452(78)80016-1"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11860110890005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Bottini, G ; Cappa, S ; Geminiani, G ; Sterzi, R",
+                "isbn": null,
+                "issn": "00283932",
+                "editor": null,
+                "doi": "10.1016\/0028-3932(90)90024-I"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "10968867810005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Marshall JC, Halligan PW.",
+                "isbn": null,
+                "issn": "1973-8102",
+                "mms_id": "991019455969005181",
+                "editor": null,
+                "doi": "https:\/\/doi.org\/10.1016\/S0010-9452(89)80065-6"
+            }
+        },
+        "Alma": {
+            "titles": [
+                "Cortex (Online)",
+                "Cortex : a journal devoted to the study of the nervous system and behavior."
+            ],
+            "creators": [],
+            "isbns": [],
+            "issns": [
+                "1973-8102"
+            ],
+            "lccns": [
+                "2011233099"
+            ]
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11860462560005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Maguire, Eleanor A ; Burke, Teresa ; Phillips, Jack ; Staunton, Hugh",
+                "isbn": null,
+                "issn": "00283932",
+                "editor": null,
+                "doi": "10.1016\/0028-3932(96)00022-X"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "10968867830005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Habib M, Sirigu A",
+                "isbn": null,
+                "issn": "1973-8102",
+                "mms_id": "991019455969005181",
+                "editor": null,
+                "doi": "https:\/\/doi.org\/10.1016\/S0010-9452(87)80020-5"
+            }
+        },
+        "Alma": {
+            "titles": [
+                "Cortex (Online)",
+                "Cortex : a journal devoted to the study of the nervous system and behavior."
+            ],
+            "creators": [],
+            "isbns": [],
+            "issns": [
+                "1973-8102"
+            ],
+            "lccns": [
+                "2011233099"
+            ]
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11861180300005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Scoville, William Beecher ; Milner, Brenda",
+                "isbn": null,
+                "issn": "00223050",
+                "editor": null,
+                "doi": "10.1136\/jnnp.20.1.11"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884164020005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Squire, Larry R ; Teng, Edmond",
+                "isbn": null,
+                "issn": "00280836",
+                "editor": null,
+                "doi": "10.1038\/23276"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884165920005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "King, John A ; Burgess, Neil ; Hartley, Tom ; Vargha-Khadem, Faraneh ; O'Keefe, John",
+                "isbn": null,
+                "issn": "10509631",
+                "editor": null,
+                "doi": "10.1002\/hipo.10070"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884128160005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Andersen, Richard A",
+                "isbn": null,
+                "issn": "09628436",
+                "editor": null,
+                "doi": "10.1098\/rstb.1997.0128"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884139310005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Duhamel, Jean-Ren\u00e9 ; Bremmer, Frank ; BenHamed, Suliann ; Graf, Werner",
+                "isbn": null,
+                "issn": "00280836",
+                "editor": null,
+                "doi": "10.1038\/39865"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884140590005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Andersen, Richard A ; Snyder, Lawrence H ; Grieve, Kenneth L ; Brotchie, Peter",
+                "isbn": null,
+                "issn": "00280836",
+                "editor": null,
+                "doi": "10.1038\/29777"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884151720005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Kahana, Michael J ; Fried, Itzhak ; Ekstrom, Arne D ; Caplan, Jeremy B ; Fields, Tony A ; Isham, Eve A ; Newman, Ehren L",
+                "isbn": null,
+                "issn": "00280836",
+                "editor": null,
+                "doi": "10.1038\/nature01964"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884153090005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Collett, Matthew ; Collett, Thomas S",
+                "isbn": null,
+                "issn": "03401200",
+                "editor": null,
+                "doi": "10.1007\/s004220000168"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884153840005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Collett, Matthew ; Collett, Thomas S ; Wehner, R\u00fcdiger",
+                "isbn": null,
+                "issn": "09609822",
+                "editor": null,
+                "doi": "10.1016\/S0960-9822(99)80451-5"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884154340005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Collett, TS ; Collett, M ; Wehner, R",
+                "isbn": null,
+                "issn": "00220949",
+                "editor": null,
+                "doi": null
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884160540005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Riley, J. R ; Greggers, U ; Smith, A. D ; Reynolds, D. R ; Menzel, R",
+                "isbn": null,
+                "issn": "00280836",
+                "editor": null,
+                "doi": "10.1038\/nature03526"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884179490005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Srinivasan, M.V",
+                "isbn": null,
+                "issn": "09609822",
+                "editor": null,
+                "doi": "10.1016\/j.cub.2003.11.005"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884183280005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Srinivasan, Mandyan V ; Zhang, Shaowu ; Altwein, Monika ; Tautz, J\u00fcrgen",
+                "isbn": null,
+                "issn": "00368075",
+                "editor": null,
+                "doi": "10.1126\/science.287.5454.851"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884185960005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Vladusich, T ; Hemmi, JM ; Srinivasan, MV ; Zeil, J",
+                "isbn": null,
+                "issn": "00220949",
+                "editor": null,
+                "doi": "10.1242\/jeb.01880"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884186980005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Wehner, R\u00fcdiger ; Michel, Barbara ; Antonsen, Per",
+                "isbn": null,
+                "issn": "00220949",
+                "editor": null,
+                "doi": null
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884187430005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Wittlinger, Matthias ; Wehner, R\u00fcdiger ; Wolf, Harald",
+                "isbn": null,
+                "issn": "00368075",
+                "editor": null,
+                "doi": "10.1126\/science.1126912"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11884190550005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Ernst, Marc O ; Banks, Martin S",
+                "isbn": null,
+                "issn": "00280836",
+                "editor": null,
+                "doi": "10.1038\/415429a"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11885071540005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Gepshtein, Sergei ; Burge, Johannes ; Ernst, Marc O ; Banks, Martin S",
+                "isbn": null,
+                "issn": "15347362",
+                "editor": null,
+                "doi": "10.1167\/5.11.7"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11885075010005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Hillis, J.H ; Ernst, M.O ; Banks, M.S ; Landy, M.S",
+                "isbn": null,
+                "issn": "00368075",
+                "editor": null,
+                "doi": "10.1126\/science.1075396"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11885076160005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "K\u00f6rding, Konrad P ; Wolpert, Daniel M",
+                "isbn": null,
+                "issn": "00280836",
+                "editor": null,
+                "doi": "10.1038\/nature02169"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11885078990005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "K\u00f6rding, Konrad P ; Wolpert, Daniel M",
+                "isbn": null,
+                "issn": "13646613",
+                "editor": null,
+                "doi": "10.1016\/j.tics.2006.05.003"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11885080850005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Wolpert, Daniel M",
+                "isbn": null,
+                "issn": "01679457",
+                "editor": null,
+                "doi": "10.1016\/j.humov.2007.05.005"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11885082220005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Egger, Seth W ; Engelhardt, Heidi R ; Britten, Kenneth H",
+                "isbn": null,
+                "issn": "19326203",
+                "editor": null,
+                "doi": "10.1371\/journal.pone.0011975"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11885083550005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Land, M.F",
+                "isbn": null,
+                "issn": "00220949",
+                "editor": null,
+                "doi": null
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11885086010005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Tucker, VA",
+                "isbn": null,
+                "issn": "00220949",
+                "editor": null,
+                "doi": null
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11885087010005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Tucker, V.A ; Tucker, A.E ; Akers, K ; Enderson, J.H",
+                "isbn": null,
+                "issn": "00220949",
+                "editor": null,
+                "doi": null
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11885090470005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Ghose, Kaushik ; Moss, Cynthia F",
+                "isbn": null,
+                "issn": "02706474",
+                "editor": null,
+                "doi": "10.1523\/JNEUROSCI.4315-05.2006"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11906055650005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Wilkie, Richard ; Wann, John ; Allison, Robert",
+                "isbn": null,
+                "issn": "15443558",
+                "editor": null,
+                "doi": "10.1145\/1870076.1870077"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11906056230005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Wilkie, Richard M ; Wann, John P ; Allison, Robert S",
+                "isbn": null,
+                "issn": "00961523",
+                "editor": null,
+                "doi": "10.1037\/0096-1523.34.5.1150"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11906197860005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Wilkie, Richard M ; Wann, John P",
+                "isbn": null,
+                "issn": "00961523",
+                "editor": null,
+                "doi": "10.1037\/0096-1523.32.1.88"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11906200190005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Wilkie, Richard M ; Wann, John P",
+                "isbn": null,
+                "issn": "00961523",
+                "editor": null,
+                "doi": "10.1037\/0096-1523.31.5.901"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "10968868210005181",
+            "secondary_type": {
+                "value": "BK",
+                "desc": "Book"
+            },
+            "type": {
+                "value": "BK",
+                "desc": "Physical Book"
+            },
+            "metadata": {
+                "title": "Optic flow and beyond ",
+                "author": "Vaina, Lucia, 1946-",
+                "isbn": "1402020910",
+                "issn": null,
+                "mms_id": "991006201129705181",
+                "editor": null,
+                "doi": null
+            }
+        },
+        "Alma": {
+            "titles": [
+                "Optic flow and beyond"
+            ],
+            "creators": [
+                "Vaina, Lucia, 1946-",
+                "Beardsley, Scott A.",
+                "Rushton, Simon K."
+            ],
+            "isbns": [
+                "1402020910",
+                "1402020929 (e-book)"
+            ],
+            "issns": [],
+            "lccns": [
+                "2004047500"
+            ]
+        },
+        "VIAF": [
+            {
+                "search": "Vaina, Lucia, 1946-",
+                "records": 1,
+                "best-match": {
+                    "heading": "Vaina, Lucia, 1946-",
+                    "about": "http:\/\/viaf.org\/viaf\/108480318\/",
+                    "confidence-title": 100,
+                    "titles": [
+                        "Cognitive constraints on communication : representations and processes",
+                        "Computational theories and their implementation in the brain : the legacy of David Marr",
+                        "From perception to cognition : a computational approach to higher level visual functions, anglais",
+                        "From the retina to the neocortex : selected papers of David Marr",
+                        "Further progress in knowledge representation for image understanding [microvorm]",
+                        "Lecture logico-mathe\u0301matique de la narration : mode\u0300le se\u0301miotique",
+                        "L'homme pre\u0301dateur versus texte proie, 1983:",
+                        "Matters of intelligence : conceptual structures in cognitive neuroscience",
+                        "Optic flow and beyond",
+                        "Textes choisis."
+                    ],
+                    "nationalities": [
+                        {
+                            "value": "GB"
+                        }
+                    ]
+                }
+            },
+            {
+                "search": "Beardsley, Scott A.",
+                "records": 1,
+                "best-match": {
+                    "heading": "Beardsley, Scott A.",
+                    "about": "http:\/\/viaf.org\/viaf\/17476034\/",
+                    "confidence-title": 100,
+                    "titles": [
+                        "Optic flow and beyond"
+                    ],
+                    "nationalities": [
+                        {
+                            "value": "US"
+                        }
+                    ]
+                }
+            },
+            {
+                "search": "Rushton, Simon K.",
+                "records": 1,
+                "best-match": {
+                    "heading": "Rushton, Simon K.",
+                    "about": "http:\/\/viaf.org\/viaf\/39629167\/",
+                    "confidence-title": 100,
+                    "titles": [
+                        "Optic flow and beyond"
+                    ],
+                    "nationalities": [
+                        {
+                            "value": "GB"
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "Leganto": {
+            "id": "11906238970005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Wilkie, Richard M ; Wann, John P",
+                "isbn": null,
+                "issn": "15347362",
+                "editor": null,
+                "doi": "10.1167\/3.11.3"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11906241730005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Wilkie, Richard ; Wann, John",
+                "isbn": null,
+                "issn": "00961523",
+                "editor": null,
+                "doi": "10.1037\/0096-1523.29.2.363"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11906254440005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Wilkie, Richard M ; Wann, John P",
+                "isbn": null,
+                "issn": "09609822",
+                "editor": null,
+                "doi": "10.1016\/S0960-9822(02)01337-4"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11906265980005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Cloete, Steven ; Wallis, Guy",
+                "isbn": null,
+                "issn": "00144819",
+                "editor": null,
+                "doi": "10.1007\/s00221-010-2530-x"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11906266820005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Kountouriotis, GK ; Floyd, RC ; Gardner, PH ; Merat, N ; Wilkie, RM",
+                "isbn": null,
+                "issn": null,
+                "editor": null,
+                "doi": "10.1037\/a0026123"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11906273190005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Wilkie, R. M ; Kountouriotis, G. K ; Merat, N ; Wann, J. P",
+                "isbn": null,
+                "issn": "00144819",
+                "editor": null,
+                "doi": "10.1007\/s00221-010-2321-4"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11906274880005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Land, M. F ; Lee, D. N",
+                "isbn": null,
+                "issn": "00280836",
+                "editor": null,
+                "doi": "10.1038\/369742a0"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11906275840005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Land, Michael ; Horwood, Julia",
+                "isbn": null,
+                "issn": "00280836",
+                "editor": null,
+                "doi": "10.1038\/377339a0"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11906278530005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Kandil, Farid I ; Rotter, Alexander ; Lappe, Markus",
+                "isbn": null,
+                "issn": "15347362",
+                "editor": null,
+                "doi": "10.1167\/9.1.11"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11906281370005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Kandil, Farid I ; Rotter, Alexander ; Lappe, Markus",
+                "isbn": null,
+                "issn": "15347362",
+                "editor": null,
+                "doi": "10.1167\/10.4.24"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11906286060005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Salvucci, Dario D ; Gray, Rob",
+                "isbn": null,
+                "issn": "03010066",
+                "editor": null,
+                "doi": "10.1068\/p5343"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11856179930005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Milner & McIntosh",
+                "isbn": null,
+                "issn": "1350-7540 ",
+                "mms_id": "991019431726805181",
+                "editor": null,
+                "doi": "10.1097\/01.wco.0000191512.60368.ee"
+            }
+        },
+        "Alma": {
+            "titles": [
+                "CURR OPIN NEUROL",
+                "CURR OP NEU",
+                "CURR. OPIN. NEUROL",
+                "Curr. opin. neurol. (Online)",
+                "Current opinion in neurology"
+            ],
+            "creators": [],
+            "isbns": [],
+            "issns": [
+                "1473-6551"
+            ],
+            "lccns": [
+                "2001214005"
+            ]
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11926928490005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Warren, Mary",
+                "isbn": null,
+                "issn": "02729490",
+                "editor": null,
+                "doi": "10.5014\/ajot.63.5.626"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11926941250005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Zihl, J",
+                "isbn": null,
+                "issn": "00283932",
+                "editor": null,
+                "doi": "10.1016\/0028-3932(94)00119-A"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11856205210005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Zihl, J.",
+                "isbn": null,
+                "issn": null,
+                "editor": null,
+                "doi": null
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927212860005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Pambakian, A L M ; Wooding, D S ; Patel, N ; Morland, A B ; Kennard, C ; Mannan, S K",
+                "isbn": null,
+                "issn": "00223050",
+                "editor": null,
+                "doi": "10.1136\/jnnp.69.6.751"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927226650005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Katz, Noomi ; Hartman-Maeir, Adina ; Ring, Haim ; Soroker, Nachum",
+                "isbn": null,
+                "issn": "00039993",
+                "editor": null,
+                "doi": "10.1016\/S0003-9993(99)90273-3"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927257970005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Girotti, Floriano ; Casazza, Marina ; Musicco, Massimo ; Avanzini, Giuliano",
+                "isbn": null,
+                "issn": "00283932",
+                "editor": null,
+                "doi": "10.1016\/0028-3932(83)90010-6"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "10968868430005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "E L\u00e0davas E et al.",
+                "isbn": null,
+                "issn": "1973-8102",
+                "mms_id": "991019455969005181",
+                "editor": null,
+                "doi": "10.1016\/s0010-9452(13)80083-4"
+            }
+        },
+        "Alma": {
+            "titles": [
+                "Cortex (Online)",
+                "Cortex : a journal devoted to the study of the nervous system and behavior."
+            ],
+            "creators": [],
+            "isbns": [],
+            "issns": [
+                "1973-8102"
+            ],
+            "lccns": [
+                "2011233099"
+            ]
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927367330005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Findlay, John M ; Walker, Robin",
+                "isbn": null,
+                "issn": "0140525X",
+                "editor": null,
+                "doi": "10.1017\/S0140525X99002150"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927375400005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Husain, Masud ; Mannan, Sabira ; Hodgson, Tim ; Wojciulik, Ewa ; Driver, Jon ; Kennard, Christopher",
+                "isbn": null,
+                "issn": "00068950",
+                "editor": null,
+                "doi": "10.1093\/brain\/124.5.941"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927402080005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Zihl, Josef ; S\u00e4mann, Philipp ; Schenk, Thomas ; Schuett, Susanne ; Dauner, Ruth",
+                "isbn": null,
+                "issn": "00283932",
+                "editor": null,
+                "doi": "10.1016\/j.neuropsychologia.2009.04.009"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "10968868480005181",
+            "secondary_type": {
+                "value": "BK",
+                "desc": "Book"
+            },
+            "type": {
+                "value": "BK",
+                "desc": "Physical Book"
+            },
+            "metadata": {
+                "title": "Cognitive neuroscience : the biology of the mind ",
+                "author": "Gazzaniga, Michael S., author.",
+                "isbn": "9780393922288",
+                "issn": null,
+                "mms_id": "991010585919705181",
+                "editor": null,
+                "doi": null
+            }
+        },
+        "Alma": {
+            "titles": [
+                "Cognitive neuroscience : the biology of the mind"
+            ],
+            "creators": [
+                "Gazzaniga, Michael S.,",
+                "Ivry, Richard B.,",
+                "Mangun, G. R. (Mangun, George Ronald), 1956-"
+            ],
+            "isbns": [
+                "9780393922288 (paperback)",
+                "0393922286 (paperback)"
+            ],
+            "issns": [],
+            "lccns": []
+        },
+        "VIAF": [
+            {
+                "search": "Gazzaniga, Michael S.,",
+                "records": 1,
+                "best-match": {
+                    "heading": "Gazzaniga, Michael S., 1939-....",
+                    "about": "http:\/\/viaf.org\/viaf\/108455024\/",
+                    "confidence-title": 100,
+                    "titles": [
+                        "Bisected brain",
+                        "Brain and mind evolutionary perspectives",
+                        "The calculating hemispheres: studies of a split-brain patient.",
+                        "El Cerebro \u00e9tico",
+                        "Le cerveau de\u0301double\u0301",
+                        "Cerveau social",
+                        "Chi comanda? : scienza, mente e libero arbitrio \/ Michael Gazzaniga ; traduzione di Silvia Inglese",
+                        "Ci\u00eancia psicol\u00f3gica",
+                        "Cognitive and neurologic aspects of hemispheric disconnection in the human brain",
+                        "Cognitive neuroscience the biology of the mind",
+                        "Cognitive neurosciences",
+                        "Consciousness instinct",
+                        "erkennende Gehirn Entdeckungen in den Netzwerken des Geistes",
+                        "<O >esp\u00edrito natural",
+                        "Ethical brain",
+                        "Extending psychological frontiers selected works of Leon Festinger",
+                        "Functional connectivity: integrating behavioral, diffusion tensor imaging, and functional magnetic resonance imaging data sets",
+                        "Functional neuroscience",
+                        "Fundamentals of psychology; an introduction",
+                        "Handbook of psychobiology",
+                        "Human",
+                        "Human : the science behind what makes us unique",
+                        "Ich-Illusion wie Bewusstsein und freier Wille entstehen",
+                        "El Instinto de la conciencia : c\u00f3mo el cerebro crea la mente",
+                        "Integrated mind",
+                        "An interview with Michael Gazzaniga.",
+                        "Istota cz\u0142owiecze\u0144stwa : co sprawia, \u017ce jeste\u015bmy wyj\u0105tkowi",
+                        "Jak z m\u00f3zgu wy\u0142ania si\u0119 umys\u0142?",
+                        "Kto tu rz\u0105dzi - ja czy m\u00f3j m\u00f3zg ? : neuronauka a istnienie wolnej woli",
+                        "libre arbitre et la science du cerveau",
+                        "Maindo matazu.",
+                        "Methods in mind",
+                        "Microelectrode analysis of transfer of visual information by the corpus callosum.",
+                        "Mind matters : how mind and brain interact to create our conscious lives",
+                        "Mind's past",
+                        "n79107722",
+                        "Nature's Mind",
+                        "Nature's mind : the biological roots of thinking, emotions, sexuality, language, and intelligence",
+                        "Neuropsychology",
+                        "Ningenrashisa towa nanika : Ningen no yunikusa o akasu kagaku no saizensen.",
+                        "No no naka no rinri : No rinrigaku josetsu.",
+                        "Noe, ingan ui jido",
+                        "Observations on visual perception after disconnexion of the cerebral hemispheres in man.",
+                        "El pasado de la mente",
+                        "Perspectives in memory research",
+                        "Po obu stronach m\u00f3zgu : moja przygoda z neuronauk\u0105",
+                        "Podzielony mo\u0301zg - ods\u0142ona druga",
+                        "Prze\u0142omowe trendy na 2006 rok : lista HBR",
+                        "Psychological science",
+                        "Relatos desde los dos lados del cerebro : una vida dedicada a la neurociencia",
+                        "Social brain : discovering the networks of the mind",
+                        "The Split Brain in Man \/ Michael S. Gazzaniga. - (8.1967)",
+                        "Stati della mente, stati del cervello : come l'interazione di mente e cervello crea la nostra vita cosciente \/ Michael S. Gazzaniga ; presentazione di Luigi Pizzamiglio ; traduzione di Gabriele Noferi",
+                        "Svobodn\u00e1 v\u016fle a neurov\u011bda",
+                        "Tales from both sides of the brain",
+                        "Understanding complexity in the human brain",
+                        "Uno to sano o mitsuketa otoko : Ninchi shinkei kagaku no chichi no to jinsei o kataru.",
+                        "Wann ist der Mensch ein Mensch? Antworten der Neurowissenschaft auf ethische Fragen",
+                        "Who's in Charge?",
+                        "Who's in charge? : free will and the science of the brain",
+                        "Why share data? Lessons learned from the fMRIDC",
+                        "\ub1cc\ub294 \uc724\ub9ac\uc801 \uc778\uac00",
+                        "\uc778\uac04\uc758 \ub9c8\uc74c\uacfc \ud589\ub3d9",
+                        "\u300c\u308f\u305f\u3057\u300d\u306f\u3069\u3053\u306b\u3042\u308b\u306e\u304b : \u30ac\u30b6\u30cb\u30ac\u8133\u79d1\u5b66\u8b1b\u7fa9",
+                        "\u30de\u30a4\u30f3\u30c9\u30fb\u30de\u30bf\u30fc\u30ba : \u5fc3\u3068\u8133\u306e\u6700\u65b0\u79d1\u5b66",
+                        "\u4eba\u9593\u3068\u306f\u306a\u306b\u304b : \u8133\u304c\u660e\u304b\u3059\u300c\u4eba\u9593\u3089\u3057\u3055\u300d\u306e\u8d77\u6e90",
+                        "\u4eba\u9593\u3089\u3057\u3055\u3068\u306f\u306a\u306b\u304b? : \u4eba\u9593\u306e\u30e6\u30cb\u30fc\u30af\u3055\u3092\u660e\u304b\u3059\u79d1\u5b66\u306e\u6700\u524d\u7dda",
+                        "\u8133\u306e\u306a\u304b\u306e\u502b\u7406 : \u8133\u502b\u7406\u5b66\u5e8f\u8aac",
+                        "\u53f3\u8133\u3068\u5de6\u8133\u3092\u898b\u3064\u3051\u305f\u7537 : \u8a8d\u77e5\u795e\u7d4c\u79d1\u5b66\u306e\u7236\u3001\u8133\u3068\u4eba\u751f\u3092\u8a9e\u308b",
+                        "\u793e\u4f1a\u7684\u8133 : \u5fc3\u306e\u30cd\u30c3\u30c8\u30ef\u30fc\u30af\u306e\u767a\u898b"
+                    ],
+                    "nationalities": [
+                        {
+                            "value": "US"
+                        },
+                        {
+                            "value": "\ubbf8\uad6d(\uad6d\uba85)[\u7f8e\u570b]"
+                        },
+                        {
+                            "value": "xxu"
+                        },
+                        {
+                            "value": "us"
+                        }
+                    ],
+                    "affiliations": [
+                        {
+                            "value": "California Institute of Technology"
+                        },
+                        {
+                            "value": "Human frontier science program"
+                        },
+                        {
+                            "value": "University of California Santa Barbara"
+                        },
+                        {
+                            "value": "University of California Santa Barbara",
+                            "$e": "Affiliation"
+                        },
+                        {
+                            "value": "ebrary, Inc"
+                        }
+                    ]
+                }
+            },
+            {
+                "search": "Ivry, Richard B.,",
+                "records": 1,
+                "best-match": {
+                    "heading": "Ivry, Richard B.",
+                    "about": "http:\/\/viaf.org\/viaf\/165535\/",
+                    "confidence-title": 100,
+                    "titles": [
+                        "Cognitive neuroscience \/ Michael S. Gazzaniga, Richard B. Ivry, George R. Mangun. - New York ; London, 1998.",
+                        "Cognitive neuroscience : the biology of the mind",
+                        "Context-specific control over the neural dynamics of temporal attention by the human cerebellum",
+                        "Credit Assignment in a Motor Decision Making Task Is Influenced by Agency and Not Sensory Prediction Errors.",
+                        "Duration-selectivity in right parietal cortex reflects the subjective experience of time",
+                        "The influence of task outcome on implicit motor learning",
+                        "Neuroci\u00eancia cognitiva : a biologia da mente",
+                        "Prioritized verbal working memory content biases ongoing action",
+                        "A single mechanism for global and selective response inhibition under the influence of motor preparation",
+                        "The two sides of perception"
+                    ],
+                    "nationalities": [
+                        {
+                            "value": "US"
+                        },
+                        {
+                            "value": "Spojen\u00e9 st\u00e1ty americk\u00e9"
+                        }
+                    ]
+                }
+            },
+            {
+                "search": "Mangun, G. R. (Mangun, George Ronald), 1956-",
+                "records": false
+            }
+        ]
+    },
+    {
+        "Leganto": {
+            "id": "10968868500005181",
+            "secondary_type": {
+                "value": "BK",
+                "desc": "Book"
+            },
+            "type": {
+                "value": "BK",
+                "desc": "Physical Book"
+            },
+            "metadata": {
+                "title": "Sight unseen : an exploration of conscious and unconscious vision ",
+                "author": "Goodale, Melvyn A.",
+                "isbn": "9780199596966",
+                "issn": null,
+                "mms_id": "991008312109705181",
+                "editor": null,
+                "doi": null
+            }
+        },
+        "Alma": {
+            "titles": [
+                "Sight unseen : an exploration of conscious and unconscious vision"
+            ],
+            "creators": [
+                "Goodale, Melvyn A.,",
+                "Milner, A. D. (A. David),"
+            ],
+            "isbns": [
+                "9780199596966 (hbk.) :"
+            ],
+            "issns": [],
+            "lccns": []
+        },
+        "VIAF": [
+            {
+                "search": "Goodale, Melvyn A.,",
+                "records": 2,
+                "best-match": {
+                    "heading": "Goodale, Melvyn A.",
+                    "about": "http:\/\/viaf.org\/viaf\/7615132\/",
+                    "confidence-title": 100,
+                    "titles": [
+                        "Analysis of visual behavior, 1982, c1981 (a.e.)",
+                        "Cues utilized by normal and posterior-neodecorticate rats in the Yerkes brightness discrimination task.",
+                        "Fractionating orientation behavior in the rodent : the role of the superior colliculus",
+                        "Interocular transfer in the pigeon : retinal locus as a factor",
+                        "Large adjustments in visually guided reaching do not depend on vision of the hand or perception of target displacement",
+                        "Mo\u0304 hitotsu no shikaku : Mienai shikaku wa donoyo\u0304ni hakkensaretaka",
+                        "M\u00f3zg wzrokowy w dzia\u0142aniu",
+                        "n81116750",
+                        "Neural mechanisms of visual orientation in rodents. M.A. Goodale.",
+                        "The organization of eye and limb movements during unrestricted reaching to targets in contralateral and ipsilateral visual space.",
+                        "Overlapping neural circuits for visual attention and eye movements in the human cerebellum.",
+                        "Perceiving the world and grasping it: is there a difference?",
+                        "Perception of the Mccollough Effect Correlates with Activity in Extrastriate Cortex: A Functional Magnetic Resonance Imaging Study",
+                        "Po co m\u00f3zg widzi",
+                        "Preserved Haptic Shape Processing after Bilateral LOC Lesions.",
+                        "Preserved visual imagery in visual form agnosia.",
+                        "Probing unconscious visual processing with the McCollough effect",
+                        "Psychophysical and neuroimaging responses to moving stimuli in a patient with the Riddoch phenomenon due to bilateral visual cortex lesions",
+                        "Pupil size is modulated by the size of equal-luminance gratings",
+                        "Radial-maze performance in the rat following enucleation and visual decortication",
+                        "Reaching for the unknown: multiple target encoding and real-time decision-making in a rapid reach task.",
+                        "Reaching to ipsilateral or contralateral targets: within-hemisphere visuomotor processing cannot explain hemispatial differences in motor control.",
+                        "Real and illusory issues in the illusion debate (Why two things are sometimes better than one): Commentary on Kopiske et\u00a0al. (2016).",
+                        "\"Real-time\" obstacle avoidance in the absence of primary visual cortex.",
+                        "Recovery of fMRI activation in motion area MT following storage of the motion aftereffect.",
+                        "The relationship between fMRI adaptation and repetition priming.",
+                        "The relationship between scanning patterns and monocular discrimination learning in the pigeon.",
+                        "The removal of binocular cues disrupts the calibration of grasping in patients with visual form agnosia.",
+                        "Repetition suppression in occipital-temporal visual areas is modulated by physical rather than semantic features of objects.",
+                        "Representation of object weight in human ventral visual cortex.",
+                        "Retinotopic activity in V1 reflects the perceived and not the retinal size of an afterimage",
+                        "Retinotopic organization of the visual cortex before and after decompression of the optic chiasm in a patient with pituitary macroadenoma.",
+                        "The role of apparent size in building- and object-specific regions of ventral visual cortex.",
+                        "The role of binocular vision in prehension: a kinematic analysis.",
+                        "The Role of Haptic Expectations in Reaching to Grasp: From Pantomime to Natural Grasps and Back Again",
+                        "The role of head movements in the discrimination of 2-D shape by blind echolocation experts.",
+                        "The role of image size and retinal motion in the computation of absolute distance by the Mongolian gerbil (Meriones unguiculatus).",
+                        "The role of non-conscious visual processing in obstacle avoidance: A commentary on Ross et\u00a0al.",
+                        "The role of online visual feedback for the control of target-directed and allocentric hand movements.",
+                        "The role of surface information in object recognition: studies of a visual form agnosic and normal subjects",
+                        "The role of the predorsal bundle in head and body movements elicited by electrical stimulation of the superior colliculus in the Mongolian gerbil.",
+                        "The role of vision in detecting and correcting fingertip force errors during object lifting.",
+                        "Saccade Latency Provides Evidence for Reduced Face Inversion Effects With Higher Autism Traits",
+                        "Scratching beneath the surface: new insights into the functional properties of the lateral occipital area and parahippocampal place area",
+                        "Seeing all the obstacles in your way: the effect of visual feedback and visual feedback schedule on obstacle avoidance while reaching.",
+                        "Separate visual pathways for perception and action",
+                        "Shape-specific activation of occipital cortex in an early blind echolocation expert.",
+                        "Sight unseen : an exploration of conscious and unconscious vision",
+                        "Size-contrast illusions deceive the eye but not the hand",
+                        "Size matters: a single representation underlies our perceptions of heaviness in the size-weight illusion.",
+                        "The size-weight illusion induced through human echolocation.",
+                        "Spared somatomotor and cognitive functions in a patient with a large porencephalic cyst revealed by fMRI.",
+                        "Still holding after all these years: An action-perception dissociation in patient DF.",
+                        "Superior performance for visually guided pointing in the lower visual field.",
+                        "Susceptibility to startle during ongoing behaviour following collicular lesions in the rat",
+                        "Target selection for reaching and saccades share a similar behavioral reference frame in the macaque.",
+                        "Temporal distortion in the perception of actions and events.",
+                        "Temporal order judgments are disrupted more by reflexive than by voluntary saccades.",
+                        "Thinking outside the box",
+                        "Time flies when we intend to act: temporal distortion in a go\/no-go task.",
+                        "Trajectories of reaches to prismatically-displaced targets: evidence for \"automatic\" visuomotor recalibration",
+                        "Transforming vision into action",
+                        "Transient visual pathway critical for normal development of primate grasping behavior.",
+                        "Transient visual responses reset the phase of low-frequency oscillations in the skeletomotor periphery.",
+                        "Unusual hand postures but not familiar tools show motor equivalence with precision grasping.",
+                        "Updating the programming of a precision grip is a function of recent history of available feedback.",
+                        "Variability-based Garner interference for perceptual estimations but not for grasping",
+                        "Ventral occipital lesions impair object recognition but not object-directed grasping: an fMRI study.",
+                        "Vision and action : the control of grasping",
+                        "Vision as a sensorimotor system",
+                        "Vision in the palm of your hand",
+                        "Visual and haptic object priming have a similar effect on fMRI activation in extra-striate cortex james@cerco.ups-tlse.fr",
+                        "The visual brain in action",
+                        "Visual control of action but not perception requires analytical processing of object shape",
+                        "Visual control of reaching movements without vision of the limb. II. Evidence of fast unconscious processes correcting the trajectory of the hand to the final position of a double-step stimulus.",
+                        "Visual cortical lesions abolish the use of motion parallax in the Mongolian gerbil.",
+                        "Visual motion due to eye movements helps guide the hand",
+                        "Visual sampling following lesions of the superior colliculus in rats.",
+                        "\u3082\u3046\u3072\u3068\u3064\u306e\u8996\u899a : \u300c\u898b\u3048\u306a\u3044\u8996\u899a\u300d\u306f\u3069\u306e\u3088\u3046\u306b\u767a\u898b\u3055\u308c\u305f\u304b"
+                    ],
+                    "nationalities": [
+                        {
+                            "value": "CA"
+                        },
+                        {
+                            "value": "GB"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "value": "Calgary"
+                        },
+                        {
+                            "value": "Leigh-on-Sea"
+                        }
+                    ]
+                }
+            },
+            {
+                "search": "Milner, A. D. (A. David),",
+                "records": 1,
+                "best-match": {
+                    "heading": "Milner, A.David",
+                    "about": "http:\/\/viaf.org\/viaf\/30592075\/",
+                    "confidence-title": 100,
+                    "titles": [
+                        "Children and race",
+                        "The Cognitive and neural bases of spatial neglect",
+                        "Mo\u0304 hitotsu no shikaku : Mienai shikaku wa donoyo\u0304ni hakkensaretaka",
+                        "M\u00f3zg wzrokowy w dzia\u0142aniu",
+                        "The Neuropsychology of consciousness",
+                        "no92008260",
+                        "The roots of visual awareness : a festschrift in honour of Alan Cowey",
+                        "Sight unseen : an exploration of conscious and unconscious vision",
+                        "The visual brain in action",
+                        "\u3082\u3046\u3072\u3068\u3064\u306e\u8996\u899a : \u3008\u898b\u3048\u306a\u3044\u8996\u899a\u3009\u306f\u3069\u306e\u3088\u3046\u306b\u767a\u898b\u3055\u308c\u305f\u304b"
+                    ],
+                    "nationalities": [
+                        {
+                            "value": "GB"
+                        }
+                    ],
+                    "affiliations": [
+                        {
+                            "value": "University"
+                        },
+                        {
+                            "value": "University of Western Ontario. Department of Psychology"
+                        },
+                        {
+                            "value": "University",
+                            "$e": "Affiliation"
+                        },
+                        {
+                            "value": "Wydawnictwo Naukowe PWN."
+                        }
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "Leganto": {
+            "id": "10968868520005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Brenner & Smeets",
+                "isbn": null,
+                "issn": "1973-8102",
+                "mms_id": "991019455969005181",
+                "editor": null,
+                "doi": "https:\/\/doi.org\/10.1016\/S0010-9452(08)70482-9"
+            }
+        },
+        "Alma": {
+            "titles": [
+                "Cortex (Online)",
+                "Cortex : a journal devoted to the study of the nervous system and behavior."
+            ],
+            "creators": [],
+            "isbns": [],
+            "issns": [
+                "1973-8102"
+            ],
+            "lccns": [
+                "2011233099"
+            ]
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927545850005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Goodale, Melvyn A ; Milner, A.David",
+                "isbn": null,
+                "issn": "01662236",
+                "editor": null,
+                "doi": "10.1016\/0166-2236(92)90344-8"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927563040005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Mishkin, Mortimer ; Ungerleider, Leslie G ; Macko, Kathleen A",
+                "isbn": null,
+                "issn": "01662236",
+                "editor": null,
+                "doi": "10.1016\/0166-2236(83)90190-X"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927570340005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Haffenden, Angela M ; Schiff, Karen C ; Goodale, Melvyn A",
+                "isbn": null,
+                "issn": "09609822",
+                "editor": null,
+                "doi": "10.1016\/S0960-9822(01)00023-9"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927583590005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Smeets, Jeroen B. J ; Brenner, Eli",
+                "isbn": null,
+                "issn": "00961523",
+                "editor": null,
+                "doi": "10.1037\/0096-1523.32.6.1501"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927616610005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Hartley, Tom ; Maguire, Eleanor A ; Spiers, Hugo J ; Burgess, Neil",
+                "isbn": null,
+                "issn": "08966273",
+                "editor": null,
+                "doi": "10.1016\/S0896-6273(03)00095-3"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927624970005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Maguire, EA ; Burgess, N ; Donnett, JG ; Frackowiak, RSJ ; Frith, CD ; O'Keefe, J",
+                "isbn": null,
+                "issn": "00368075",
+                "editor": null,
+                "doi": "10.1126\/science.280.5365.921"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927635230005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Maguire, Eleanor A ; Gadian, David G ; Johnsrude, Ingrid S ; Good, Catriona D ; Ashburner, John ; Frackowiak, Richard S. J ; Frith, Christopher D",
+                "isbn": null,
+                "issn": "00278424",
+                "editor": null,
+                "doi": "10.1073\/pnas.070039597"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927641380005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Maguire, Eleanor A ; Nannery, Rory ; Spiers, Hugo J",
+                "isbn": null,
+                "issn": "00068950",
+                "editor": null,
+                "doi": "10.1093\/brain\/awl286"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927647890005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Spiers, Hugo J ; Maguire, Eleanor A",
+                "isbn": null,
+                "issn": "10538119",
+                "editor": null,
+                "doi": "10.1016\/j.neuroimage.2006.01.037"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11927656450005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Spiers, Hugo J ; Maguire, Eleanor A",
+                "isbn": null,
+                "issn": "10509631",
+                "editor": null,
+                "doi": "10.1002\/hipo.20298"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11929324230005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Field, David T ; Wilkie, Richard M ; Wann, John P",
+                "isbn": null,
+                "issn": "02706474",
+                "editor": null,
+                "doi": "10.1523\/JNEUROSCI.2130-07.2007"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11929344610005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Spiers, Hugo J ; Maguire, Eleanor A",
+                "isbn": null,
+                "issn": "10538119",
+                "editor": null,
+                "doi": "10.1016\/j.neuroimage.2007.02.032"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11929353080005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Loomis, Jack M ; Da Silva, Jos\u00e9 A ; Fujita, Naofumi ; Fukusima, Sergio S",
+                "isbn": null,
+                "issn": "00961523",
+                "editor": null,
+                "doi": "10.1037\/0096-1523.18.4.906"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11929348500005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Billington, Jac ; Field, David T ; Wilkie, Richard M ; Wann, John P",
+                "isbn": null,
+                "issn": "00961523",
+                "editor": null,
+                "doi": "10.1037\/a0018728"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11946073460005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Raw, Rachael K ; Kountouriotis, Georgios K ; Mon-Williams, Mark ; Wilkie, Richard M",
+                "isbn": null,
+                "issn": "00961523",
+                "editor": null,
+                "doi": "10.1037\/a0026568"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11946090470005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Raw, Rachael K ; Wilkie, Richard M ; Culmer, Peter R ; Mon-Williams, Mark",
+                "isbn": null,
+                "issn": "00144819",
+                "editor": null,
+                "doi": "10.1007\/s00221-011-2971-x"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "11946094720005181",
+            "secondary_type": {
+                "value": "CR",
+                "desc": "Article"
+            },
+            "type": {
+                "value": "CR",
+                "desc": "Physical Article"
+            },
+            "metadata": {
+                "title": null,
+                "author": "Harley, Clare ; Wilkie, Richard M ; Wann, John P",
+                "isbn": null,
+                "issn": "09666362",
+                "editor": null,
+                "doi": "10.1016\/j.gaitpost.2008.10.063"
+            }
+        }
+    },
+    {
+        "Leganto": {
+            "id": "10968868740005181",
+            "secondary_type": {
+                "value": "BK",
+                "desc": "Book"
+            },
+            "type": {
+                "value": "BK",
+                "desc": "Physical Book"
+            },
+            "metadata": {
+                "title": "The hippocampal and parietal foundations of spatial cognition ",
+                "author": "Burgess, N. (Neil)",
+                "isbn": "0198524528",
+                "issn": null,
+                "mms_id": "991010585989705181",
+                "editor": null,
+                "doi": null
+            }
+        },
+        "Alma": {
+            "titles": [
+                "The hippocampal and parietal foundations of spatial cognition"
+            ],
+            "creators": [
+                "Burgess, N. (Neil)",
+                "Jeffery, K. J. (Kathryn J.)",
+                "O'Keefe, John."
+            ],
+            "isbns": [
+                "0198524528 (pbk.)",
+                "0198524536 (hardcover)"
+            ],
+            "issns": [],
+            "lccns": [
+                "98026209"
+            ]
+        },
+        "VIAF": [
+            {
+                "search": "Burgess, N. (Neil)",
+                "records": 1,
+                "best-match": {
+                    "heading": "Burgess, Neil",
+                    "about": "http:\/\/viaf.org\/viaf\/166556\/",
+                    "confidence-title": 96,
+                    "titles": [
+                        "hippocampal and parietal foundations of spatial cognition"
+                    ],
+                    "nationalities": [
+                        {
+                            "value": "GB"
+                        }
+                    ]
+                }
+            },
+            {
+                "search": "Jeffery, K. J. (Kathryn J.)",
+                "records": 2,
+                "best-match": {
+                    "heading": "Jeffery, Kathryn J.",
+                    "about": "http:\/\/viaf.org\/viaf\/39532594\/",
+                    "confidence-title": 96,
+                    "titles": [
+                        "hippocampal and parietal foundations of spatial cognition",
+                        "Navigation",
+                        "neurobiology of spatial behaviour"
+                    ],
+                    "nationalities": [
+                        {
+                            "value": "GB"
+                        }
+                    ]
+                }
+            },
+            {
+                "search": "O'Keefe, John.",
+                "records": 2,
+                "best-match": {
+                    "heading": "O'Keefe, John",
+                    "about": "http:\/\/viaf.org\/viaf\/22297659\/",
+                    "confidence-title": 100,
+                    "titles": [
+                        "The boundary vector cell model of place cell firing and spatial memory.",
+                        "Dedication: Robert U. Muller (1942\u20132013).",
+                        "The development of the head direction system before eye opening in the rat.",
+                        "Environmental novelty elicits a later theta phase of firing in CA1 but not subiculum.",
+                        "Experience-dependent increase in CA1 place cell spatial information, but not spatial reproducibility, is dependent on the autophosphorylation of the alpha-isoform of the calcium\/calmodulin-dependent protein kinase II.",
+                        "Framing the grid: effect of boundaries on grid cells and navigation.",
+                        "Fully integrated silicon probes for high-density recording of neural activity.",
+                        "Geometric determinants of the place fields of hippocampal neurons.",
+                        "Grid cell firing patterns signal environmental novelty by expansion",
+                        "A Head-Mounted Camera System Integrates Detailed Behavioral Monitoring with Multichannel Electrophysiology in Freely Moving Mice",
+                        "The hippocampal and parietal foundations of spatial cognition",
+                        "The hippocampus as a cognitive map, 1978:",
+                        "The honeycomb maze provides a novel test to study hippocampal-dependent spatial navigation.",
+                        "How environment geometry affects grid cell symmetry and what we can learn from it",
+                        "How vision and movement combine in the hippocampal place code",
+                        "The human hippocampus and spatial and episodic memory",
+                        "Human spatial navigation: cognitive maps, sexual dimorphism, and neural substrates",
+                        "Independent rate and temporal coding in hippocampal pyramidal cells.",
+                        "Knowing where and getting there: a human navigation network.",
+                        "Knowing where things are parahippocampal involvement in encoding object locations in virtual large-scale space.",
+                        "Medial septal control of theta-correlated unit firing in the entorhinal cortex of awake rats.",
+                        "Modeling place fields in terms of the cortical inputs to the hippocampus",
+                        "Models of grid cells and theta oscillations.",
+                        "Neural representations of location composed of spatially periodic bands.",
+                        "Neuronal computations underlying the firing of place cells and their role in navigation.",
+                        "Novelty and anxiolytic drugs dissociate two components of hippocampal theta in behaving rats.",
+                        "Place cell firing correlates with memory deficits and amyloid plaque burden in Tg2576 Alzheimer mouse model",
+                        "Predictions derived from modelling the hippocampal role in navigation",
+                        "Rearing on hind legs, environmental novelty, and the hippocampal formation.",
+                        "The representation of space and the hippocampus in rats, robots and humans.",
+                        "Response properties of amygdalar units in the freely moving cat.",
+                        "Special report",
+                        "A temporoparietal and prefrontal network for retrieving the spatial context of lifelike events.",
+                        "Theta activity, virtual navigation and the human hippocampus.",
+                        "Theta-modulated place-by-direction cells in the hippocampal formation in the rat.",
+                        "The theta rhythm.",
+                        "Unilateral temporal lobectomy patients show lateralized topographical and episodic memory deficits in a virtual town.",
+                        "What can the hippocampal representation of environmental geometry tell us about Hebbian learning?"
+                    ],
+                    "nationalities": [
+                        {
+                            "value": "GB"
+                        },
+                        {
+                            "value": "US"
+                        }
+                    ],
+                    "locations": [
+                        {
+                            "value": "New York, NY"
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+]

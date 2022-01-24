@@ -32,7 +32,20 @@ function simplify($string) {
     return $string ? $string : FALSE;
 }
 
+function similarity($string1, $string2) { 
+    if ($string1==$string2) { return 100; } 
+    $string1 = normalise($string1); 
+    $string2 = normalise($string2);
+    if (!$string1 || !$string2) { return 0; } 
+    $lev = levenshtein($string1, $string2); 
+    
+    $pc = 100 * (1 - $lev/(strlen($string1)+strlen($string2)));  
 
+    if ($pc<0) { $pc = 0; }
+    if ($pc>100) { $pc = 100; }
+    
+    return floor($pc); 
+}
 
 $citations = Array(); 
 $citations[] = Array("mmsid"=>"991017031009705181");
@@ -46,6 +59,7 @@ foreach ($citations as &$citation) {
     $citation["titles"] = Array();
     $citation["creators"] = Array(); 
     
+    $creatorsSeen = Array();
     $anies = $bib_record["anies"];
     foreach ($anies as $anie) {
         $anie = str_replace("encoding=\"UTF-16\"?>", "encoding=\"UTF-8\"?>", $anie); // kludge
@@ -73,32 +87,35 @@ foreach ($citations as &$citation) {
                     }
                 }
                 $creator = trim(standardise($raw));
-                if ($creator) {
-                    $citation["creators"][] = Array("name"=>$creator);
+                if ($creator && !isset($creatorsSeen[$creator])) {
+                    $citation["creators"][] = $creator;
+                    $creatorsSeen[$creator] = TRUE; 
                 }
             }
         }
         
     }
     
-    
+    $citation["viaf"] = Array(); // to hold data from VIAF integration 
      
     if (count($citation["creators"])) {
         foreach ($citation["creators"] as &$creator) {
             
             sleep(3);
             
-            $creator["viaf"] = NULL; // will populate if we find one  
+            $citationViaf = Array();
             
-            $viafSearchURL = "http://viaf.org/viaf/search?query=local.names+exact+%22".urlencode($creator["name"])."%22&maximumRecords=10&startRecord=1&sortKeys=holdingscount&httpAccept=text/xml"; 
+            $citationViaf["search"] = $creator; 
+            
+            $viafSearchURL = "http://viaf.org/viaf/search?query=local.names+exact+%22".urlencode($creator)."%22&maximumRecords=10&startRecord=1&sortKeys=holdingscount&httpAccept=text/xml"; 
             $viafSearchResponse = file_get_contents($viafSearchURL);
             
             $viafSearchResponse = preg_replace('/(<\/?)ns2:/', "$1", $viafSearchResponse); // kludge - need to parse namespaced document properly 
             
             $viafSearchData = new SimpleXmlElement($viafSearchResponse);
-            $viafCreator["records"] = count($viafSearchData->records->record);
+            $citationViaf["records"] = count($viafSearchData->records->record);
             
-            if ($viafCreator["records"]) { 
+            if ($citationViaf["records"]) { 
                 
                 $viafDataParsed = FALSE;
                 $viafBestConfidence = FALSE; // set to integer 0-100 when we find potential match 
@@ -107,18 +124,33 @@ foreach ($citations as &$citation) {
                     
                     $viafRecordTitles = Array(); // collect to compare with source title 
                     $viafNationalities = Array(); 
-                    $viaf5xxs = Array(); 
+                    $viafLocations = Array(); 
+                    $viafAffiliations = Array();
+                    
+                    $viafDataParsedItem = Array(); 
                     
                     $viafCluster = $record->recordData->VIAFCluster; 
                     
-                    $viafAboutURI = $viafCluster->Document ? $viafCluster->Document["about"]->__toString() : NULL;
+                    if ($viafCluster->mainHeadings) {
+                        foreach ($viafCluster->mainHeadings->data as $viafHeadingObject) {
+                            $viafDataParsedItem["heading"] = $viafHeadingObject->text->__toString();
+                            break;
+                        }
+                    }
+                    
+                    if ($viafCluster->Document) { 
+                        $viafDataParsedItem["about"] = $viafCluster->Document["about"]->__toString(); 
+                    }
+                    
+                    $viafDataParsedItem["confidence-title"] = FALSE; // will populate below 
                     
                     $viafTitles = $viafCluster->titles; 
                     if ($viafTitles) { 
                         foreach ($viafTitles->work as $work) {
                             $viafRecordTitle = trim($work->title->__toString()); 
                             if ($viafRecordTitle) { 
-                                $viafRecordTitles[] = $viafRecordTitle;
+                                if (!isset($viafDataParsedItem["titles"])) { $viafDataParsedItem["titles"] = Array(); } 
+                                $viafDataParsedItem["titles"][] = $viafRecordTitle;
                             }
                         }
                     }
@@ -127,78 +159,80 @@ foreach ($citations as &$citation) {
                     foreach ($viafNatData as $viafNatDataItem) {
                         $viafNationality = trim($viafNatDataItem->text->__toString());
                         if ($viafNationality) {
-                            $viafNationalities[] = $viafNationality;
+                            if (!isset($viafDataParsedItem["nationalities"])) { $viafDataParsedItem["nationalities"] = Array(); }
+                            $viafDataParsedItem["nationalities"][] = Array("value"=>$viafNationality);
                         }
                     }
                     
                     $viaf5xxData = $viafCluster->x500s ? $viafCluster->x500s->x500 : Array();
                     foreach ($viaf5xxData as $viaf5xxDataItem) {
-                        $viaf5xx = ""; 
-                        foreach ($viaf5xxDataItem->datafield->subfield as $subfield) {
-                            $viaf5xx .= "$".$subfield["code"].trim($subfield->__toString());
-                        }
-                        if ($viaf5xx) {
-                            $viaf5xxs[] = $viaf5xx;
-                        }
-                    }
-                    
-                    
-                    $viafHeadings = $viafCluster->mainHeadings ? $viafCluster->mainHeadings->data : Array();
-                    foreach ($viafHeadings as $viafHeadingObject) { 
-                        $viafHeading = $viafHeadingObject->text->__toString();
-                        break; 
-                    }
-                    
-                    if ($viafTitles) {
-                        foreach ($viafTitles->work as $work) {
-                            $viafRecordTitle = trim($work->title->__toString());
-                            if ($viafRecordTitle) {
-                                $viafRecordTitles[] = $viafRecordTitle;
-                            }
-                        }
-                    }
-                    
-                    // cross compare source and arget titles 
-                    foreach ($citation["titles"] as $citationTitle) {
-                        foreach ($viafRecordTitles as $viafTitle) { 
                         
-                            $thisConfidence = FALSE; 
-                            // simple case 
-                            if ($viafTitle==$citationTitle) { 
-                                $thisConfidence = 100; 
-                            } else if (normalise($viafTitle)==normalise($citationTitle)) { 
-                                $thisConfidence = 90;
-                            } else if (simplify($viafTitle)==simplify($citationTitle)) {
-                                $thisConfidence = 75;
-                            }
-                            if ($thisConfidence!==FALSE) {
-                                if ($viafBestConfidence===FALSE || $thisConfidence>$viafBestConfidence) { 
-                                    $viafBestConfidence = $thisConfidence;
-                                    $viafDataParsed = Array(); // reset 
-                                    $viafDataParsed["heading"] = $viafHeading; 
-                                    $viafDataParsed["about"] = $viafAboutURI; 
-                                    $viafDataParsed["confidence-title"] = $thisConfidence;
-                                    // $viafDataParsed["titles"] = $viafRecordTitles; 
-                                    $viafDataParsed["nationalities"] = $viafNationalities;
-                                    $viafDataParsed["5xx"] = $viaf5xxs;
-                                    // etc 
+                        $dataField = $viaf5xxDataItem->datafield; 
+                        
+                        if ($dataField["tag"]=="551") {
+                            foreach ($dataField->subfield as $subfield) {
+                                if ($subfield["code"]=="a") { 
+                                    if (!isset($viafDataParsedItem["locations"])) { $viafDataParsedItem["locations"] = Array(); }
+                                    $viafDataParsedItem["locations"][] = Array("value"=>trim($subfield->__toString())); 
+                                    break; 
                                 }
                             }
-                            // special case 
-                            if ($thisConfidence==100) { 
-                                break 2; // no point in testing any more  
+                        }
+                        if ($dataField["tag"]=="510" && $dataField["ind1"]=="2" && $dataField["ind2"]==" ") {
+                            $viafDataParsedItemAffiliation = Array();
+                            foreach ($dataField->subfield as $subfield) {
+                                if ($subfield["code"]=="a" && !isset($viafDataParsedItemAffiliation["value"])) {
+                                    $viafDataParsedItemAffiliation["value"] = trim($subfield->__toString()); 
+                                }
+                                if ($subfield["code"]=="e" && !isset($viafDataParsedItemAffiliation["\$e"])) {
+                                    $viafDataParsedItemAffiliation["\$e"] = trim($subfield->__toString()); 
+                                }
+                            }
+                            if (count($viafDataParsedItemAffiliation)) { 
+                                if (!isset($viafDataParsedItem["affiliations"])) { $viafDataParsedItem["affiliations"] = Array(); }
+                                $viafDataParsedItem["affiliations"][] = $viafDataParsedItemAffiliation; 
                             }
                         }
+                    }
+                    
+                    
+                    // cross compare source and arget titles 
+                    if (isset($viafDataParsedItem["titles"]) && count($viafDataParsedItem["titles"])) { 
+
+                        foreach ($citation["titles"] as $citationTitle) {
+                            foreach ($viafDataParsedItem["titles"] as $viafTitle) {
+                                
+                                $thisConfidence = similarity($viafTitle, $citationTitle);
+
+                                if ($viafBestConfidence===FALSE || $thisConfidence>$viafBestConfidence) {
+                                    
+                                    $viafBestConfidence = $thisConfidence;
+                                    
+                                    $viafDataParsedItem["confidence-title"] = $thisConfidence;
+                                    unset($viafDataParsedItem["titles"]); // we won't keep titles for now
+                                    $viafDataParsed = $viafDataParsedItem;
+                                    
+                                }
+                                
+                                // special case
+                                if ($thisConfidence==100) {
+                                    break 2; // no point in testing any more
+                                }
+                            }
+                        }
+                        
+                    
                     }
                     
                 }
                 
                 if ($viafDataParsed) { 
-                    $viafCreator["best-match"] = $viafDataParsed; // the best we found so far
+                    $citationViaf["best-match"] = $viafDataParsed; // the best we found so far
                 }
-                $creator["viaf"] = $viafCreator;
                 
             }
+            
+            $citation["viaf"][] = $citationViaf; // add it 
 
         }
     }
@@ -207,6 +241,6 @@ foreach ($citations as &$citation) {
 }
     
 
-print_r($citations); 
+print json_encode($citations, JSON_PRETTY_PRINT); 
 
 ?>
