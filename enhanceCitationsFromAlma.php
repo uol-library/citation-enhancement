@@ -34,9 +34,7 @@ foreach ($citations as &$citation) {
         
         $citation["Alma"]["titles"] = Array();
         $citation["Alma"]["creators"] = Array();
-        $citation["Alma"]["isbns"] = Array();
-        $citation["Alma"]["issns"] = Array();
-        $citation["Alma"]["lccns"] = Array();
+        $citation["Alma"]["ids"] = Array();
         
         $creatorsSeen = Array();
         $anies = $bib_record["anies"];
@@ -62,7 +60,8 @@ foreach ($citations as &$citation) {
                         if (in_array($subfield["code"], Array("a"))) {
                             $raw = $subfield->__toString();
                             if ($raw) { 
-                                $citation["Alma"]["lccns"][] = $raw; 
+                                if (!isset($citation["Alma"]["ids"]["lccn"])) { $citation["Alma"]["ids"]["lccn"] = Array(); }
+                                $citation["Alma"]["ids"]["lccn"][] = $raw; 
                             }
                         }
                     }
@@ -72,7 +71,8 @@ foreach ($citations as &$citation) {
                         if (in_array($subfield["code"], Array("a"))) {
                             $raw = $subfield->__toString();
                             if ($raw) { 
-                                $citation["Alma"]["isbns"][] = $raw;
+                                if (!isset($citation["Alma"]["ids"]["isbn"])) { $citation["Alma"]["ids"]["isbn"] = Array(); }
+                                $citation["Alma"]["ids"]["isbn"][] = $raw;
                             }
                         }
                     }
@@ -82,13 +82,12 @@ foreach ($citations as &$citation) {
                         if (in_array($subfield["code"], Array("a"))) {
                             $raw = $subfield->__toString();
                             if ($raw) {
-                                $citation["Alma"]["issns"][] = $raw;
+                                if (!isset($citation["Alma"]["ids"]["issn"])) { $citation["Alma"]["ids"]["issn"] = Array(); }
+                                $citation["Alma"]["ids"]["issn"][] = $raw;
                             }
                         }
                     }
                 }
-                
-                
                 
                 if (in_array($field["tag"], Array("100", "700"))) {
                     $creator = Array();
