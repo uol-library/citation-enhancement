@@ -7,10 +7,6 @@
 
 error_reporting(E_ALL);                     // we want to know about all problems
 
-require '../AlmaAPI/private/AlmaAPI/LULAlmaBibs.php';
-
-$bib_endpoint = new LULAlmaBibs('bibs');
-// $bib_endpoint->setDebug(TRUE);
 
 
 function standardise($string) {
@@ -62,7 +58,7 @@ foreach ($citations as &$citation) {
     
     if (isset($citation["Leganto"]["secondary_type"]["value"]) && $citation["Leganto"]["secondary_type"]["value"]=="BK") {
 
-        if (count($citation["Alma"]["creators"]) && count($citation["Alma"]["titles"])) {
+        if (isset($citation["Alma"]) && isset($citation["Alma"]["creators"]) && isset($citation["Alma"]["titles"]) && count($citation["Alma"]["creators"]) && count($citation["Alma"]["titles"])) {
 
             $citation["VIAF"] = Array(); // to populate 
             

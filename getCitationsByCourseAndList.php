@@ -16,15 +16,22 @@ $list_endpoint = new LULAlmaReadingLists();
 // $course_endpoint->setDebug(TRUE);
 // $list_endpoint->setDebug(TRUE);
 
+/*
+$course_code = "25874_PSYC3505";
+$list_code = "202122_PSYC3505__8994937_1"; 
 
-//$course_code = "25874_PSYC3505";
-//$list_code = "202122_PSYC3505__8994937_1"; 
-
-//$course_code = "29679_HIST1055";
-//$list_code = "202122_HIST1055__8661554_1";
+$course_code = "29679_HIST1055";
+$list_code = "202122_HIST1055__8661554_1";
 
 $course_code = "30214_LUBS2680";
 $list_code = "202122_LUBS2680__8694118_1";
+*/
+
+$course_code = "38495_LAW5358M";
+$list_code = "202122_LAW5358M__9442593_1";
+
+
+
 
 $citations = Array(); 
 
