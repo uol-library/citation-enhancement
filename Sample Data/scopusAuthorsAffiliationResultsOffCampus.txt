@@ -1,0 +1,27 @@
+https://api.elsevier.com/content/abstract/eid/2-s2.0-85122652424?field=authors,affiliation&httpAccept=application/json&apiKey=ace0da58224b7aafa53389ebb4b157ad
+=>
+{"abstracts-retrieval-response": {
+    "affiliation": [
+        {
+            "affiliation-city": "Lille",
+            "affilname": "Université de Lille",
+            "affiliation-country": "France"
+        },
+        {
+            "affiliation-city": "College Station",
+            "affilname": "Texas A&amp;M University",
+            "affiliation-country": "United States"
+        },
+        {
+            "affiliation-city": "Marcq-en-Baroeul",
+            "affilname": "Phileo by Lesaffre",
+            "affiliation-country": "France"
+        },
+        {
+            "affiliation-city": "Milwaukee",
+            "affilname": "Phileo-Lesaffre Animal Care",
+            "affiliation-country": "United States"
+        }
+    ],
+    "coredata": null
+}}

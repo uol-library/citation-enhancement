@@ -17,7 +17,7 @@ $iso3Map = json_decode(file_get_contents("Config/CountryCodes/iso3.json"), TRUE)
 $namesMap = json_decode(file_get_contents("Config/CountryCodes/names.json"), TRUE);
 $continentMap = json_decode(file_get_contents("Config/CountryCodes/continent.json"), TRUE);
 $iso2Map = array_flip($iso3Map); 
-$namesToCodesMap = array_change_key_case(array_flip($namesMap));
+$countryMap = array_flip($continentMap);
 
 
 
@@ -25,7 +25,7 @@ $namesToCodesMap = array_change_key_case(array_flip($namesMap));
 $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 
 $outputRecords = Array(); 
-$rowHeadings = Array("TYPE", "TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "SOURCES");   
+$rowHeadings = Array("TYPE", "TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS");   
 
 foreach ($citations as $citation) { 
     
@@ -60,22 +60,22 @@ foreach ($citations as $citation) {
     
     $outputRecord["NATIONALITIES"] = Array();
     $outputRecord["CONTINENTS"] = Array();
-    $outputRecord["SOURCES"] = Array();
     
     if (isset($citation["VIAF"])) { 
-        $outputRecord["SOURCES"][] = "VIAF"; 
         foreach ($citation["VIAF"] as $viafCitation) { 
+            $nationCodes = Array();
+            $continentCodes = Array();
             if (isset($viafCitation["best-match"]) && isset($viafCitation["best-match"]["nationalities"])) {
                 foreach ($viafCitation["best-match"]["nationalities"] as $nationality) {
                     $nationalityValue = strtoupper($nationality["value"]);
                     if (strlen($nationalityValue)==2) {
                         if (!in_array($nationalityValue, Array("XX", "ZZ"))) {
-                            $outputRecord["NATIONALITIES"][] = $nationalityValue;
+                            $nationCodes[] = $nationalityValue;
                         }
                     } else if (strlen($nationalityValue)==3) {
                         if (isset($iso2Map[$nationalityValue]) && $iso2Map[$nationalityValue]) {
                             if (!in_array($iso2Map[$nationalityValue], Array("XX", "ZZ"))) { 
-                                $outputRecord["NATIONALITIES"][] = $iso2Map[$nationalityValue];
+                                $nationCodes[] = $iso2Map[$nationalityValue];
                             }
                         }
                     } else {
@@ -83,33 +83,18 @@ foreach ($citations as $citation) {
                     }
                 }
             }
-        }
-    }
-    if (isset($citation["Scopus"])) {
-        $outputRecord["SOURCES"][] = "Scopus";
-        if (isset($citation["Scopus"]["first-match"]) && isset($citation["Scopus"]["first-match"]["authors"])) {
-            foreach ($citation["Scopus"]["first-match"]["authors"] as $author) {
-                if (isset($author["affiliation"]) && isset($author["affiliation"]["country"])) {
-                    if (isset($namesToCodesMap[strtolower($author["affiliation"]["country"])])) {
-                        $outputRecord["NATIONALITIES"][] = $namesToCodesMap[strtolower($author["affiliation"]["country"])];
-                    } else {
-                        trigger_error("No country name:code mapping for ".$author["affiliation"]["country"], E_USER_ERROR);
-                    }
+            $nationCodes = array_unique($nationCodes);
+            foreach ($nationCodes as $nationCode) {
+                if (isset($continentMap[$nationCode]) && $continentMap[$nationCode]) {
+                    $continentCodes[] = $continentMap[$nationCode];
                 }
             }
+            $continentCodes = array_unique($continentCodes);
+            
+            $outputRecord["NATIONALITIES"][] = implode("+", $nationCodes);
+            $outputRecord["CONTINENTS"][] = implode("+", $continentCodes);
         }
     }
-    
-    
-    $outputRecord["NATIONALITIES"] = array_unique($outputRecord["NATIONALITIES"]);
-    foreach ($outputRecord["NATIONALITIES"] as $nationCode) {
-        if (isset($continentMap[$nationCode]) && $continentMap[$nationCode]) {
-            $outputRecord["CONTINENTS"][] = $continentMap[$nationCode];
-        }
-    }
-    $outputRecord["CONTINENTS"] = array_unique($outputRecord["CONTINENTS"]);
-    
-    
     
     $outputRecords[] = $outputRecord; 
     

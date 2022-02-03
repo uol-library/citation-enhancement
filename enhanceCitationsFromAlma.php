@@ -7,17 +7,13 @@
 
 error_reporting(E_ALL);                     // we want to know about all problems
 
+require_once("utils.php"); 
+
+
 require '../AlmaAPI/private/AlmaAPI/LULAlmaBibs.php';
 
 $bib_endpoint = new LULAlmaBibs('bibs');
 // $bib_endpoint->setDebug(TRUE);
-
-
-function standardise($string) {
-    $string = preg_replace('/\s*\/\s*$/', "", $string);
-    $string = trim($string);
-    return $string;
-}
 
 
 $citations = json_decode(file_get_contents("php://stdin"), TRUE);

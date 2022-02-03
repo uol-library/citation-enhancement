@@ -7,6 +7,11 @@
 
 error_reporting(E_ALL);                     // we want to know about all problems
 
+
+require_once("utils.php"); 
+
+
+
 require '../AlmaAPI/private/AlmaAPI/LULAlmaCourses.php';
 require '../AlmaAPI/private/AlmaAPI/LULAlmaCodeTables.php';
 require '../AlmaAPI/private/AlmaAPI/LULAlmaReadingLists.php';

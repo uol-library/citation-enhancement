@@ -1,0 +1,203 @@
+https://api.elsevier.com/content/abstract/eid/2-s2.0-85122652424?field=authors,affiliation&httpAccept=application/json&apiKey=ace0da58224b7aafa53389ebb4b157ad
+=>
+{"abstracts-retrieval-response": {
+    "affiliation": [
+        {
+            "affiliation-city": null,
+            "@id": "60104665",
+            "affilname": "Université de Lille",
+            "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/60104665",
+            "affiliation-country": null
+        },
+        {
+            "affiliation-city": null,
+            "@id": "60020547",
+            "affilname": "Texas A&amp;M University",
+            "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/60020547",
+            "affiliation-country": null
+        },
+        {
+            "affiliation-city": null,
+            "@id": "122910499",
+            "affilname": "Phileo by Lesaffre",
+            "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/122910499",
+            "affiliation-country": null
+        },
+        {
+            "affiliation-city": null,
+            "@id": "116990565",
+            "affilname": "Phileo-Lesaffre Animal Care",
+            "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/116990565",
+            "affiliation-country": null
+        }
+    ],
+    "coredata": null,
+    "authors": {"author": [
+        {
+            "ce:given-name": "Nuria",
+            "preferred-name": {
+                "ce:given-name": "Nuria",
+                "ce:initials": "N.",
+                "ce:surname": "Vieco-Saiz",
+                "ce:indexed-name": "Vieco-Saiz N."
+            },
+            "@seq": "1",
+            "ce:initials": "N.",
+            "@_fa": "true",
+            "affiliation": {
+                "@id": "60104665",
+                "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/60104665"
+            },
+            "ce:surname": "Vieco-Saiz",
+            "@auid": "57207773295",
+            "author-url": "https://api.elsevier.com/content/author/author_id/57207773295",
+            "ce:indexed-name": "Vieco-Saiz N."
+        },
+        {
+            "ce:given-name": "Yanath",
+            "preferred-name": {
+                "ce:given-name": "Yanath",
+                "ce:initials": "Y.",
+                "ce:surname": "Belguesmia",
+                "ce:indexed-name": "Belguesmia Y."
+            },
+            "@seq": "2",
+            "ce:initials": "Y.",
+            "@_fa": "true",
+            "affiliation": {
+                "@id": "60104665",
+                "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/60104665"
+            },
+            "ce:surname": "Belguesmia",
+            "@auid": "23484277600",
+            "author-url": "https://api.elsevier.com/content/author/author_id/23484277600",
+            "ce:indexed-name": "Belguesmia Y."
+        },
+        {
+            "ce:given-name": "Ruth",
+            "preferred-name": {
+                "ce:given-name": "Ruth",
+                "ce:initials": "R.",
+                "ce:surname": "Raspoet",
+                "ce:indexed-name": "Raspoet R."
+            },
+            "@seq": "3",
+            "ce:initials": "R.",
+            "@_fa": "true",
+            "affiliation": {
+                "@id": "122910499",
+                "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/122910499"
+            },
+            "ce:surname": "Raspoet",
+            "@auid": "51665758200",
+            "author-url": "https://api.elsevier.com/content/author/author_id/51665758200",
+            "ce:indexed-name": "Raspoet R."
+        },
+        {
+            "ce:given-name": "Eric",
+            "preferred-name": {
+                "ce:given-name": "Eric",
+                "ce:initials": "E.",
+                "ce:surname": "Auclair",
+                "ce:indexed-name": "Auclair E."
+            },
+            "@seq": "4",
+            "ce:initials": "E.",
+            "@_fa": "true",
+            "affiliation": {
+                "@id": "122910499",
+                "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/122910499"
+            },
+            "ce:surname": "Auclair",
+            "@auid": "56615001500",
+            "author-url": "https://api.elsevier.com/content/author/author_id/56615001500",
+            "ce:indexed-name": "Auclair E."
+        },
+        {
+            "ce:given-name": "Connor",
+            "preferred-name": {
+                "ce:given-name": "Connor",
+                "ce:initials": "C.",
+                "ce:surname": "Padgett",
+                "ce:indexed-name": "Padgett C."
+            },
+            "@seq": "5",
+            "ce:initials": "C.",
+            "@_fa": "true",
+            "affiliation": [
+                {
+                    "@id": "116990565",
+                    "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/116990565"
+                },
+                {
+                    "@id": "60020547",
+                    "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/60020547"
+                }
+            ],
+            "ce:surname": "Padgett",
+            "@auid": "57408661100",
+            "author-url": "https://api.elsevier.com/content/author/author_id/57408661100",
+            "ce:indexed-name": "Padgett C."
+        },
+        {
+            "ce:given-name": "Christopher",
+            "preferred-name": {
+                "ce:given-name": "Christopher",
+                "ce:initials": "C.",
+                "ce:surname": "Bailey",
+                "ce:indexed-name": "Bailey C."
+            },
+            "@seq": "6",
+            "ce:initials": "C.",
+            "@_fa": "true",
+            "affiliation": {
+                "@id": "60020547",
+                "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/60020547"
+            },
+            "ce:surname": "Bailey",
+            "@auid": "7402066296",
+            "author-url": "https://api.elsevier.com/content/author/author_id/7402066296",
+            "ce:indexed-name": "Bailey C."
+        },
+        {
+            "ce:given-name": "Frédérique",
+            "preferred-name": {
+                "ce:given-name": "Frédérique",
+                "ce:initials": "F.",
+                "ce:surname": "Gancel",
+                "ce:indexed-name": "Gancel F."
+            },
+            "@seq": "7",
+            "ce:initials": "F.",
+            "@_fa": "true",
+            "affiliation": {
+                "@id": "60104665",
+                "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/60104665"
+            },
+            "ce:surname": "Gancel",
+            "@auid": "6507242381",
+            "author-url": "https://api.elsevier.com/content/author/author_id/6507242381",
+            "ce:indexed-name": "Gancel F."
+        },
+        {
+            "ce:given-name": "Djamel",
+            "preferred-name": {
+                "ce:given-name": "Djamel",
+                "ce:initials": "D.",
+                "ce:surname": "Drider",
+                "ce:indexed-name": "Drider D."
+            },
+            "@seq": "8",
+            "ce:initials": "D.",
+            "@_fa": "true",
+            "affiliation": {
+                "@id": "60104665",
+                "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/60104665"
+            },
+            "ce:surname": "Drider",
+            "@auid": "6603389799",
+            "author-url": "https://api.elsevier.com/content/author/author_id/6603389799",
+            "ce:indexed-name": "Drider D."
+        }
+    ]}
+}}

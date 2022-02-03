@@ -5,49 +5,13 @@
  */
 
 
+
+
+
 error_reporting(E_ALL);                     // we want to know about all problems
 
 
-
-function standardise($string) {
-    $string = preg_replace('/\s*\/\s*$/', "", $string);
-    $string = trim($string);
-    return $string;
-}
-
-function normalise($string) {
-    $string = strtolower($string);
-    $string = preg_replace('/[\.,\-_;:\/\\\'"\?!\+\&]/', " ", $string);
-    $string = preg_replace('/\s+/', " ", $string);
-    $string = trim($string);
-    return $string ? $string : FALSE;
-}
-
-function simplify($string) {
-    $string = normalise($string);
-    if ($string!==FALSE) {
-        $parts = explode(" ", $string);
-        sort($parts);
-        $string = implode(" ", $parts);
-    }
-    return $string ? $string : FALSE;
-}
-
-function similarity($string1, $string2) {
-    if ($string1==$string2) { return 100; }
-    $string1 = normalise($string1);
-    $string2 = normalise($string2);
-    if (!$string1 || !$string2) { return 0; }
-    $lev = levenshtein($string1, $string2);
-    
-    $pc = 100 * (1 - $lev/(strlen($string1)+strlen($string2)));
-    
-    if ($pc<0) { $pc = 0; }
-    if ($pc>100) { $pc = 100; }
-    
-    return floor($pc);
-}
-
+require_once("utils.php"); 
 
 
 
@@ -71,7 +35,9 @@ foreach ($citations as &$citation) {
                 $citationViaf["search"] = $creator;
                 
                 $viafSearchURL = "http://viaf.org/viaf/search?query=local.names+exact+%22".urlencode($creator)."%22&maximumRecords=10&startRecord=1&sortKeys=holdingscount&httpAccept=text/xml";
-                $viafSearchResponse = file_get_contents($viafSearchURL);
+                $viafSearchResponse = curl_get_file_contents($viafSearchURL);
+                
+                //TODO error checking
                 
                 $viafSearchResponse = preg_replace('/(<\/?)ns2:/', "$1", $viafSearchResponse); // kludge - need to parse namespaced document properly
                 
