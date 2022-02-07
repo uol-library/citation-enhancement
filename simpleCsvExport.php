@@ -19,13 +19,27 @@ $continentMap = json_decode(file_get_contents("Config/CountryCodes/continent.jso
 $iso2Map = array_flip($iso3Map); 
 $namesToCodesMap = array_change_key_case(array_flip($namesMap));
 
-
-
+// World Bank rankings 
+$worldBankRank = Array(); 
+$worldBankMaxRank = NULL; 
+$worldBankRankLines = file($worldBankRankFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+$columnNames = explode("\t", array_shift($worldBankRankLines));   
+foreach ($worldBankRankLines as $worldBankRankLine) { 
+    $entry = explode("\t", $worldBankRankLine);
+    $entry = array_combine($columnNames, $entry); // turn numeric to text column ids
+    if (isset($entry["Country Code [2]"]) && $entry["Country Code [2]"]) {
+        $worldBankRank[$entry["Country Code [2]"]] = $entry["Rank"]; 
+        if (!$worldBankMaxRank || $entry["Rank"]>$worldBankMaxRank) {
+            $worldBankMaxRank = $entry["Rank"]; 
+        }
+    }
+}
 
 $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 
 $outputRecords = Array(); 
-$rowHeadings = Array("TYPE", "TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "SOURCES");   
+// $rowHeadings = Array("TYPE", "TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "SOURCES", "CSI", "CSI-AUTHORS", "CSI-SUM");   
+$rowHeadings = Array("TYPE", "TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "SOURCES", "CSI");
 
 foreach ($citations as $citation) { 
     
@@ -62,24 +76,41 @@ foreach ($citations as $citation) {
     $outputRecord["CONTINENTS"] = Array();
     $outputRecord["SOURCES"] = Array();
     
+    $csiSum = 0; 
+    $csiAuthors = 0; 
+    
     if (isset($citation["VIAF"])) { 
         $outputRecord["SOURCES"][] = "VIAF"; 
         foreach ($citation["VIAF"] as $viafCitation) { 
             if (isset($viafCitation["best-match"]) && isset($viafCitation["best-match"]["nationalities"])) {
+                $worldBankRanks = Array(); 
                 foreach ($viafCitation["best-match"]["nationalities"] as $nationality) {
                     $nationalityValue = strtoupper($nationality["value"]);
+                    $nationalityCode = NULL; 
                     if (strlen($nationalityValue)==2) {
                         if (!in_array($nationalityValue, Array("XX", "ZZ"))) {
-                            $outputRecord["NATIONALITIES"][] = $nationalityValue;
+                            $nationalityCode = $nationalityValue;
                         }
                     } else if (strlen($nationalityValue)==3) {
                         if (isset($iso2Map[$nationalityValue]) && $iso2Map[$nationalityValue]) {
                             if (!in_array($iso2Map[$nationalityValue], Array("XX", "ZZ"))) { 
-                                $outputRecord["NATIONALITIES"][] = $iso2Map[$nationalityValue];
+                                $nationalityCode = $iso2Map[$nationalityValue];
                             }
                         }
                     } else {
                         // ignore these 
+                    }
+                    if ($nationalityCode!==NULL) { 
+                        $outputRecord["NATIONALITIES"][] = $nationalityCode;
+                        if (isset($worldBankRank[$nationalityCode])) {
+                            $worldBankRanks[] = $worldBankRank[$nationalityCode];
+                        }
+                    }
+                }
+                if (count($worldBankRanks)) {
+                    $csiAuthors++;
+                    foreach ($worldBankRanks as $worldBankRankValue) { 
+                        $csiSum += $worldBankRankValue/count($worldBankRanks); // average for each author 
                     }
                 }
             }
@@ -91,7 +122,12 @@ foreach ($citations as $citation) {
             foreach ($citation["Scopus"]["first-match"]["authors"] as $author) {
                 if (isset($author["affiliation"]) && isset($author["affiliation"]["country"])) {
                     if (isset($namesToCodesMap[strtolower($author["affiliation"]["country"])])) {
-                        $outputRecord["NATIONALITIES"][] = $namesToCodesMap[strtolower($author["affiliation"]["country"])];
+                        $nationalityCode = $namesToCodesMap[strtolower($author["affiliation"]["country"])];
+                        if ($nationalityCode && isset($worldBankRank[$nationalityCode])) { 
+                            $csiAuthors++; 
+                            $csiSum += $worldBankRank[$nationalityCode]; 
+                        }
+                        $outputRecord["NATIONALITIES"][] = $nationalityCode; 
                     } else {
                         trigger_error("No country name:code mapping for ".$author["affiliation"]["country"], E_USER_ERROR);
                     }
@@ -102,6 +138,7 @@ foreach ($citations as $citation) {
     
     
     $outputRecord["NATIONALITIES"] = array_unique($outputRecord["NATIONALITIES"]);
+    
     foreach ($outputRecord["NATIONALITIES"] as $nationCode) {
         if (isset($continentMap[$nationCode]) && $continentMap[$nationCode]) {
             $outputRecord["CONTINENTS"][] = $continentMap[$nationCode];
@@ -110,10 +147,16 @@ foreach ($citations as $citation) {
     $outputRecord["CONTINENTS"] = array_unique($outputRecord["CONTINENTS"]);
     
     
+    $outputRecord["CSI"] = $csiAuthors ? ($csiSum/($csiAuthors*$worldBankMaxRank)) : ""; 
+    $outputRecord["CSI-AUTHORS"] = $csiAuthors;
+    $outputRecord["CSI-SUM"] = $csiSum; 
+    
     
     $outputRecords[] = $outputRecord; 
     
 }
+
+
 
 
 

@@ -1,5 +1,6 @@
 <?php 
 
+$worldBankRankFile = "Config/WorldBank/rankings.txt"; 
 
 function standardise($string) {
     $string = preg_replace('/\s*\/\s*$/', "", $string);
