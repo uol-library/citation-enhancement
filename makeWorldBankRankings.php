@@ -15,20 +15,13 @@
 
 require_once("utils.php"); 
 
-
-
-$worldBankGNIFile = "Config/WorldBank/API_NY.GNP.PCAP.CD_DS2_en_csv_v2_3470973.csv";
-$worldBankSummaryFile = "Config/WorldBank/Metadata_Country_API_NY.GNP.PCAP.CD_DS2_en_csv_v2_3470973.csv";
-
-$worldBankGNIYears = Array(1960,2020); // range available in file  
-
 $iso3Map = json_decode(file_get_contents("Config/CountryCodes/iso3.json"), TRUE);
 $iso2Map = array_flip($iso3Map);
 
 $worldBankData = Array(); // Associative array of 3-letter code:data  
 
 // Summary 
-$worldBankSummaryLines = file($worldBankSummaryFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+$worldBankSummaryLines = file($config["World Bank"]["SummaryFile"], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 $worldBankSummaryColumnNames = str_getcsv(preg_replace('/^\xef\xbb\xbf/', '', array_shift($worldBankSummaryLines)));
 
 
@@ -42,7 +35,7 @@ foreach ($worldBankSummaryLines as $worldBankSummaryLine) {
 }
 
 //GNI data 
-$worldBankGNILines = file($worldBankGNIFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+$worldBankGNILines = file($config["World Bank"]["GNIFile"], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 // throw away top-matter
 $worldBankGNILines[0] = preg_replace('/^\xef\xbb\xbf/', '', $worldBankGNILines[0]);
 
@@ -56,7 +49,7 @@ foreach ($worldBankGNILines as $worldBankGNILine) {
     $entry = array_combine($worldBankGNIColumnNames, $entry); // turn numeric to text column ids
     if (!isset($worldBankData[$entry["Country Code"]])) { $worldBankData[$entry["Country Code"]] = Array(); } 
     $worldBankData[$entry["Country Code"]]["Country Name"] = $entry["Country Name"];
-    for ($year=$worldBankGNIYears[1]; $year>=$worldBankGNIYears[0]; $year--) { 
+    for ($year=$config["World Bank"]["MaxYear"]; $year>=$config["World Bank"]["MinYear"]; $year--) { 
         $yearStr = strval($year); 
         if (isset($entry[$yearStr]) && is_numeric($entry[$yearStr])) { 
             $worldBankData[$entry["Country Code"]]["GNI"] = floatval($entry[$yearStr]); 
@@ -95,6 +88,6 @@ foreach ($worldBankData as $countryCode=>$countryWorldBankData) {
         $rank++; 
     }
 }
-file_put_contents($worldBankRankFile, $output); // filename set in utils.php
+file_put_contents($config["World Bank"]["RankFile"], $output); 
 
 ?>

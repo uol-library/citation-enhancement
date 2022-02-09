@@ -19,10 +19,13 @@ $continentMap = json_decode(file_get_contents("Config/CountryCodes/continent.jso
 $iso2Map = array_flip($iso3Map); 
 $namesToCodesMap = array_change_key_case(array_flip($namesMap));
 
+
+
+
 // World Bank rankings 
 $worldBankRank = Array(); 
 $worldBankMaxRank = NULL; 
-$worldBankRankLines = file($worldBankRankFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+$worldBankRankLines = file($config["World Bank"]["RankFile"], FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 $columnNames = explode("\t", array_shift($worldBankRankLines));   
 foreach ($worldBankRankLines as $worldBankRankLine) { 
     $entry = explode("\t", $worldBankRankLine);
@@ -39,7 +42,8 @@ $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 
 $outputRecords = Array(); 
 // $rowHeadings = Array("TYPE", "TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "SOURCES", "CSI", "CSI-AUTHORS", "CSI-SUM");   
-$rowHeadings = Array("TYPE", "TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "SOURCES", "CSI");
+// $rowHeadings = Array("TYPE", "TITLE", "CONTAINER-TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "SOURCES", "CSI", "GNI-RANKS");
+$rowHeadings = Array("TYPE", "TITLE", "CONTAINER-TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CSI");
 
 foreach ($citations as $citation) { 
     
@@ -68,6 +72,15 @@ foreach ($citations as $citation) {
     } else if (isset($citation["Leganto"]["metadata"]["journal_title"])) {
         $outputRecord["TITLE"] = $citation["Leganto"]["metadata"]["journal_title"];
     }
+    
+    if (isset($citation["Leganto"]["metadata"]["article_title"])) {
+        if (isset($outputRecord["TITLE"])) { $outputRecord["CONTAINER-TITLE"] = $outputRecord["TITLE"]; } 
+        $outputRecord["TITLE"] = $citation["Leganto"]["metadata"]["article_title"];
+    } else if (isset($citation["Leganto"]["metadata"]["chapter_title"])) {
+        if (isset($outputRecord["TITLE"])) { $outputRecord["CONTAINER-TITLE"] = $outputRecord["TITLE"]; }
+        $outputRecord["TITLE"] = $citation["Leganto"]["metadata"]["chapter_title"];
+    }
+    
     if (isset($citation["Leganto"]["metadata"]["author"])) {
         $outputRecord["AUTHOR"] = $citation["Leganto"]["metadata"]["author"];
     }
@@ -75,16 +88,29 @@ foreach ($citations as $citation) {
     $outputRecord["NATIONALITIES"] = Array();
     $outputRecord["CONTINENTS"] = Array();
     $outputRecord["SOURCES"] = Array();
+    $outputRecord["CSI"] = "";  // default 
+    $outputRecord["GNI-RANKS"] = Array();
     
-    $csiSum = 0; 
-    $csiAuthors = 0; 
     
+    $gniRanks = Array();    // one value for each author - higher values for higher GNI countries 
+                            // where an author has more than one affiliation entry is the mean of all the individual ranks 
+                            // authors from VIAF and from Scopus count as separate authors (even though they are probably the same) 
+                            // so an item with only one author and data from VIAF and from Scopus will have *two* entries 
+                            // Scopus affiliation is taken from contemporary affiliation (abstract) where possible
+                            // and if not from the current affiliation (profile) 
+    
+    
+    $sources = Array(); 
     if (isset($citation["VIAF"])) { 
-        $outputRecord["SOURCES"][] = "VIAF"; 
         foreach ($citation["VIAF"] as $viafCitation) { 
             if (isset($viafCitation["best-match"]) && isset($viafCitation["best-match"]["nationalities"])) {
-                $worldBankRanks = Array(); 
+                
+                $gniRanksAuthorSource = Array(); // just for this author, this source 
+                
                 foreach ($viafCitation["best-match"]["nationalities"] as $nationality) {
+                    
+                    $sources["VIAF"] = TRUE; 
+                    
                     $nationalityValue = strtoupper($nationality["value"]);
                     $nationalityCode = NULL; 
                     if (strlen($nationalityValue)==2) {
@@ -97,45 +123,90 @@ foreach ($citations as $citation) {
                                 $nationalityCode = $iso2Map[$nationalityValue];
                             }
                         }
-                    } else {
-                        // ignore these 
+                    }
+                    if ($nationalityCode==NULL && isset($namesToCodesMap[strtolower($nationality["value"])])) {
+                        // is a country name
+                        print $nationality["value"].": "; 
+                        $nationalityCode = $namesToCodesMap[strtolower($nationality["value"])]; 
+                        print $nationalityCode."\n";
                     }
                     if ($nationalityCode!==NULL) { 
-                        $outputRecord["NATIONALITIES"][] = $nationalityCode;
                         if (isset($worldBankRank[$nationalityCode])) {
-                            $worldBankRanks[] = $worldBankRank[$nationalityCode];
+                            $gniRanksAuthorSource[] = $worldBankRank[$nationalityCode];
+                        } else { 
+                            trigger_error("No World Bank ranking for ".$nationalityCode, E_USER_ERROR);
                         }
+                        $outputRecord["NATIONALITIES"][] = $nationalityCode;
                     }
                 }
-                if (count($worldBankRanks)) {
-                    $csiAuthors++;
-                    foreach ($worldBankRanks as $worldBankRankValue) { 
-                        $csiSum += $worldBankRankValue/count($worldBankRanks); // average for each author 
-                    }
+                if (count($gniRanksAuthorSource)) { 
+                    $gniRanks[] = array_sum($gniRanksAuthorSource)/count($gniRanksAuthorSource);
                 }
             }
         }
     }
     if (isset($citation["Scopus"])) {
-        $outputRecord["SOURCES"][] = "Scopus";
         if (isset($citation["Scopus"]["first-match"]) && isset($citation["Scopus"]["first-match"]["authors"])) {
             foreach ($citation["Scopus"]["first-match"]["authors"] as $author) {
-                if (isset($author["affiliation"]) && isset($author["affiliation"]["country"])) {
-                    if (isset($namesToCodesMap[strtolower($author["affiliation"]["country"])])) {
-                        $nationalityCode = $namesToCodesMap[strtolower($author["affiliation"]["country"])];
-                        if ($nationalityCode && isset($worldBankRank[$nationalityCode])) { 
-                            $csiAuthors++; 
-                            $csiSum += $worldBankRank[$nationalityCode]; 
+                
+                $gniRanksAuthorSource = Array(); // just for this author, this source
+                $contemporaryAffiliation = FALSE; // set to TRUE if we find one 
+                
+                if (isset($author["affiliation"]) && is_array($author["affiliation"])) {
+                    foreach ($author["affiliation"] as $authorAffiliation) {
+                        
+                        $sources["Scopus-contemporary"] = TRUE;
+                        $contemporaryAffiliation = TRUE; 
+                        
+                        if (isset($authorAffiliation["country"])) {
+                            if (isset($namesToCodesMap[strtolower($authorAffiliation["country"])])) {
+                                $nationalityCode = $namesToCodesMap[strtolower($authorAffiliation["country"])];
+                                if ($nationalityCode!==NULL) {
+                                    if (isset($worldBankRank[$nationalityCode])) {
+                                        $gniRanksAuthorSource[] = $worldBankRank[$nationalityCode];
+                                    } else {
+                                        trigger_error("No World Bank ranking for ".$nationalityCode, E_USER_ERROR);
+                                    }
+                                    $outputRecord["NATIONALITIES"][] = $nationalityCode;
+                                }
+                            } else {
+                                trigger_error("No country name:code mapping for ".$authorAffiliation["country"], E_USER_ERROR);
+                            }
                         }
-                        $outputRecord["NATIONALITIES"][] = $nationalityCode; 
-                    } else {
-                        trigger_error("No country name:code mapping for ".$author["affiliation"]["country"], E_USER_ERROR);
                     }
+                }
+                if (!$contemporaryAffiliation) { // no contemporary affiliation, try current instead 
+                    if (isset($author["affiliation-current"]) && is_array($author["affiliation-current"])) {
+                        foreach ($author["affiliation-current"] as $authorAffiliation) {
+                            
+                            $sources["Scopus-current"] = TRUE;
+                            
+                            if (isset($authorAffiliation["country"])) {
+                                if (isset($namesToCodesMap[strtolower($authorAffiliation["country"])])) {
+                                    $nationalityCode = $namesToCodesMap[strtolower($authorAffiliation["country"])];
+                                    if ($nationalityCode!==NULL) {
+                                        if (isset($worldBankRank[$nationalityCode])) {
+                                            $gniRanksAuthorSource[] = $worldBankRank[$nationalityCode];
+                                        } else {
+                                            trigger_error("No World Bank ranking for ".$nationalityCode, E_USER_ERROR);
+                                        }
+                                        $outputRecord["NATIONALITIES"][] = $nationalityCode;
+                                    }
+                                } else {
+                                    trigger_error("No country name:code mapping for ".$authorAffiliation["country"], E_USER_ERROR);
+                                }
+                            }
+                        }
+                    }
+                }
+                if (count($gniRanksAuthorSource)) {
+                    $gniRanks[] = array_sum($gniRanksAuthorSource)/count($gniRanksAuthorSource);
                 }
             }
         }
     }
     
+    $outputRecord["SOURCES"] = array_keys($sources);
     
     $outputRecord["NATIONALITIES"] = array_unique($outputRecord["NATIONALITIES"]);
     
@@ -146,11 +217,10 @@ foreach ($citations as $citation) {
     }
     $outputRecord["CONTINENTS"] = array_unique($outputRecord["CONTINENTS"]);
     
-    
-    $outputRecord["CSI"] = $csiAuthors ? ($csiSum/($csiAuthors*$worldBankMaxRank)) : ""; 
-    $outputRecord["CSI-AUTHORS"] = $csiAuthors;
-    $outputRecord["CSI-SUM"] = $csiSum; 
-    
+    if (count($gniRanks) && $worldBankMaxRank) {
+        $outputRecord["CSI"] = array_sum($gniRanks)/($worldBankMaxRank*count($gniRanks));
+        $outputRecord["GNI-RANKS"] = $gniRanks; 
+    }
     
     $outputRecords[] = $outputRecord; 
     

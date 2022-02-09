@@ -1,8 +1,11 @@
 <?php 
 
-$worldBankRankFile = "Config/WorldBank/rankings.txt"; 
+$config = parse_ini_file("config.ini", true);
+
+
 
 function standardise($string) {
+    $string = preg_replace('/\xe2\x9c\xb1/', '', $string); // remove heavy asterisks 
     $string = preg_replace('/\s*\/\s*$/', "", $string);
     $string = trim($string);
     return $string;
@@ -51,7 +54,7 @@ function similarity($string1, $string2) {
  */
 function curl_get_file_contents($URL) {
     
-    global $http_response_header; // to mimit file_get_contents side-effect
+    global $http_response_header; // to mimic file_get_contents side-effect
     
     $c = curl_init();
     curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
