@@ -42,8 +42,8 @@ $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 
 $outputRecords = Array(); 
 // $rowHeadings = Array("TYPE", "TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "SOURCES", "CSI", "CSI-AUTHORS", "CSI-SUM");   
-// $rowHeadings = Array("TYPE", "TITLE", "CONTAINER-TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "SOURCES", "CSI", "GNI-RANKS");
-$rowHeadings = Array("TYPE", "TITLE", "CONTAINER-TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CSI");
+$rowHeadings = Array("TYPE", "TITLE", "CONTAINER-TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "SOURCES", "CSI", "GNI-RANKS");
+// $rowHeadings = Array("TYPE", "TITLE", "CONTAINER-TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CSI");
 
 foreach ($citations as $citation) { 
     
@@ -126,9 +126,10 @@ foreach ($citations as $citation) {
                     }
                     if ($nationalityCode==NULL && isset($namesToCodesMap[strtolower($nationality["value"])])) {
                         // is a country name
-                        print $nationality["value"].": "; 
-                        $nationalityCode = $namesToCodesMap[strtolower($nationality["value"])]; 
-                        print $nationalityCode."\n";
+                        $nationalityValue = strtolower($nationality["value"]);
+                        if (isset($namesToCodesMap[$nationalityValue])) { 
+                            $nationalityCode = $namesToCodesMap[$nationalityValue];
+                        }
                     }
                     if ($nationalityCode!==NULL) { 
                         if (isset($worldBankRank[$nationalityCode])) {
@@ -137,6 +138,8 @@ foreach ($citations as $citation) {
                             trigger_error("No World Bank ranking for ".$nationalityCode, E_USER_ERROR);
                         }
                         $outputRecord["NATIONALITIES"][] = $nationalityCode;
+                    } else { 
+                        // trigger_error("Can't derive nation code for ".$nationality["value"], E_USER_NOTICE);
                     }
                 }
                 if (count($gniRanksAuthorSource)) { 
@@ -156,21 +159,19 @@ foreach ($citations as $citation) {
                     foreach ($author["affiliation"] as $authorAffiliation) {
                         
                         $sources["Scopus-contemporary"] = TRUE;
-                        $contemporaryAffiliation = TRUE; 
                         
                         if (isset($authorAffiliation["country"])) {
                             if (isset($namesToCodesMap[strtolower($authorAffiliation["country"])])) {
                                 $nationalityCode = $namesToCodesMap[strtolower($authorAffiliation["country"])];
-                                if ($nationalityCode!==NULL) {
-                                    if (isset($worldBankRank[$nationalityCode])) {
-                                        $gniRanksAuthorSource[] = $worldBankRank[$nationalityCode];
-                                    } else {
-                                        trigger_error("No World Bank ranking for ".$nationalityCode, E_USER_ERROR);
-                                    }
-                                    $outputRecord["NATIONALITIES"][] = $nationalityCode;
+                                if (isset($worldBankRank[$nationalityCode])) {
+                                    $gniRanksAuthorSource[] = $worldBankRank[$nationalityCode];
+                                } else {
+                                    trigger_error("No World Bank ranking for ".$nationalityCode, E_USER_ERROR);
                                 }
+                                $outputRecord["NATIONALITIES"][] = $nationalityCode;
+                                $contemporaryAffiliation = TRUE;
                             } else {
-                                trigger_error("No country name:code mapping for ".$authorAffiliation["country"], E_USER_ERROR);
+                                // trigger_error("Can't derive nation code for ".$authorAffiliation["country"], E_USER_NOTICE);
                             }
                         }
                     }
@@ -180,22 +181,39 @@ foreach ($citations as $citation) {
                         foreach ($author["affiliation-current"] as $authorAffiliation) {
                             
                             $sources["Scopus-current"] = TRUE;
-                            
-                            if (isset($authorAffiliation["country"])) {
-                                if (isset($namesToCodesMap[strtolower($authorAffiliation["country"])])) {
-                                    $nationalityCode = $namesToCodesMap[strtolower($authorAffiliation["country"])];
-                                    if ($nationalityCode!==NULL) {
-                                        if (isset($worldBankRank[$nationalityCode])) {
-                                            $gniRanksAuthorSource[] = $worldBankRank[$nationalityCode];
-                                        } else {
-                                            trigger_error("No World Bank ranking for ".$nationalityCode, E_USER_ERROR);
+
+                            if (isset($authorAffiliation["address"])) {
+                                
+                                $nationalityCode = NULL;
+                                if (isset($authorAffiliation["address"]["@country"])) {
+                                    // 3-digit code
+                                    $nationalityValue = strtoupper($authorAffiliation["address"]["@country"]); 
+                                    if (isset($iso2Map[$nationalityValue]) && $iso2Map[$nationalityValue]) {
+                                        if (!in_array($iso2Map[$nationalityValue], Array("XX", "ZZ"))) {
+                                            $nationalityCode = $iso2Map[$nationalityValue];
                                         }
-                                        $outputRecord["NATIONALITIES"][] = $nationalityCode;
                                     }
-                                } else {
-                                    trigger_error("No country name:code mapping for ".$authorAffiliation["country"], E_USER_ERROR);
                                 }
+                                if ($nationalityCode==NULL && isset($authorAffiliation["address"]["country"])) {
+                                    // country name
+                                    $nationalityValue = strtolower($authorAffiliation["address"]["country"]);
+                                    if (isset($namesToCodesMap[$nationalityValue])) {
+                                        $nationalityCode = $namesToCodesMap[$nationalityValue];
+                                    }
+                                }
+                                if ($nationalityCode!==NULL) {
+                                    if (isset($worldBankRank[$nationalityCode])) {
+                                        $gniRanksAuthorSource[] = $worldBankRank[$nationalityCode];
+                                    } else {
+                                        trigger_error("No World Bank ranking for ".$nationalityCode, E_USER_ERROR);
+                                    }
+                                    $outputRecord["NATIONALITIES"][] = $nationalityCode;
+                                } else {
+                                    // trigger_error("Can't derive nation code for ".$authorAffiliation["address"]["@country"].":".$authorAffiliation["address"]["country"], E_USER_NOTICE);
+                                }
+                                
                             }
+                            
                         }
                     }
                 }

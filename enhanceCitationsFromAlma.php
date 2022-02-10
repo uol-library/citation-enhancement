@@ -32,26 +32,34 @@ foreach ($citations as &$citation) {
         $citation["Alma"]["creators"] = Array();
         $citation["Alma"]["ids"] = Array();
         
-        $creatorsSeen = Array();
         $anies = $bib_record["anies"];
         foreach ($anies as $anie) {
             $anie = str_replace("encoding=\"UTF-16\"?>", "encoding=\"UTF-8\"?>", $anie); // kludge
             $xmlrecord = new SimpleXmlElement($anie);
             foreach ($xmlrecord->datafield as $field) {
-                if (in_array($field["tag"], Array("245", "210", "240", "242", "243", "246", "247", "730", "740"))) {
-                    $title = Array();
-                    $raw = "";
+                
+                $tag = $field["tag"]->__toString(); 
+                
+                if (in_array($tag, Array("245", "210", "240", "242", "243", "246", "247", "730", "740"))) {
+                    $acceptedSubfields = Array("a","b"); 
+                    $title = Array("tag"=>$tag, "collated"=>""); 
+                    foreach ($acceptedSubfields as $acceptedSubfield) { $title[$acceptedSubfield] = ""; } 
                     foreach ($field->subfield as $subfield) {
-                        if (in_array($subfield["code"], Array("a","b"))) {
-                            $raw .= $subfield->__toString()." ";
+                        $subfieldCode = $subfield["code"]->__toString(); 
+                        if (in_array($subfieldCode, $acceptedSubfields)) {
+                            $title["collated"] .= $subfield->__toString()." ";
+                            $title[$subfieldCode] .= $subfield->__toString()." ";
                         }
                     }
-                    $title = trim(standardise($raw));
-                    if ($title) {
-                        $citation["Alma"]["titles"][] = $title;
+                    $title["collated"] = trim(standardise($title["collated"]));
+                    if (!$title["collated"]) { unset($title["collated"]); } 
+                    foreach ($acceptedSubfields as $acceptedSubfield) { 
+                        $title[$acceptedSubfield] = trim(standardise($title[$acceptedSubfield]));
+                        if (!$title[$acceptedSubfield]) { unset($title[$acceptedSubfield]); }
                     }
+                    $citation["Alma"]["titles"][] = $title;
                 }
-                if (in_array($field["tag"], Array("010"))) {
+                if (in_array($tag, Array("010"))) {
                     foreach ($field->subfield as $subfield) {
                         if (in_array($subfield["code"], Array("a"))) {
                             $raw = $subfield->__toString();
@@ -62,7 +70,7 @@ foreach ($citations as &$citation) {
                         }
                     }
                 }
-                if (in_array($field["tag"], Array("020"))) {
+                if (in_array($tag, Array("020"))) {
                     foreach ($field->subfield as $subfield) {
                         if (in_array($subfield["code"], Array("a"))) {
                             $raw = $subfield->__toString();
@@ -73,7 +81,7 @@ foreach ($citations as &$citation) {
                         }
                     }
                 }
-                if (in_array($field["tag"], Array("022"))) {
+                if (in_array($tag, Array("022"))) {
                     foreach ($field->subfield as $subfield) {
                         if (in_array($subfield["code"], Array("a"))) {
                             $raw = $subfield->__toString();
@@ -85,19 +93,24 @@ foreach ($citations as &$citation) {
                     }
                 }
                 
-                if (in_array($field["tag"], Array("100", "700"))) {
-                    $creator = Array();
-                    $raw = "";
+                if (in_array($tag, Array("100", "700"))) {
+                    $acceptedSubfields = Array("a","b","c","d","q");
+                    $creator = Array("tag"=>$tag, "collated"=>"");
+                    foreach ($acceptedSubfields as $acceptedSubfield) { $creator[$acceptedSubfield] = ""; }
                     foreach ($field->subfield as $subfield) {
-                        if (in_array($subfield["code"], Array("a","b","c","d","q"))) {
-                            $raw .= $subfield->__toString()." ";
+                        $subfieldCode = $subfield["code"]->__toString();
+                        if (in_array($subfieldCode, $acceptedSubfields)) {
+                            $creator["collated"] .= $subfield->__toString()." ";
+                            $creator[$subfieldCode] .= $subfield->__toString()." ";
                         }
                     }
-                    $creator = trim(standardise($raw));
-                    if ($creator && !isset($creatorsSeen[$creator])) {
-                        $citation["Alma"]["creators"][] = $creator;
-                        $creatorsSeen[$creator] = TRUE;
+                    $creator["collated"] = trim(standardise($creator["collated"]));
+                    if (!$creator["collated"]) { unset($creator["collated"]); }
+                    foreach ($acceptedSubfields as $acceptedSubfield) {
+                        $creator[$acceptedSubfield] = trim(standardise($creator[$acceptedSubfield]));
+                        if (!$creator[$acceptedSubfield]) { unset($creator[$acceptedSubfield]); }
                     }
+                    $citation["Alma"]["creators"][] = $creator;
                 }
             }
             

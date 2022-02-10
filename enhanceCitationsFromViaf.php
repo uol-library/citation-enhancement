@@ -21,20 +21,48 @@ $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 foreach ($citations as &$citation) { 
     
     if (isset($citation["Leganto"]["secondary_type"]["value"]) && $citation["Leganto"]["secondary_type"]["value"]=="BK") {
+        
+        $creators = Array(); 
+        $titles = Array(); 
+        $creatorsSeen = Array(); 
+        $titlesSeen = Array();
+        // assemble from Alma data 
+        if (isset($citation["Alma"]) && isset($citation["Alma"]["creators"])) { 
+            foreach ($citation["Alma"]["creators"] as $creatorAlma) { 
+                $creatorAlmaSerialised = print_r($creatorAlma, TRUE); 
+                if (isset($creatorAlma["collated"]) && $creatorAlma["collated"] && !in_array($creatorAlmaSerialised, $creatorsSeen)) {
+                    $creators[] = $creatorAlma; 
+                    $creatorsSeen[] = $creatorAlmaSerialised; 
+                }
+            }
+        }
+        if (isset($citation["Alma"]) && isset($citation["Alma"]["titles"])) {
+            foreach ($citation["Alma"]["titles"] as $titleAlma) {
+                $titleAlmaSerialised = print_r($titleAlma, TRUE);
+                if (isset($titleAlma["collated"]) && $titleAlma["collated"] && !in_array($titleAlmaSerialised, $titlesSeen)) {
+                    $titles[] = $titleAlma;
+                    $titlesSeen[] = $titleAlmaSerialised;
+                }
+            }
+        }
 
-        if (isset($citation["Alma"]) && isset($citation["Alma"]["creators"]) && isset($citation["Alma"]["titles"]) && count($citation["Alma"]["creators"]) && count($citation["Alma"]["titles"])) {
+        if (count($creators) && count($titles)) {
 
             $citation["VIAF"] = Array(); // to populate 
             
-            foreach ($citation["Alma"]["creators"] as &$creator) {
+            foreach ($creators as &$creator) {
                 
                 usleep(250000);
                 
                 $citationViaf = Array();
                 
-                $citationViaf["search"] = $creator;
+                $citationViaf["search-fields"] = "local.names+exact";
+                $citationViaf["search-term-source"] = "collated";
+                $citationViaf["search-term"] = $creator[$citationViaf["search-term-source"]];
+                $viafSearchData = viafApiQuery($citationViaf["search-fields"], $citationViaf["search-term"]); 
                 
-                $viafSearchURL = "http://viaf.org/viaf/search?query=local.names+exact+%22".urlencode($creator)."%22&maximumRecords=10&startRecord=1&sortKeys=holdingscount&httpAccept=text/xml";
+                /* 
+                $viafSearchURL = "http://viaf.org/viaf/search?query=".$citationViaf["search-fields"]."+%22".urlencode($creator)."%22&maximumRecords=10&startRecord=1&sortKeys=holdingscount&httpAccept=text/xml";
                 $viafSearchResponse = curl_get_file_contents($viafSearchURL);
                 
                 //TODO error checking
@@ -42,7 +70,40 @@ foreach ($citations as &$citation) {
                 $viafSearchResponse = preg_replace('/(<\/?)ns2:/', "$1", $viafSearchResponse); // kludge - need to parse namespaced document properly
                 
                 $viafSearchData = new SimpleXmlElement($viafSearchResponse);
+                */ 
+                
                 $citationViaf["records"] = $viafSearchData->records->record ? count($viafSearchData->records->record) : FALSE;
+                
+                if (!$citationViaf["records"]) {
+                    // try again with a slightly more generous search 
+                    $citationViaf["search-fields"] = "local.names+all";
+                    $viafSearchData = viafApiQuery($citationViaf["search-fields"], $citationViaf["search-term"]);
+                    $citationViaf["records"] = $viafSearchData->records->record ? count($viafSearchData->records->record) : FALSE;
+                }
+                // don't do this next one - generating too many false matches 
+                /*
+                if (!$citationViaf["records"]) {
+                    // try again with an even more generous search
+                    $citationViaf["search-fields"] = "local.names+any";
+                    $viafSearchData = viafApiQuery($citationViaf["search-fields"], $citationViaf["search-term"]);
+                    $citationViaf["records"] = $viafSearchData->records->record ? count($viafSearchData->records->record) : FALSE;
+                }
+                */
+                if (!$citationViaf["records"]) {
+                    // try again but only look in the $a for the author 
+                    $citationViaf["search-term-source"] = "a";
+                    $citationViaf["search-term"] = $creator[$citationViaf["search-term-source"]];
+                    $citationViaf["search-fields"] = "local.names+exact";
+                    $viafSearchData = viafApiQuery($citationViaf["search-fields"], $citationViaf["search-term"]);
+                    $citationViaf["records"] = $viafSearchData->records->record ? count($viafSearchData->records->record) : FALSE;
+                }
+                if (!$citationViaf["records"]) {
+                    // try again with a slightly more generous search 
+                    $citationViaf["search-fields"] = "local.names+all";
+                    $viafSearchData = viafApiQuery($citationViaf["search-fields"], $citationViaf["search-term"]);
+                    $citationViaf["records"] = $viafSearchData->records->record ? count($viafSearchData->records->record) : FALSE;
+                }
+                
                 
                 if ($citationViaf["records"]) {
                     
@@ -128,24 +189,28 @@ foreach ($citations as &$citation) {
                         // cross compare source and arget titles
                         if (isset($viafDataParsedItem["titles"]) && count($viafDataParsedItem["titles"])) {
                             
-                            foreach ($citation["Alma"]["titles"] as $citationTitle) {
-                                foreach ($viafDataParsedItem["titles"] as $viafTitle) {
-                                    
-                                    $thisConfidence = similarity($viafTitle, $citationTitle);
-                                    
-                                    if ($viafBestConfidence===FALSE || $thisConfidence>$viafBestConfidence) {
+                            foreach ($titles as $citationTitle) {
+                                
+                                if (isset($citationTitle["collated"])) { 
+
+                                    foreach ($viafDataParsedItem["titles"] as $viafTitle) {
                                         
-                                        $viafBestConfidence = $thisConfidence;
+                                        $thisConfidence = similarity($viafTitle, $citationTitle["collated"]);
                                         
-                                        $viafDataParsedItem["confidence-title"] = $thisConfidence;
-                                        // unset($viafDataParsedItem["titles"]); // we won't keep titles for now
-                                        $viafDataParsed = $viafDataParsedItem;
+                                        if ($viafBestConfidence===FALSE || $thisConfidence>$viafBestConfidence) {
+                                            
+                                            $viafBestConfidence = $thisConfidence;
+                                            
+                                            $viafDataParsedItem["confidence-title"] = $thisConfidence;
+                                            // unset($viafDataParsedItem["titles"]); // we won't keep titles for now
+                                            $viafDataParsed = $viafDataParsedItem;
+                                            
+                                        }
                                         
-                                    }
-                                    
-                                    // special case
-                                    if ($thisConfidence==100) {
-                                        break 2; // no point in testing any more
+                                        // special case
+                                        if ($thisConfidence==100) {
+                                            break 2; // no point in testing any more
+                                        }
                                     }
                                 }
                             }
@@ -185,6 +250,19 @@ foreach ($citations as &$citation) {
 print json_encode($citations, JSON_PRETTY_PRINT);
 
 
+
+function viafApiQuery($fields, $term) { 
+    
+    global $config, $http_response_header; // latter needed to allow curl_get_file_contents to mimic file_get_contents side-effect
+    
+    $viafSearchURL = "http://viaf.org/viaf/search?query=".$fields."+%22".urlencode($term)."%22&maximumRecords=10&startRecord=1&sortKeys=holdingscount&httpAccept=text/xml";
+    $viafSearchResponse = curl_get_file_contents($viafSearchURL);
+
+    
+    //TODO error checking
+    $viafSearchResponse = preg_replace('/(<\/?)ns2:/', "$1", $viafSearchResponse); // kludge - need to parse namespaced document properly
+    return new SimpleXmlElement($viafSearchResponse);
+}
 
 
 

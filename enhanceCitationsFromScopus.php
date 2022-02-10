@@ -128,29 +128,31 @@ foreach ($citations as &$citation) {
                                     if (!$affiliationData) { continue; }
                                     
                                     $citationScopusAuthorAffiliationExtra = array_filter(array_intersect_key($affiliationData["affiliation-retrieval-response"], Array("affiliation-name"=>TRUE, "address"=>TRUE, "city"=>TRUE, "country"=>TRUE)));
-                                    $scopusAffiliationCache[$citationScopusAuthorAffiliation["@id"]] = $citationScopusAuthorAffiliationExtra; // cache this
                                     $citationScopusAuthorAffiliation = array_merge($citationScopusAuthorAffiliation, $citationScopusAuthorAffiliationExtra);
                                 }
                             }
                         }
                         // author current (profile) affiliation 
+                        // just get data from the author retrieve - 
+                        // don't bother following up with an affiliation retrieve, 
+                        // even though that would put data in same format as contemporary affiliation, 
+                        // because extra affiliation retrieves may cause us problems with rate-limit    
                         if (isset($citationScopusAuthor["author-url"]) && $citationScopusAuthor["author-url"]) {
                             $authorData = scopusApiQuery($citationScopusAuthor["author-url"]."?", $citation["Scopus"], "author-retrieval", TRUE, "author-retrieval-response");
                             $citationScopusAuthor["affiliation-current"] = Array(); 
-                            foreach ($authorData["author-retrieval-response"] as $authorRetrieved) { 
-                                if (isset($authorRetrieved["affiliation-current"]) && $authorRetrieved["affiliation-current"]) { 
+                            foreach($authorData["author-retrieval-response"] as $authorEntry) { 
+                                if (isset($authorEntry["author-profile"])
+                                    && isset($authorEntry["author-profile"]["affiliation-current"])
+                                    && isset($authorEntry["author-profile"]["affiliation-current"]["affiliation"])
+                                ) {
+                                    $authorProfileAffiliations = $authorEntry["author-profile"]["affiliation-current"]["affiliation"]; // for convenience
                                     // affiliation may be single or a list(?) - for simplicity, *always* turn it into a list
                                     // - if associative array, wrap in a numeric array
-                                    if (count(array_filter(array_keys($authorRetrieved["affiliation-current"]), 'is_string'))>0) { $authorRetrieved["affiliation-current"]=Array($authorRetrieved["affiliation-current"]); }
-                                    foreach ($authorRetrieved["affiliation-current"] as $authorProfileAffiliation) {
-                                        if (isset($authorProfileAffiliation["@id"]) && isset($authorProfileAffiliation["@href"])) {
-                                            // fetch affiliation details
-                                            $affiliationData = scopusApiQuery($authorProfileAffiliation["@href"]."?", $citation["Scopus"], "affiliation-retrieval[current]", TRUE, "affiliation-retrieval-response");
-                                            if (!$affiliationData) { continue; }
-                                            $citationScopusAuthorAffiliationProfile = array_filter(array_intersect_key($affiliationData["affiliation-retrieval-response"], Array("affiliation-name"=>TRUE, "address"=>TRUE, "city"=>TRUE, "country"=>TRUE)));
-                                            $scopusAffiliationCache[$citationScopusAuthorAffiliation["@id"]] = $citationScopusAuthorAffiliationProfile; // cache this
-                                            $citationScopusAuthor["affiliation-current"][] = array_merge($authorProfileAffiliation, $citationScopusAuthorAffiliationProfile);
-                                        }
+                                    if (count(array_filter(array_keys($authorProfileAffiliations), 'is_string'))>0) { $authorProfileAffiliations=Array($authorProfileAffiliations); }
+                                    foreach ($authorProfileAffiliations as $authorProfileAffiliation) {
+                                        $citationScopusAuthorAffiliationProfile = array_filter(array_intersect_key($authorProfileAffiliation, Array("@affiliation-id"=>TRUE)));
+                                        $citationScopusAuthorAffiliationProfile = array_merge($citationScopusAuthorAffiliationProfile, array_filter(array_intersect_key($authorProfileAffiliation["ip-doc"], Array("sort-name"=>TRUE, "address"=>TRUE))));
+                                        $citationScopusAuthor["affiliation-current"][] = $citationScopusAuthorAffiliationProfile;
                                     }
                                 }
                             }
@@ -159,17 +161,8 @@ foreach ($citations as &$citation) {
                     }
                 }
             }
-            
-            
         }
-        
-        
-        
-        
     }
-    
-    
-    
 }
 
 
