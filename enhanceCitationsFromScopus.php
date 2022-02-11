@@ -19,82 +19,110 @@ $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 
 foreach ($citations as &$citation) { 
     
+    $searchParameters = Array(); // collect things here 
     
-    $searchTermEncoded = FALSE; 
-    $searchTermDisplay = FALSE; 
-
     if (isset($citation["Leganto"]["metadata"]["doi"]) && $citation["Leganto"]["metadata"]["doi"]) {
-        $doi = $citation["Leganto"]["metadata"]["doi"]; 
-        $doi = preg_replace('/^https?:\/\/doi\.org\//', '', $doi);  
-        $searchTermEncoded = "DOI(".urlencode($doi).")"; 
-        $searchTermDisplay = "DOI( ".$doi." )";
+        $doi = $citation["Leganto"]["metadata"]["doi"];
+        $doi = preg_replace('/^https?:\/\/doi\.org\//', '', $doi);
+        $searchParameters["DOI"] = $doi; 
     }
-    if (!$searchTermEncoded && isset($citation["Leganto"]["secondary_type"]["value"]) && $citation["Leganto"]["secondary_type"]["value"]=="CR"
+    if (isset($citation["Leganto"]["secondary_type"]["value"]) && $citation["Leganto"]["secondary_type"]["value"]=="CR"
         && isset($citation["Leganto"]["metadata"]["article_title"]) && $citation["Leganto"]["metadata"]["article_title"]) {
-        
-        $searchTermEncoded = "TITLE(".urlencode('"'.$citation["Leganto"]["metadata"]["article_title"].'"').")";
-        $searchTermDisplay = "TITLE( \"".$citation["Leganto"]["metadata"]["article_title"]."\" )";
-        
-        $additionalTerms = FALSE; 
-        if (isset($citation["Leganto"]["metadata"]["issn"]) && $citation["Leganto"]["metadata"]["issn"]) {
-            $searchTermEncoded .= "+AND+ISSN(".urlencode($citation["Leganto"]["metadata"]["issn"]).")";
-            $searchTermDisplay .= " AND ISSN( ".$citation["Leganto"]["metadata"]["issn"]." )";
-            $additionalTerms = TRUE; 
-        }
-        if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
-            $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["author"]); 
-            $searchTermEncoded .= "+AND+AUTHOR-NAME(".urlencode($legantoAuthor).")";
-            $searchTermDisplay .= " AND AUTHOR-NAME( ".$legantoAuthor." )";
-            $additionalTerms = TRUE;
-        }
-        if ($additionalTerms) { 
-            $searchTermEncoded = "($searchTermEncoded)"; 
-            $searchTermDisplay = "( $searchTermDisplay )";
-        }
-        
-        
+            $searchParameters["TITLE"] = $citation["Leganto"]["metadata"]["article_title"];
+            if (isset($citation["Leganto"]["metadata"]["issn"]) && $citation["Leganto"]["metadata"]["issn"]) {
+                $searchParameters["ISSN"] = $citation["Leganto"]["metadata"]["issn"];
+            }
+            if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
+                $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["author"]);
+                $searchParameters["AUTH"] = $legantoAuthor;
+            }
+            $searchParameters["DOCTYPE"] = "ar";
     }
-    if (!$searchTermEncoded && isset($citation["Leganto"]["secondary_type"]["value"]) && $citation["Leganto"]["secondary_type"]["value"]=="BK"
+    if (isset($citation["Leganto"]["secondary_type"]["value"]) && $citation["Leganto"]["secondary_type"]["value"]=="BK"
         && isset($citation["Leganto"]["metadata"]["title"]) && $citation["Leganto"]["metadata"]["title"]) {
-        $searchTermEncoded = "TITLE(".urlencode('"'.$citation["Leganto"]["metadata"]["title"].'"').")";
-        $searchTermDisplay = "TITLE( \"".$citation["Leganto"]["metadata"]["title"]."\" )";
-        
-        $additionalTerms = FALSE;
-        if (isset($citation["Leganto"]["metadata"]["isbn"]) && $citation["Leganto"]["metadata"]["isbn"]) {
-            $searchTermEncoded .= "+AND+ALL(".urlencode($citation["Leganto"]["metadata"]["isbn"]).")";
-            $searchTermDisplay .= " AND ALL( ".$citation["Leganto"]["metadata"]["isbn"]." )";
-            $additionalTerms = TRUE;
-        }
-        if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
-            $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["author"]);
-            $searchTermEncoded .= "+AND+AUTHOR-NAME(".urlencode($legantoAuthor).")";
-            $searchTermDisplay .= " AND AUTHOR-NAME( ".$legantoAuthor." )";
-            $additionalTerms = TRUE;
-        }
-        if ($additionalTerms) {
-            $searchTermEncoded = "($searchTermEncoded)";
-            $searchTermDisplay = "( $searchTermDisplay )";
-        }
-        
+            $searchParameters["TITLE"] = $citation["Leganto"]["metadata"]["title"];
+            if (isset($citation["Leganto"]["metadata"]["isbn"]) && $citation["Leganto"]["metadata"]["isbn"]) {
+                $searchParameters["ISBN"] = $citation["Leganto"]["metadata"]["isbn"];
+            }
+            if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
+                $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["author"]);
+                $searchParameters["AUTH"] = $legantoAuthor;
+            }
+            $searchParameters["DOCTYPE"] = "bk";
     }
         
     
-    if ($searchTermEncoded) {
+    
+    // if ($searchTermEncoded) {
+    if (count($searchParameters)) { 
 
         $citation["Scopus"] = Array(); // to populate
         
-        $citation["Scopus"]["search"] = $searchTermDisplay;
-                
-        $scopusSearchData = scopusApiQuery("https://api.elsevier.com/content/search/scopus?query=".$searchTermEncoded, $citation["Scopus"], "scopus-search", TRUE);
-        if (!$scopusSearchData) { continue; }
+        $searchStrings = Array(); // assemble search parameters into one or more search strings, in order of preference
         
-        $citation["Scopus"]["records"] = $scopusSearchData["search-results"]["opensearch:totalResults"];
-        
-        if ($citation["Scopus"]["records"]) {
+        if (isset($searchParameters["DOI"]) && $searchParameters["DOI"]) {
+            $searchStrings[] = "DOI(".$searchParameters["DOI"].")";
+        }
+        if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
+            $searchString = "TITLE({".$searchParameters["TITLE"]."})"; // exact match
+            if (isset($searchParameters["DOCTYPE"]) && $searchParameters["DOCTYPE"]) { $searchString .= " AND DOCTYPE(".$searchParameters["DOCTYPE"].")"; }
+            if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"]) { $searchString .= " AND AUTH(".$searchParameters["AUTH"].")"; }
+            if (isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) { $searchString .= " AND ISBN(".$searchParameters["ISBN"].")"; }
+            if (isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) { $searchString .= " AND ISSN(".$searchParameters["ISSN"].")"; }
+            $searchStrings[] = $searchString;
             
+        }
+        if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
+            $searchString = "TITLE(\"".str_replace('"', '\"', $searchParameters["TITLE"])."\")"; // slightly looser match
+            $extraParams = FALSE;
+            if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"]) { $extraParams=TRUE; $searchString .= " AND AUTH(".$searchParameters["AUTH"].")"; }
+            if (isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) { $extraParams=TRUE; $searchString .= " AND ISBN(".$searchParameters["ISBN"].")"; }
+            if (isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) { $extraParams=TRUE; $searchString .= " AND ISSN(".$searchParameters["ISSN"].")"; }
+            if (!$extraParams && isset($searchParameters["DOCTYPE"]) && $searchParameters["DOCTYPE"]) { $searchString .= " AND DOCTYPE(".$searchParameters["DOCTYPE"].")"; }
+            if (!in_array($searchString, $searchStrings)) { $searchStrings[] = $searchString; } // only add this one if we've made a difference
+            
+        }
+        if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
+            $searchString = "TITLE(\"".str_replace('"', '\"', $searchParameters["TITLE"])."\")";
+            // even looser match
+            if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"] && isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) {
+                $searchString .= " AND (AUTH(".$searchParameters["AUTH"].") OR ISSN(".$searchParameters["ISSN"]."))";
+            } else if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"] && isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) {
+                $searchString .= " AND (AUTH(".$searchParameters["AUTH"].") OR ISBN(".$searchParameters["ISBN"]."))";
+            }
+            if (!in_array($searchString, $searchStrings)) { $searchStrings[] = $searchString; } // only add this one if we've made a difference
+            
+        }
+        if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
+            $searchString = "TITLE({".$searchParameters["TITLE"]."})";
+            // sort-of looser match
+            if (isset($searchParameters["DOCTYPE"]) && $searchParameters["DOCTYPE"]) { $searchString .= " AND DOCTYPE(".$searchParameters["DOCTYPE"].")"; }
+            if (!in_array($searchString, $searchStrings)) { $searchStrings[] = $searchString; } // only add this one if we've made a difference
+            
+        }
+
+        foreach ($searchStrings as $searchString) { 
+            $scopusSearchData = scopusApiQuery("https://api.elsevier.com/content/search/scopus?query=".urlencode($searchString), $citation["Scopus"], "scopus-search", TRUE);
+            if ($scopusSearchData && $scopusSearchData["search-results"]["opensearch:totalResults"]>0) { break; } // first successful result
+            if (!isset($citation["Scopus"]["searches-no-results"])) { $citation["Scopus"]["searches-no-results"] = Array(); } 
+            $citation["Scopus"]["searches-no-results"][] = $searchString; // record the one we're trying
+        }
+        if (!$scopusSearchData) { continue; } // move on to next citation 
+            
+        $citation["Scopus"]["result-count"] = $scopusSearchData["search-results"]["opensearch:totalResults"];
+        
+        if ($citation["Scopus"]["result-count"]) {
+            
+            $citation["Scopus"]["search-active"] = $searchString;
             $citation["Scopus"]["first-match"] = Array(); 
+            $citation["Scopus"]["results"] = Array(); 
+            $summaryFields = Array("eid"=>TRUE, "dc:title"=>TRUE, "dc:creator"=>TRUE, "prism:publicationName"=>TRUE, "subtype"=>TRUE);
+            foreach ($scopusSearchData["search-results"]["entry"] as $entry) {
+                $citation["Scopus"]["results"][] = array_filter(array_intersect_key($entry, $summaryFields));
+            }
             
-            $links = $scopusSearchData["search-results"]["entry"][0]["link"];
+            $entry = $scopusSearchData["search-results"]["entry"][0]; // now only interested in first result 
+            $links = $entry["link"]; 
             $linkAuthorAffiliation = FALSE; 
             
             foreach ($links as $link) { 
