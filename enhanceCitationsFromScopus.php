@@ -60,9 +60,11 @@ foreach ($citations as &$citation) {
         
         $searchStrings = Array(); // assemble search parameters into one or more search strings, in order of preference
         
+        // 1st choice - DOI 
         if (isset($searchParameters["DOI"]) && $searchParameters["DOI"]) {
             $searchStrings[] = "DOI(".$searchParameters["DOI"].")";
         }
+        // 2nd choice - exact title match and author surname *and* doctype *and* isbn/issn 
         if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
             $searchString = "TITLE({".$searchParameters["TITLE"]."})"; // exact match
             if (isset($searchParameters["DOCTYPE"]) && $searchParameters["DOCTYPE"]) { $searchString .= " AND DOCTYPE(".$searchParameters["DOCTYPE"].")"; }
@@ -70,20 +72,10 @@ foreach ($citations as &$citation) {
             if (isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) { $searchString .= " AND ISBN(".$searchParameters["ISBN"].")"; }
             if (isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) { $searchString .= " AND ISSN(".$searchParameters["ISSN"].")"; }
             $searchStrings[] = $searchString;
-            
         }
+        // 3rd choice - exact title match and ( author surname *or* isbn/issn ) 
         if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
-            $searchString = "TITLE(\"".str_replace('"', '\"', $searchParameters["TITLE"])."\")"; // slightly looser match
-            $extraParams = FALSE;
-            if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"]) { $extraParams=TRUE; $searchString .= " AND AUTH(".$searchParameters["AUTH"].")"; }
-            if (isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) { $extraParams=TRUE; $searchString .= " AND ISBN(".$searchParameters["ISBN"].")"; }
-            if (isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) { $extraParams=TRUE; $searchString .= " AND ISSN(".$searchParameters["ISSN"].")"; }
-            if (!$extraParams && isset($searchParameters["DOCTYPE"]) && $searchParameters["DOCTYPE"]) { $searchString .= " AND DOCTYPE(".$searchParameters["DOCTYPE"].")"; }
-            if (!in_array($searchString, $searchStrings)) { $searchStrings[] = $searchString; } // only add this one if we've made a difference
-            
-        }
-        if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
-            $searchString = "TITLE(\"".str_replace('"', '\"', $searchParameters["TITLE"])."\")";
+            $searchString = "TITLE({".$searchParameters["TITLE"]."})"; // exact match
             // even looser match
             if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"] && isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) {
                 $searchString .= " AND (AUTH(".$searchParameters["AUTH"].") OR ISSN(".$searchParameters["ISSN"]."))";
@@ -91,15 +83,32 @@ foreach ($citations as &$citation) {
                 $searchString .= " AND (AUTH(".$searchParameters["AUTH"].") OR ISBN(".$searchParameters["ISBN"]."))";
             }
             if (!in_array($searchString, $searchStrings)) { $searchStrings[] = $searchString; } // only add this one if we've made a difference
-            
         }
+        // 4th choice - exact title match and doctype 
         if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
             $searchString = "TITLE({".$searchParameters["TITLE"]."})";
             // sort-of looser match
             if (isset($searchParameters["DOCTYPE"]) && $searchParameters["DOCTYPE"]) { $searchString .= " AND DOCTYPE(".$searchParameters["DOCTYPE"].")"; }
             if (!in_array($searchString, $searchStrings)) { $searchStrings[] = $searchString; } // only add this one if we've made a difference
-            
         }
+        // 5th choice - title search terms adjacent and author surname *and* doctype *and* isbn/issn
+        if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
+            $searchString = "TITLE(\"".str_replace('"', '\"', $searchParameters["TITLE"])."\")";
+            if (isset($searchParameters["DOCTYPE"]) && $searchParameters["DOCTYPE"]) { $searchString .= " AND DOCTYPE(".$searchParameters["DOCTYPE"].")"; }
+            if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"]) { $searchString .= " AND AUTH(".$searchParameters["AUTH"].")"; }
+            if (isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) { $searchString .= " AND ISBN(".$searchParameters["ISBN"].")"; }
+            if (isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) { $searchString .= " AND ISSN(".$searchParameters["ISSN"].")"; }
+            if (!in_array($searchString, $searchStrings)) { $searchStrings[] = $searchString; } // only add this one if we've made a difference
+        }
+        // 6th choice - title search terms adjacent and author surname *and* isbn/issn
+        if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
+            $searchString = "TITLE(\"".str_replace('"', '\"', $searchParameters["TITLE"])."\")"; // slightly looser match
+            if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"]) { $searchString .= " AND AUTH(".$searchParameters["AUTH"].")"; }
+            if (isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) { $searchString .= " AND ISBN(".$searchParameters["ISBN"].")"; }
+            if (isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) { $searchString .= " AND ISSN(".$searchParameters["ISSN"].")"; }
+            if (!in_array($searchString, $searchStrings)) { $searchStrings[] = $searchString; } // only add this one if we've made a difference
+        }
+
 
         foreach ($searchStrings as $searchString) { 
             $scopusSearchData = scopusApiQuery("https://api.elsevier.com/content/search/scopus?query=".urlencode($searchString), $citation["Scopus"], "scopus-search", TRUE);

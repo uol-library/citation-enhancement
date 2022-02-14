@@ -67,7 +67,7 @@ uasort($worldBankData, function ($a, $b) {
     if (!isset($b["GNI"])) {
         return 1;
     }
-    return $a["GNI"] <=> $b["GNI"];
+    return $a["GNI"] < $b["GNI"] ? -1 : ( $a["GNI"] > $b["GNI"] ? 1 : 0 );
 });
 
 // print_r($worldBankData);
