@@ -37,18 +37,31 @@ $list_code = "202122_LAW5358M__9442593_1";
 $course_code = "35627_EDUC5264M";
 $list_code = "202122_EDUC5264M__8629446_1";
 
+
+28573_SOEE5531M
+202122_SOEE5531M__8970365_1
+
+32925_MEDS5107M
+202122_MEDS5107M__9256341_1
+
+37648_LLLC0189
+202122_LLLC0189_9226086_1
+
+
 */
 
 
 $lists_to_process = Array(
-    Array("course_code"=>"35627_EDUC5264M", "list_code"=>"202122_EDUC5264M__8629446_1"),  
-    Array("course_code"=>"25874_PSYC3505", "list_code"=>"202122_PSYC3505__8994937_1")
+    Array("course_code"=>"28573_SOEE5531M", "list_code"=>"202122_SOEE5531M__8970365_1"),  
+    Array("course_code"=>"32925_MEDS5107M", "list_code"=>"202122_MEDS5107M__9256341_1_B"),
+    Array("course_code"=>"37648_LLLC0189", "list_code"=>"202122_LLLC0189__9226086_1")
 );
 
 $citations = Array(); 
 
 
 foreach ($lists_to_process as $list_to_process) { 
+    
     $course_code = $list_to_process["course_code"];
     $list_code = $list_to_process["list_code"];
     
@@ -56,7 +69,9 @@ foreach ($lists_to_process as $list_to_process) {
     foreach ($course_records["course"] as $course_record) {
         $course_id = $course_record["id"];
         $list_records = $list_endpoint->retrieveReadingLists($course_id);
+        
         foreach ($list_records["reading_list"] as $list_record) {
+            
             if ($list_record["code"]==$list_code) {
                 
                 $list_full_record = $list_endpoint->retrieveReadingList($course_id, $list_record["id"], "full");

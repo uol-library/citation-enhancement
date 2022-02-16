@@ -5,13 +5,34 @@ $config = parse_ini_file("config.ini", true);
 
 
 function standardise($string) {
+    
+    $dashes = Array("\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\x95");
+    $dblQuotes = Array("\xe2\x80\x9c", "\xe2\x80\x9d", "\xc2\xab}", "\xc2\xbb}");
+    $quotes = Array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\xb9", "\xe2\x80\xba");
+    $whitespace = Array("\xc2\xa0}", "\xe2\x80\xa8", "\xe2\x80\xa9", "\xe3\x80\x80"); // any whitespace we need to know about apart from \n\r\t\x20
+    
+    foreach ($dashes as $character) {
+        $string = preg_replace('/'.$character.'/', '-', $string);
+    }
+    foreach ($dblQuotes as $character) {
+        $string = preg_replace('/'.$character.'/', '"', $string);
+    }
+    foreach ($quotes as $character) {
+        $string = preg_replace('/'.$character.'/', '"', $string);
+    }
+    foreach ($whitespace as $character) {
+        $string = preg_replace('/'.$character.'/', '"', $string);
+    }
+    
     $string = preg_replace('/\xe2\x9c\xb1/', '', $string); // remove heavy asterisks 
+    
     $string = preg_replace('/\s*\/\s*$/', "", $string);
     $string = trim($string);
     return $string;
 }
 
 function normalise($string) {
+    $string = standardise($string);
     $string = strtolower($string);
     $string = preg_replace('/[\.,\-_;:\/\\\'"\?!\+\&]/', " ", $string);
     $string = preg_replace('/\s+/', " ", $string);

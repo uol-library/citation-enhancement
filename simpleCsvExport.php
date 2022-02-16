@@ -42,7 +42,7 @@ $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 
 $outputRecords = Array(); 
 // $rowHeadings = Array("TYPE", "TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "SOURCES", "CSI", "CSI-AUTHORS", "CSI-SUM");   
-$rowHeadings = Array("TYPE", "TITLE", "CONTAINER-TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "SOURCES", "CSI", "GNI-RANKS");
+$rowHeadings = Array("TYPE", "TITLE", "CONTAINER-TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "DATA", "SOURCES", "CSI", "GNI-RANKS");
 // $rowHeadings = Array("TYPE", "TITLE", "CONTAINER-TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CSI");
 
 foreach ($citations as $citation) { 
@@ -102,6 +102,9 @@ foreach ($citations as $citation) {
     
     $sources = Array(); 
     if (isset($citation["VIAF"])) { 
+        
+        $outputRecord["DATA"][] = "VIAF"; 
+        
         foreach ($citation["VIAF"] as $viafCitation) { 
             if (isset($viafCitation["best-match"]) && isset($viafCitation["best-match"]["nationalities"])) {
                 
@@ -149,7 +152,12 @@ foreach ($citations as $citation) {
         }
     }
     if (isset($citation["Scopus"])) {
+        
+        
         if (isset($citation["Scopus"]["first-match"]) && isset($citation["Scopus"]["first-match"]["authors"])) {
+        
+            $outputRecord["DATA"][] = "Scopus";
+            
             foreach ($citation["Scopus"]["first-match"]["authors"] as $author) {
                 
                 $gniRanksAuthorSource = Array(); // just for this author, this source
