@@ -9,6 +9,7 @@ error_reporting(E_ALL);                     // we want to know about all problem
 
 
 require_once("utils.php"); 
+require_once("vectorComparison.php");
 
 
 
@@ -37,22 +38,11 @@ foreach ($worldBankRankLines as $worldBankRankLine) {
         }
     }
 }
-// World Bank country code aliases 
-$worldBankAlias = json_decode(file_get_contents("Config/WorldBank/alias.json"), TRUE); 
-foreach ($worldBankAlias as $source=>$target) {
-    if (!isset($worldBankRank[$source])) { // only alias if we really don't have it  
-        $worldBankRank[$source] = $worldBankRank[$target];
-    }
-} 
-
-
 
 $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 
 $outputRecords = Array(); 
-// $rowHeadings = Array("TYPE", "TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "SOURCES", "CSI", "CSI-AUTHORS", "CSI-SUM");   
-$rowHeadings = Array("TYPE", "TITLE", "CONTAINER-TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "SOURCES", "VIAF-SA", "VIAF-ST", "SCOPUS-SA", "SCOPUS-ST", "CSI");
-// $rowHeadings = Array("TYPE", "TITLE", "CONTAINER-TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CSI");
+$rowHeadings = Array("TYPE", "TITLE", "CONTAINER-TITLE", "AUTHOR", "TAGS", "NATNS-VIAF", "NATNS-SCOPUS", "NATNS-AGREEMENT");
 
 foreach ($citations as $citation) { 
     
@@ -94,6 +84,12 @@ foreach ($citations as $citation) {
         $outputRecord["AUTHOR"] = $citation["Leganto"]["metadata"]["author"];
     }
     
+    $outputRecord["NATNS-VIAF"] = Array();
+    $outputRecord["NATNS-SCOPUS"] = Array();
+    $outputRecord["NATNS-VIAF-RAW"] = Array();
+    $outputRecord["NATNS-SCOPUS-RAW"] = Array();
+    $outputRecord["NATNS-VIAF-HASH"] = Array();
+    $outputRecord["NATNS-SCOPUS-HASH"] = Array();
     $outputRecord["NATIONALITIES"] = Array();
     $outputRecord["CONTINENTS"] = Array();
     $outputRecord["SOURCES"] = Array();
@@ -117,52 +113,43 @@ foreach ($citations as $citation) {
         foreach ($citation["VIAF"] as $viafCitation) { 
             if (isset($viafCitation["best-match"]) && isset($viafCitation["best-match"]["nationalities"])) {
                 
-                $outputRecord["VIAF-SA"] = $viafCitation["best-match"]["similarity-author"]; 
-                $outputRecord["VIAF-ST"] = $viafCitation["best-match"]["similarity-title"];
-                
                 $gniRanksAuthorSource = Array(); // just for this author, this source 
                 
-                foreach (Array("NAT"=>"nationalities") as $fieldCode=>$countryField) { 
+                foreach ($viafCitation["best-match"]["nationalities"] as $nationality) {
                     
-                    if (isset($viafCitation["best-match"][$countryField]) && is_array($viafCitation["best-match"][$countryField])) { 
+                    $sources["VIAF"] = TRUE; 
                     
-                        foreach ($viafCitation["best-match"][$countryField] as $nationality) {
-                            
-                            $nationalityValue = strtoupper($nationality["value"]);
-                            $nationalityCode = NULL;
-                            if (strlen($nationalityValue)==2) {
-                                if (!in_array($nationalityValue, Array("XX", "ZZ"))) {
-                                    $nationalityCode = $nationalityValue;
-                                }
-                            } else if (strlen($nationalityValue)==3) {
-                                if (isset($iso2Map[$nationalityValue]) && $iso2Map[$nationalityValue]) {
-                                    if (!in_array($iso2Map[$nationalityValue], Array("XX", "ZZ"))) {
-                                        $nationalityCode = $iso2Map[$nationalityValue];
-                                    }
-                                }
+                    $nationalityValue = strtoupper($nationality["value"]);
+                    $nationalityCode = NULL; 
+                    if (strlen($nationalityValue)==2) {
+                        if (!in_array($nationalityValue, Array("XX", "ZZ"))) {
+                            $nationalityCode = $nationalityValue;
+                        }
+                    } else if (strlen($nationalityValue)==3) {
+                        if (isset($iso2Map[$nationalityValue]) && $iso2Map[$nationalityValue]) {
+                            if (!in_array($iso2Map[$nationalityValue], Array("XX", "ZZ"))) { 
+                                $nationalityCode = $iso2Map[$nationalityValue];
                             }
-                            if ($nationalityCode==NULL && isset($namesToCodesMap[strtolower($nationality["value"])])) {
-                                // is a country name
-                                $nationalityValue = strtolower($nationality["value"]);
-                                if (isset($namesToCodesMap[$nationalityValue])) {
-                                    $nationalityCode = $namesToCodesMap[$nationalityValue];
-                                }
-                            }
-                            if ($nationalityCode!==NULL) {
-                                $sources["VIAF-$fieldCode"] = TRUE;
-                                if (isset($worldBankRank[$nationalityCode])) {
-                                    $gniRanksAuthorSource[] = $worldBankRank[$nationalityCode];
-                                } else {
-                                    trigger_error("No World Bank ranking for ".$nationalityCode, E_USER_ERROR);
-                                }
-                                $outputRecord["NATIONALITIES"][] = $nationalityCode;
-                            } else {
-                                // trigger_error("Can't derive nation code for ".$nationality["value"], E_USER_NOTICE);
-                            }
-                            
                         }
                     }
-                    
+                    if ($nationalityCode==NULL && isset($namesToCodesMap[strtolower($nationality["value"])])) {
+                        // is a country name
+                        $nationalityValue = strtolower($nationality["value"]);
+                        if (isset($namesToCodesMap[$nationalityValue])) { 
+                            $nationalityCode = $namesToCodesMap[$nationalityValue];
+                        }
+                    }
+                    if ($nationalityCode!==NULL) { 
+                        if (isset($worldBankRank[$nationalityCode])) {
+                            $gniRanksAuthorSource[] = $worldBankRank[$nationalityCode];
+                        } else { 
+                            trigger_error("No World Bank ranking for ".$nationalityCode, E_USER_ERROR);
+                        }
+                        $outputRecord["NATIONALITIES"][] = $nationalityCode;
+                        $outputRecord["NATNS-VIAF-RAW"][] = $nationalityCode;
+                    } else { 
+                        // trigger_error("Can't derive nation code for ".$nationality["value"], E_USER_NOTICE);
+                    }
                 }
                 if (count($gniRanksAuthorSource)) { 
                     $gniRanks[] = array_sum($gniRanksAuthorSource)/count($gniRanksAuthorSource);
@@ -176,9 +163,6 @@ foreach ($citations as $citation) {
         if (isset($citation["Scopus"]["first-match"]) && isset($citation["Scopus"]["first-match"]["authors"])) {
         
             $outputRecord["DATA"][] = "Scopus";
-            
-            $outputRecord["SCOPUS-SA"] = $citation["Scopus"]["first-match"]["similarity-authors"];
-            $outputRecord["SCOPUS-ST"] = $citation["Scopus"]["first-match"]["similarity-title"];
             
             foreach ($citation["Scopus"]["first-match"]["authors"] as $author) {
                 
@@ -199,6 +183,7 @@ foreach ($citations as $citation) {
                                     trigger_error("No World Bank ranking for ".$nationalityCode, E_USER_ERROR);
                                 }
                                 $outputRecord["NATIONALITIES"][] = $nationalityCode;
+                                $outputRecord["NATNS-SCOPUS-RAW"][] = $nationalityCode;
                                 $contemporaryAffiliation = TRUE;
                             } else {
                                 // trigger_error("Can't derive nation code for ".$authorAffiliation["country"], E_USER_NOTICE);
@@ -238,6 +223,8 @@ foreach ($citations as $citation) {
                                         trigger_error("No World Bank ranking for ".$nationalityCode, E_USER_ERROR);
                                     }
                                     $outputRecord["NATIONALITIES"][] = $nationalityCode;
+                                    $outputRecord["NATNS-SCOPUS-RAW"][] = $nationalityCode;
+                                    
                                 } else {
                                     // trigger_error("Can't derive nation code for ".$authorAffiliation["address"]["@country"].":".$authorAffiliation["address"]["country"], E_USER_NOTICE);
                                 }
@@ -257,13 +244,42 @@ foreach ($citations as $citation) {
     $outputRecord["SOURCES"] = array_keys($sources);
     
     $outputRecord["NATIONALITIES"] = array_unique($outputRecord["NATIONALITIES"]);
-    
     foreach ($outputRecord["NATIONALITIES"] as $nationCode) {
         if (isset($continentMap[$nationCode]) && $continentMap[$nationCode]) {
             $outputRecord["CONTINENTS"][] = $continentMap[$nationCode];
         }
     }
     $outputRecord["CONTINENTS"] = array_unique($outputRecord["CONTINENTS"]);
+
+    foreach (Array("VIAF", "SCOPUS") as $natSource) {
+        $nations = array_unique($outputRecord["NATNS-$natSource-RAW"]); 
+        sort($nations); 
+        foreach ($nations as $nationInstance) { 
+            $outputRecord["NATNS-$natSource-HASH"][$nationInstance] = 0;             
+        }
+        foreach ($outputRecord["NATNS-$natSource-RAW"] as $nationInstance) { 
+            $outputRecord["NATNS-$natSource-HASH"][$nationInstance]++; 
+        }
+        $outputRecord["NATNS-$natSource"] = Array(); 
+        foreach ($outputRecord["NATNS-$natSource-HASH"] as $nationInstance=>$count) { 
+            $outputRecord["NATNS-$natSource"][] = $nationInstance."[".$count."]"; 
+        }
+    }
+    
+    if (count($outputRecord["NATNS-VIAF-RAW"]) && count($outputRecord["NATNS-SCOPUS-RAW"])) { 
+        $dictionary = array_unique(array_merge($outputRecord["NATNS-VIAF-RAW"], $outputRecord["NATNS-SCOPUS-RAW"]));
+        sort($dictionary);
+        $vectorViaf = hashToVector($dictionary, $outputRecord["NATNS-VIAF-HASH"]);
+        $vectorScopus = hashToVector($dictionary, $outputRecord["NATNS-SCOPUS-HASH"]);
+        $vectorViaf = normaliseVector($vectorViaf);
+        $vectorScopus = normaliseVector($vectorScopus);
+        $agreement = floor(100*cosineDifference($vectorViaf, $vectorScopus));
+        $outputRecord["NATNS-AGREEMENT"] = $agreement;
+    } else { 
+        $outputRecord["NATNS-AGREEMENT"] = "";
+    }
+    
+    
     
     if (count($gniRanks) && $worldBankMaxRank) {
         $outputRecord["CSI"] = array_sum($gniRanks)/($worldBankMaxRank*count($gniRanks));

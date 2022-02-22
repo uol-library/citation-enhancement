@@ -37,21 +37,12 @@ foreach ($worldBankRankLines as $worldBankRankLine) {
         }
     }
 }
-// World Bank country code aliases 
-$worldBankAlias = json_decode(file_get_contents("Config/WorldBank/alias.json"), TRUE); 
-foreach ($worldBankAlias as $source=>$target) {
-    if (!isset($worldBankRank[$source])) { // only alias if we really don't have it  
-        $worldBankRank[$source] = $worldBankRank[$target];
-    }
-} 
-
-
 
 $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 
 $outputRecords = Array(); 
 // $rowHeadings = Array("TYPE", "TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "SOURCES", "CSI", "CSI-AUTHORS", "CSI-SUM");   
-$rowHeadings = Array("TYPE", "TITLE", "CONTAINER-TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "SOURCES", "VIAF-SA", "VIAF-ST", "SCOPUS-SA", "SCOPUS-ST", "CSI");
+$rowHeadings = Array("TYPE", "TITLE", "CONTAINER-TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CONTINENTS", "DATA", "SOURCES", "CSI", "GNI-RANKS");
 // $rowHeadings = Array("TYPE", "TITLE", "CONTAINER-TITLE", "AUTHOR", "TAGS", "NATIONALITIES", "CSI");
 
 foreach ($citations as $citation) { 
@@ -117,16 +108,15 @@ foreach ($citations as $citation) {
         foreach ($citation["VIAF"] as $viafCitation) { 
             if (isset($viafCitation["best-match"]) && isset($viafCitation["best-match"]["nationalities"])) {
                 
-                $outputRecord["VIAF-SA"] = $viafCitation["best-match"]["similarity-author"]; 
-                $outputRecord["VIAF-ST"] = $viafCitation["best-match"]["similarity-title"];
-                
                 $gniRanksAuthorSource = Array(); // just for this author, this source 
                 
-                foreach (Array("NAT"=>"nationalities") as $fieldCode=>$countryField) { 
+                foreach (Array("NAT"=>"nationalities", "COP"=>"countriesOfPublication") as $fieldCode=>$countryField) { 
                     
                     if (isset($viafCitation["best-match"][$countryField]) && is_array($viafCitation["best-match"][$countryField])) { 
                     
                         foreach ($viafCitation["best-match"][$countryField] as $nationality) {
+                            
+                            if (isset($sources["VIAF-NAT"]) && $sources["VIAF-NAT"] && $fieldCode=="COP") { break; } // only do COP at all if we have no NAT data
                             
                             $nationalityValue = strtoupper($nationality["value"]);
                             $nationalityCode = NULL;
@@ -160,6 +150,8 @@ foreach ($citations as $citation) {
                                 // trigger_error("Can't derive nation code for ".$nationality["value"], E_USER_NOTICE);
                             }
                             
+                            if ($fieldCode=="COP") { break; } // only look at first (most numerous) entry in COP
+                            
                         }
                     }
                     
@@ -176,9 +168,6 @@ foreach ($citations as $citation) {
         if (isset($citation["Scopus"]["first-match"]) && isset($citation["Scopus"]["first-match"]["authors"])) {
         
             $outputRecord["DATA"][] = "Scopus";
-            
-            $outputRecord["SCOPUS-SA"] = $citation["Scopus"]["first-match"]["similarity-authors"];
-            $outputRecord["SCOPUS-ST"] = $citation["Scopus"]["first-match"]["similarity-title"];
             
             foreach ($citation["Scopus"]["first-match"]["authors"] as $author) {
                 

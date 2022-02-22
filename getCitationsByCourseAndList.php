@@ -52,9 +52,12 @@ $list_code = "202122_EDUC5264M__8629446_1";
 
 
 $lists_to_process = Array(
+    /*
     Array("course_code"=>"28573_SOEE5531M", "list_code"=>"202122_SOEE5531M__8970365_1"),  
     Array("course_code"=>"32925_MEDS5107M", "list_code"=>"202122_MEDS5107M__9256341_1_B"),
     Array("course_code"=>"37648_LLLC0189", "list_code"=>"202122_LLLC0189__9226086_1")
+    */
+    Array("course_code"=>"29679_HIST1055", "list_code"=>"202122_HIST1055__9463092_1")
 );
 
 $citations = Array(); 

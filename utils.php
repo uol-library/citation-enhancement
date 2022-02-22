@@ -25,6 +25,8 @@ function standardise($string) {
     }
     
     $string = preg_replace('/\xe2\x9c\xb1/', '', $string); // remove heavy asterisks 
+  
+    $string = preg_replace('/[\t\r\n]/', ' ', $string); // whitespace
     
     $string = preg_replace('/\s*\/\s*$/', "", $string);
     $string = trim($string);
@@ -50,22 +52,85 @@ function simplify($string) {
     return $string ? $string : FALSE;
 }
 
-function similarity($string1, $string2) {
+function similarity($string1, $string2, $type="Levenshtein", $crop=FALSE, $alphabeticise=FALSE) {
+
     if ($string1==$string2) { return 100; }
     $string1 = normalise($string1);
     $string2 = normalise($string2);
     if (!$string1 || !$string2) { return 0; }
-    $lev = levenshtein($string1, $string2);
     
-    $pc = 100 * (1 - $lev/(strlen($string1)+strlen($string2)));
+    if ($crop && strlen($string1)!=strlen($string2)) { 
+        if (strlen($string1)>strlen($string2)) { 
+            $string1 = cropto($string1, strlen($string2)); 
+        } else { 
+            $string2 = cropto($string2, strlen($string1));
+        }
+    }
     
-    if ($pc<0) { $pc = 0; }
-    if ($pc>100) { $pc = 100; }
+    if ($alphabeticise) { 
+        $stringArray = explode(" ", $string1); 
+        sort($stringArray); 
+        $string1 = implode(" ", $stringArray); 
+        $stringArray = explode(" ", $string2);
+        sort($stringArray);
+        $string2 = implode(" ", $stringArray);
+    }
     
-    return floor($pc);
+    if ($type=="Levenshtein") { 
+        $lev = levenshtein($string1, $string2);
+        // $pc = 100 * (1 - 2*$lev/(strlen($string1)+strlen($string2)));
+        $pc = 100 * (1 - $lev/max(strlen($string1),strlen($string2)));
+        if ($pc<0) { $pc = 0; }
+        if ($pc>100) { $pc = 100; }
+        return floor($pc);
+    } else if ($type=="similar_text") { 
+        $pc = 0;
+        similar_text($string1, $string2, $pc); 
+        return floor($pc);
+    } else if ($type=="metaphone") { 
+        $string1Mod = implode(' ', array_map('metaphone', explode(' ', $string1)));
+        $string2Mod = implode(' ', array_map('metaphone', explode(' ', $string2)));
+        $lev = levenshtein($string1Mod, $string2Mod);
+        // $pc = 100 * (1 - 2*$lev/(strlen($string1Mod)+strlen($string2Mod)));
+        $pc = 100 * (1 - $lev/max(strlen($string1Mod), strlen($string2Mod)));
+        if ($pc<0) { $pc = 0; }
+        if ($pc>100) { $pc = 100; }
+        return floor($pc);
+    } else if ($type=="lcms") { 
+        $lcms = getLongestMatchingSubstring($string1, $string2);
+        $pc = 100 * (2*strlen($lcms)/(strlen($string1)+strlen($string2)));
+        if ($pc<0) { $pc = 0; }
+        if ($pc>100) { $pc = 100; }
+        return floor($pc);
+    }
+    
+    throw new Exception("Similarity type $type nort implemented"); 
+    
 }
 
 
+function cropto($string, $length) { 
+    // can't just use substr because we only want to split at a space or punctuation 
+    $left = substr($string, 0, $length); 
+    $right = substr($string, $length);
+    $right = preg_replace('/^([^\s\.,:;\!\?\-&]*).*$/', '$1', $right);
+    return $left.$right; 
+}
+
+function getLongestMatchingSubstring($str1, $str2) {
+    $len_1 = strlen($str1);
+    $longest = '';
+    for($i = 0; $i < $len_1; $i++){
+        for($j = $len_1 - $i; $j > 0; $j--){
+            $sub = substr($str1, $i, $j);
+            if (strpos($str2, $sub) !== false && strlen($sub) > strlen($longest)){
+                $longest = $sub;
+                break;
+            }
+        }
+    }
+    return $longest;
+}
 
 /**
  * file_get_contents lookalike function using cURL

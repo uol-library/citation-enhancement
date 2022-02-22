@@ -26,7 +26,7 @@ foreach ($citations as &$citation) {
         $doi = preg_replace('/^https?:\/\/doi\.org\//', '', $doi);
         $searchParameters["DOI"] = $doi; 
     }
-    if (isset($citation["Leganto"]["secondary_type"]["value"]) && $citation["Leganto"]["secondary_type"]["value"]=="CR"
+    if (isset($citation["Leganto"]["secondary_type"]["value"]) && in_array($citation["Leganto"]["secondary_type"]["value"], Array("CR", "E_CR"))
         && isset($citation["Leganto"]["metadata"]["article_title"]) && $citation["Leganto"]["metadata"]["article_title"]) {
             $searchParameters["TITLE"] = $citation["Leganto"]["metadata"]["article_title"];
             if (isset($citation["Leganto"]["metadata"]["issn"]) && $citation["Leganto"]["metadata"]["issn"]) {
@@ -35,10 +35,10 @@ foreach ($citations as &$citation) {
             if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
                 $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["author"]);
                 $searchParameters["AUTH"] = $legantoAuthor;
+                $searchParameters["__auth_raw"] = $citation["Leganto"]["metadata"]["author"];
             }
-            $searchParameters["DOCTYPE"] = "ar";
-    }
-    if (isset($citation["Leganto"]["secondary_type"]["value"]) && $citation["Leganto"]["secondary_type"]["value"]=="BK"
+            $searchParameters["DOCTYPE"] = Array("ar", "re"); // this parameter may have multiple possible values (to join with "or") 
+    } else if (isset($citation["Leganto"]["secondary_type"]["value"]) && $citation["Leganto"]["secondary_type"]["value"]=="BK"
         && isset($citation["Leganto"]["metadata"]["title"]) && $citation["Leganto"]["metadata"]["title"]) {
             $searchParameters["TITLE"] = $citation["Leganto"]["metadata"]["title"];
             if (isset($citation["Leganto"]["metadata"]["isbn"]) && $citation["Leganto"]["metadata"]["isbn"]) {
@@ -47,11 +47,25 @@ foreach ($citations as &$citation) {
             if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
                 $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["author"]);
                 $searchParameters["AUTH"] = $legantoAuthor;
+                $searchParameters["__auth_raw"] = $citation["Leganto"]["metadata"]["author"];
             }
-            $searchParameters["DOCTYPE"] = "bk";
+            $searchParameters["DOCTYPE"] = Array("bk");
+    } else if (isset($citation["Leganto"]["secondary_type"]["value"]) && in_array($citation["Leganto"]["secondary_type"]["value"], Array("WS", "CONFERENCE", "E_BK", "OTHER"))
+        && isset($citation["Leganto"]["metadata"]["title"]) && $citation["Leganto"]["metadata"]["title"]
+        && isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
+            $searchParameters["TITLE"] = $citation["Leganto"]["metadata"]["title"];
+            if (isset($citation["Leganto"]["metadata"]["isbn"]) && $citation["Leganto"]["metadata"]["isbn"]) {
+                $searchParameters["ISBN"] = $citation["Leganto"]["metadata"]["isbn"];
+            }
+            if (isset($citation["Leganto"]["metadata"]["issn"]) && $citation["Leganto"]["metadata"]["issn"]) {
+                $searchParameters["ISSN"] = $citation["Leganto"]["metadata"]["issn"];
+            }
+            if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
+                $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["author"]);
+                $searchParameters["AUTH"] = $legantoAuthor;
+                $searchParameters["__auth_raw"] = $citation["Leganto"]["metadata"]["author"];
+            }
     }
-        
-    
     
     // if ($searchTermEncoded) {
     if (count($searchParameters)) { 
@@ -62,43 +76,58 @@ foreach ($citations as &$citation) {
         
         // 1st choice - DOI 
         if (isset($searchParameters["DOI"]) && $searchParameters["DOI"]) {
-            $searchStrings[0] = "DOI(".$searchParameters["DOI"].")";
+            $searchStrings[1] = "DOI(".$searchParameters["DOI"].")";
         }
         // 2nd choice - exact title match and author surname *and* doctype *and* isbn/issn 
         if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
             $searchString = "TITLE({".$searchParameters["TITLE"]."})"; // exact match
-            if (isset($searchParameters["DOCTYPE"]) && $searchParameters["DOCTYPE"]) { $searchString .= " AND DOCTYPE(".$searchParameters["DOCTYPE"].")"; }
+            if (isset($searchParameters["DOCTYPE"]) && count($searchParameters["DOCTYPE"])) { 
+                // $searchString .= " AND DOCTYPE(".$searchParameters["DOCTYPE"].")";
+                $searchString .= " AND (".implode(" OR ", array_map(function($doctype) { return "DOCTYPE(".$doctype.")"; }, $searchParameters["DOCTYPE"])).")";
+            }
             if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"]) { $searchString .= " AND AUTH(".$searchParameters["AUTH"].")"; }
             if (isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) { $searchString .= " AND ISBN(".$searchParameters["ISBN"].")"; }
             if (isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) { $searchString .= " AND ISSN(".$searchParameters["ISSN"].")"; }
-            $searchStrings[1] = $searchString;
+            $searchStrings[2] = $searchString;
         }
-        // 3rd choice - exact title match and ( author surname *or* isbn/issn ) 
+        // 3rd choice - exact title match and doctype and ( author surname *or* isbn/issn ) 
         if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
             $searchString = "TITLE({".$searchParameters["TITLE"]."})"; // exact match
-            // even looser match
+            if (isset($searchParameters["DOCTYPE"]) && count($searchParameters["DOCTYPE"])) {
+                // $searchString .= " AND DOCTYPE(".$searchParameters["DOCTYPE"].")";
+                $searchString .= " AND (".implode(" OR ", array_map(function($doctype) { return "DOCTYPE(".$doctype.")"; }, $searchParameters["DOCTYPE"])).")";
+            }
+            $qualifyingField = FALSE;
             if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"] && isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) {
+                $qualifyingField = TRUE;
                 $searchString .= " AND (AUTH(".$searchParameters["AUTH"].") OR ISSN(".$searchParameters["ISSN"]."))";
             } else if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"] && isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) {
+                $qualifyingField = TRUE;
                 $searchString .= " AND (AUTH(".$searchParameters["AUTH"].") OR ISBN(".$searchParameters["ISBN"]."))";
             }
-            if (!in_array($searchString, $searchStrings)) { $searchStrings[2] = $searchString; } // only add this one if we've made a difference
+            if ($qualifyingField && !in_array($searchString, $searchStrings)) { $searchStrings[3] = $searchString; } // only add this one if we've made a difference
         }
-        // 4th choice - exact title match and doctype 
+        // 4th choice - exact title match and ( author surname *or* isbn/issn ) 
         if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
-            $searchString = "TITLE({".$searchParameters["TITLE"]."})";
-            // sort-of looser match
-            if (isset($searchParameters["DOCTYPE"]) && $searchParameters["DOCTYPE"]) { $searchString .= " AND DOCTYPE(".$searchParameters["DOCTYPE"].")"; }
-            if (!in_array($searchString, $searchStrings)) { $searchStrings[3] = $searchString; } // only add this one if we've made a difference
+            $searchString = "TITLE({".$searchParameters["TITLE"]."})"; // exact match
+            $qualifyingField = FALSE; 
+            if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"] && isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) {
+                $qualifyingField = TRUE;
+                $searchString .= " AND (AUTH(".$searchParameters["AUTH"].") OR ISSN(".$searchParameters["ISSN"]."))";
+            } else if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"] && isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) {
+                $qualifyingField = TRUE;
+                $searchString .= " AND (AUTH(".$searchParameters["AUTH"].") OR ISBN(".$searchParameters["ISBN"]."))";
+            }
+            if ($qualifyingField && !in_array($searchString, $searchStrings)) { $searchStrings[4] = $searchString; } // only add this one if we've made a difference
         }
         // 5th choice - title search terms adjacent and author surname *and* doctype *and* isbn/issn
-        if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
+        if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"] && isset($searchParameters["DOCTYPE"]) && count($searchParameters["DOCTYPE"])) {
             $searchString = "TITLE(\"".str_replace('"', '\"', $searchParameters["TITLE"])."\")";
-            if (isset($searchParameters["DOCTYPE"]) && $searchParameters["DOCTYPE"]) { $searchString .= " AND DOCTYPE(".$searchParameters["DOCTYPE"].")"; }
+            $searchString .= " AND (".implode(" OR ", array_map(function($doctype) { return "DOCTYPE(".$doctype.")"; }, $searchParameters["DOCTYPE"])).")";
             if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"]) { $searchString .= " AND AUTH(".$searchParameters["AUTH"].")"; }
             if (isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) { $searchString .= " AND ISBN(".$searchParameters["ISBN"].")"; }
             if (isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) { $searchString .= " AND ISSN(".$searchParameters["ISSN"].")"; }
-            if (!in_array($searchString, $searchStrings)) { $searchStrings[4] = $searchString; } // only add this one if we've made a difference
+            if (!in_array($searchString, $searchStrings)) { $searchStrings[5] = $searchString; } // only add this one if we've made a difference
         }
         // 6th choice - title search terms adjacent and author surname *and* isbn/issn
         if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
@@ -106,13 +135,26 @@ foreach ($citations as &$citation) {
             if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"]) { $searchString .= " AND AUTH(".$searchParameters["AUTH"].")"; }
             if (isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) { $searchString .= " AND ISBN(".$searchParameters["ISBN"].")"; }
             if (isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) { $searchString .= " AND ISSN(".$searchParameters["ISSN"].")"; }
-            if (!in_array($searchString, $searchStrings)) { $searchStrings[5] = $searchString; } // only add this one if we've made a difference
+            if (!in_array($searchString, $searchStrings)) { $searchStrings[6] = $searchString; } // only add this one if we've made a difference
         }
-
-
+        // 7th choice - title search terms adjacent and author surname *or* isbn/issn
+        if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
+            $searchString = "TITLE(\"".str_replace('"', '\"', $searchParameters["TITLE"])."\")"; // slightly looser match
+            $qualifyingField = FALSE;
+            if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"] && isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) {
+                $qualifyingField = TRUE;
+                $searchString .= " AND (AUTH(".$searchParameters["AUTH"].") OR ISSN(".$searchParameters["ISSN"]."))";
+            } else if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"] && isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) {
+                $qualifyingField = TRUE;
+                $searchString .= " AND (AUTH(".$searchParameters["AUTH"].") OR ISBN(".$searchParameters["ISBN"]."))";
+            }
+            if ($qualifyingField && !in_array($searchString, $searchStrings)) { $searchStrings[7] = $searchString; } // only add this one if we've made a difference
+        }
+        
+        
         foreach ($searchStrings as $searchPref=>$searchString) { 
             $scopusSearchData = scopusApiQuery("https://api.elsevier.com/content/search/scopus?query=".urlencode($searchString), $citation["Scopus"], "scopus-search", TRUE);
-            if ($scopusSearchData && $scopusSearchData["search-results"]["opensearch:totalResults"]>0) { break; } // first successful result
+            if ($scopusSearchData && intval($scopusSearchData["search-results"]["opensearch:totalResults"])>0) { break; } // first successful result
             if (!isset($citation["Scopus"]["searches-no-results"])) { $citation["Scopus"]["searches-no-results"] = Array(); } 
             $citation["Scopus"]["searches-no-results"][] = $searchString; // record the one we're trying
         }
@@ -145,6 +187,10 @@ foreach ($citations as &$citation) {
                 }
             }
             
+            
+            $collatedAuthorsShort = Array(); 
+            $collatedAuthorsLong = Array();
+            
             if ($linkAuthorAffiliation) { 
                 
                 $scopusAuthorAffiliationData = scopusApiQuery($linkAuthorAffiliation, $citation["Scopus"], "abstract-retrieval", TRUE);
@@ -154,7 +200,20 @@ foreach ($citations as &$citation) {
                 $citation["Scopus"]["first-match"]["authors"] = Array(); 
                 if (isset($scopusAuthorAffiliationData["abstracts-retrieval-response"]["authors"]["author"])) {
                     foreach ($scopusAuthorAffiliationData["abstracts-retrieval-response"]["authors"]["author"] as $author) {
-                        $citationScopusAuthor = array_filter(array_intersect_key($author, Array("@auid"=>TRUE, "author-url"=>TRUE, "preferred-name"=>TRUE, "ce:indexed-name"=>TRUE, "affiliation"=>TRUE)));
+                        $citationScopusAuthor = array_filter(array_intersect_key($author, Array("@auid"=>TRUE, "author-url"=>TRUE, "preferred-name"=>TRUE, "ce:indexed-name"=>TRUE, "ce:surname"=>TRUE, "ce:initials"=>TRUE, "ce:given-name"=>TRUE, "affiliation"=>TRUE)));
+                        
+                        // assemble string list of authors for later comparison with source metadata 
+                        if (isset($author["ce:indexed-name"]) && $author["ce:indexed-name"]) { 
+                            $collatedAuthorsShort[] = $author["ce:indexed-name"];
+                        }
+                        if (isset($author["ce:surname"]) && $author["ce:surname"]) {
+                            $collatedAuthorLong = $author["ce:surname"]." ";
+                            if (isset($author["ce:given-name"]) && $author["ce:given-name"]) {
+                                $collatedAuthorLong .= $author["ce:given-name"];
+                            }
+                            $collatedAuthorsLong[] = $collatedAuthorLong; 
+                        }
+                        
                         // (contemporary) affiliation from the abstract information 
                         if (isset($citationScopusAuthor["affiliation"]) && is_array($citationScopusAuthor["affiliation"])) {
                             // affiliation may be single or a list - for simplicity, *always* turn it into a list
@@ -200,6 +259,32 @@ foreach ($citations as &$citation) {
                     }
                 }
             }
+            
+            // try to quantify the similarity of title and authors between source and Scopus 
+            if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
+                if (isset($entry["dc:title"]) && $entry["dc:title"])  {
+                    $citation["Scopus"]["first-match"]["similarity-title"] = similarity($entry["dc:title"], $searchParameters["TITLE"], "Levenshtein", FALSE);
+                }
+            }
+            $thisSimilarity = 0;
+            if (isset($searchParameters["__auth_raw"]) && $searchParameters["__auth_raw"]) {
+                foreach ($collatedAuthorsShort as $collatedAuthor) { 
+                    $thisSimilarity = max($thisSimilarity, similarity($collatedAuthor, $searchParameters["__auth_raw"], "Levenshtein", FALSE, TRUE)); // final TRUE means sort all words in strings into alphabetical order first
+                }
+                foreach ($collatedAuthorsLong as $collatedAuthor) {
+                    $thisSimilarity = max($thisSimilarity, similarity($collatedAuthor, $searchParameters["__auth_raw"], "Levenshtein", FALSE, TRUE)); // final TRUE means sort all words in strings into alphabetical order first
+                }
+                if (count($collatedAuthorsShort)) {
+                    $thisSimilarity = max($thisSimilarity, similarity(implode("", $collatedAuthorsShort), $searchParameters["__auth_raw"], "Levenshtein", FALSE, TRUE)); // final TRUE means sort all words in strings into alphabetical order first
+                }
+                if (count($collatedAuthorsLong)) {
+                    $thisSimilarity = max($thisSimilarity, similarity(implode("", $collatedAuthorsLong), $searchParameters["__auth_raw"], "Levenshtein", FALSE, TRUE)); // final TRUE means sort all words in strings into alphabetical order first
+                }
+                if (count($collatedAuthorsLong) || count($collatedAuthorsShort)) { 
+                    $citation["Scopus"]["first-match"]["similarity-authors"] = $thisSimilarity;
+                }
+            }
+            
         }
     }
 }
