@@ -1,25 +1,99 @@
 <?php 
 
-/*
- * Expects JSON input from stdin
+/**
+ * 
+ * =======================================================================
+ * 
+ * Script to enhance reading list citations using data from the Scopus API 
+ * 
+ * =======================================================================
+ * 
+ * Input: 
+ * JSON-encoded list of citations on STDIN 
+ * 
+ * Output: 
+ * JSON-encoded list of enhanced citations on STDOUT
+ * 
+ * =======================================================================
+ *
+ * Typical usage: 
+ * php enhanceCitationsFromScopus.php <Data/2.json >Data/3.json 
+ * 
+ * The input citation data is assumed to already contain data from Leganto and Alma 
+ * 
+ * See getCitationsByCourseAndList.php and enhanceCitationsFromAlma.php for how this data is prepared  
+ * 
+ * =======================================================================
+ * 
+ * General process: 
+ * 
+ * Loop over citations - for each citation: 
+ * 
+ *  - Collect the metadata that might potentially be useful in a Scopus search
+ *  - Prepare a set of progressively-looser search strings from this metadata 
+ *  - Try these searches in turn, until a search returns at least one result   
+ *  - Take the *first* record in the result set - 
+ *    TODO: may need an intelligent way of picking the best record where multiple records are returned 
+ *  - Fetch the abstract for this record (some relevant data is in here) 
+ *  - For each author in the abstract - 
+ *    - Fetch the contemporary affiliation of the author 
+ *    - Fetch the author profile which includes current affiliation   
+ *  - Calculate string similarities between source and Scopus authors and titles 
+ *  - Save all the data (including any Scopus rate-limit data and errors) in the citation object 
+ *  
+ * Export the enhanced citations 
+ * 
+ * =======================================================================
+ * 
+ * 
+ * 
+ * !! Gotchas !!  
+ * 
+ * You need a developer key for the Scopus API - see https://dev.elsevier.com/ 
+ * 
+ * Save your key in config.ini 
+ * 
+ * The API is only fully-accessible from a machine on a subscribing University's network e.g. 129.11.0.0 - it will not generate the required output if run on a remote machine
+ * 
+ * The API is rate-limited - each category of call has a weekly quota - 
+ * The remaining uses are logged by the code below in the citation data in CITATION["Scopus"]["rate-limit"]
+ * NB the code below caches the results of an API call to help limit usage 
+ * 
+ * The code below includes a small delay (usleep(100000)) between API calls to avoid overloading the service
+ * 
+ * Double-quote characters should to be encoded within phrase searches {like \"this\"} or "like \"this\"" 
+ * But even with this, I am still seeing errors from some searches including double-quotes 
+ * For now I am removing double-quotes altogether from titles - looks like things are still found, 
+ * but possibly via a looser search than would be ideal 
+ * TODO: Figure out how to create searches including doublt-quotes correctly   
+ * 
+ * TODO: I think some other special characters and strings (* ? ( ) { } " AND OR ) may need special handling if they occur in other fields e.g. DOI  
+ * I am not currently checking for these but it may need looking at 
+ * 
+ * Elsevier uses Cloudfare to protect its servers and during testing, some complex search strings triggered a block from Cloudfare  
+ * This is likely related to the previous two points 
+ * 
+ * 
  */
+
 
 
 error_reporting(E_ALL);                     // we want to know about all problems
 
-$scopusCache = Array(); // because of rate limit, don't fetch unless we have to 
+$scopusCache = Array();                     // because of rate limit, don't fetch unless we have to 
 
-require_once("utils.php"); 
-
-
+require_once("utils.php");                  // contains helper functions  
 
 
+// fetch the data from STDIN  
 $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 
 
+// main loop: process each citation 
 foreach ($citations as &$citation) { 
     
-    $searchParameters = Array(); // collect things here 
+    $searchParameters = Array();    // collect things in here for the Scopus search
+    $extraParameters = Array();     // not using in search query but may use e.g. to calculate result to source similarity 
     
     if (isset($citation["Leganto"]["metadata"]["doi"]) && $citation["Leganto"]["metadata"]["doi"]) {
         $doi = $citation["Leganto"]["metadata"]["doi"];
@@ -35,7 +109,7 @@ foreach ($citations as &$citation) {
             if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
                 $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["author"]);
                 $searchParameters["AUTH"] = $legantoAuthor;
-                $searchParameters["__auth_raw"] = $citation["Leganto"]["metadata"]["author"];
+                $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["author"];
             }
             $searchParameters["DOCTYPE"] = Array("ar", "re"); // this parameter may have multiple possible values (to join with "or") 
     } else if (isset($citation["Leganto"]["secondary_type"]["value"]) && $citation["Leganto"]["secondary_type"]["value"]=="BK"
@@ -47,7 +121,7 @@ foreach ($citations as &$citation) {
             if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
                 $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["author"]);
                 $searchParameters["AUTH"] = $legantoAuthor;
-                $searchParameters["__auth_raw"] = $citation["Leganto"]["metadata"]["author"];
+                $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["author"];
             }
             $searchParameters["DOCTYPE"] = Array("bk");
     } else if (isset($citation["Leganto"]["secondary_type"]["value"]) && in_array($citation["Leganto"]["secondary_type"]["value"], Array("WS", "CONFERENCE", "E_BK", "OTHER"))
@@ -63,13 +137,52 @@ foreach ($citations as &$citation) {
             if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
                 $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["author"]);
                 $searchParameters["AUTH"] = $legantoAuthor;
-                $searchParameters["__auth_raw"] = $citation["Leganto"]["metadata"]["author"];
+                $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["author"];
             }
     }
     
+    // now also collect some a-t data from Alma, that we can use to calculate source-Scopus similarity
+    $extraParameters["ALMA-CREATORS"] = Array();
+    $extraParameters["ALMA-TITLES"] = Array();
+    $creatorsSeen = Array();
+    $titlesSeen = Array();
+    // first choice - data from Alma Marc record
+    if (isset($citation["Leganto"]["secondary_type"]["value"]) && $citation["Leganto"]["secondary_type"]["value"]=="BK"
+        && isset($citation["Leganto"]["metadata"]["mms_id"]) && $citation["Leganto"]["metadata"]["mms_id"]
+        ) {
+            if (isset($citation["Alma"]) && isset($citation["Alma"]["creators"])) {
+                foreach ($citation["Alma"]["creators"] as $creatorAlma) {
+                    $creatorAlmaSerialised = print_r($creatorAlma, TRUE);
+                    if (isset($creatorAlma["collated"]) && $creatorAlma["collated"] && !in_array($creatorAlmaSerialised, $creatorsSeen)) {
+                        $extraParameters["ALMA-CREATORS"][] = $creatorAlma;
+                        $creatorsSeen[] = $creatorAlmaSerialised;
+                    }
+                }
+            }
+            if (isset($citation["Alma"]) && isset($citation["Alma"]["titles"])) {
+                foreach ($citation["Alma"]["titles"] as $titleAlma) {
+                    $titleAlmaSerialised = print_r($titleAlma, TRUE);
+                    if (isset($titleAlma["collated"]) && $titleAlma["collated"] && !in_array($titleAlmaSerialised, $titlesSeen)) {
+                        $extraParameters["ALMA-TITLES"][] = $titleAlma;
+                        $titlesSeen[] = $titleAlmaSerialised;
+                    }
+                }
+            }
+    }
+    
+    
     // if ($searchTermEncoded) {
     if (count($searchParameters)) { 
-
+        
+        // need to escape quote characters in TITLE - other fields don't matter for now 
+        // because the search terms are not wrapped in {} or "" 
+        //TODO need to properly deal with special characters (",*,?) in *any* field?
+        // NB for now removing double-quotes altogether because of problems 
+        if (isset($searchParameters["TITLE"])) { 
+            // $searchParameters["TITLE"] = str_replace('"', '\"', $searchParameters["TITLE"]); 
+            $searchParameters["TITLE"] = str_replace('"', '', $searchParameters["TITLE"]);
+        }
+       
         $citation["Scopus"] = Array(); // to populate
         
         $searchStrings = Array(); // assemble search parameters into one or more search strings, in order of preference
@@ -122,7 +235,7 @@ foreach ($citations as &$citation) {
         }
         // 5th choice - title search terms adjacent and author surname *and* doctype *and* isbn/issn
         if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"] && isset($searchParameters["DOCTYPE"]) && count($searchParameters["DOCTYPE"])) {
-            $searchString = "TITLE(\"".str_replace('"', '\"', $searchParameters["TITLE"])."\")";
+            $searchString = "TITLE(\"".$searchParameters["TITLE"]."\")";
             $searchString .= " AND (".implode(" OR ", array_map(function($doctype) { return "DOCTYPE(".$doctype.")"; }, $searchParameters["DOCTYPE"])).")";
             if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"]) { $searchString .= " AND AUTH(".$searchParameters["AUTH"].")"; }
             if (isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) { $searchString .= " AND ISBN(".$searchParameters["ISBN"].")"; }
@@ -131,7 +244,7 @@ foreach ($citations as &$citation) {
         }
         // 6th choice - title search terms adjacent and author surname *and* isbn/issn
         if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
-            $searchString = "TITLE(\"".str_replace('"', '\"', $searchParameters["TITLE"])."\")"; // slightly looser match
+            $searchString = "TITLE(\"".$searchParameters["TITLE"]."\")";
             if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"]) { $searchString .= " AND AUTH(".$searchParameters["AUTH"].")"; }
             if (isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) { $searchString .= " AND ISBN(".$searchParameters["ISBN"].")"; }
             if (isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) { $searchString .= " AND ISSN(".$searchParameters["ISSN"].")"; }
@@ -139,7 +252,7 @@ foreach ($citations as &$citation) {
         }
         // 7th choice - title search terms adjacent and author surname *or* isbn/issn
         if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
-            $searchString = "TITLE(\"".str_replace('"', '\"', $searchParameters["TITLE"])."\")"; // slightly looser match
+            $searchString = "TITLE(\"".$searchParameters["TITLE"]."\")";
             $qualifyingField = FALSE;
             if (isset($searchParameters["AUTH"]) && $searchParameters["AUTH"] && isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) {
                 $qualifyingField = TRUE;
@@ -154,7 +267,7 @@ foreach ($citations as &$citation) {
         
         foreach ($searchStrings as $searchPref=>$searchString) { 
             $scopusSearchData = scopusApiQuery("https://api.elsevier.com/content/search/scopus?query=".urlencode($searchString), $citation["Scopus"], "scopus-search", TRUE);
-            if ($scopusSearchData && intval($scopusSearchData["search-results"]["opensearch:totalResults"])>0) { break; } // first successful result
+            if ($scopusSearchData && isset($scopusSearchData["search-results"]) && isset($scopusSearchData["search-results"]["opensearch:totalResults"]) && intval($scopusSearchData["search-results"]["opensearch:totalResults"])>0) { break; } // first successful result
             if (!isset($citation["Scopus"]["searches-no-results"])) { $citation["Scopus"]["searches-no-results"] = Array(); } 
             $citation["Scopus"]["searches-no-results"][] = $searchString; // record the one we're trying
         }
@@ -261,29 +374,85 @@ foreach ($citations as &$citation) {
             }
             
             // try to quantify the similarity of title and authors between source and Scopus 
-            if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
-                if (isset($entry["dc:title"]) && $entry["dc:title"])  {
-                    $citation["Scopus"]["first-match"]["similarity-title"] = similarity($entry["dc:title"], $searchParameters["TITLE"], "Levenshtein", FALSE);
+            // titles first 
+            $thisSimilarity = 0;
+            $foundSimilarity = FALSE;
+            if (isset($entry["dc:title"]) && $entry["dc:title"])  {
+                // first just use the title we searched for (the Leganto title) 
+                if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
+                    $foundSimilarity = TRUE;
+                    $thisSimilarity = max($thisSimilarity, similarity($entry["dc:title"], $searchParameters["TITLE"], "Levenshtein", FALSE));
+                }
+                // now try comparing with all the Alma titles
+                foreach ($extraParameters["ALMA-TITLES"] as $titleAlma) {
+                    $foundSimilarity = TRUE;
+                    if (isset($titleAlma["collated"])) {
+                        $thisSimilarity = max($thisSimilarity, similarity($entry["dc:title"], $titleAlma["collated"], "Levenshtein", FALSE));
+                    }
+                    if (isset($titleAlma["a"])) {
+                        $thisSimilarity = max($thisSimilarity, similarity($entry["dc:title"], $titleAlma["a"], "Levenshtein", FALSE));
+                    }
                 }
             }
+            // now save the best match we found by any means
+            if ($foundSimilarity) {
+                $citation["Scopus"]["first-match"]["similarity-title"] = $thisSimilarity;
+            }
+            
+            // now authors 
             $thisSimilarity = 0;
-            if (isset($searchParameters["__auth_raw"]) && $searchParameters["__auth_raw"]) {
+            $foundSimilarity = FALSE; 
+            // first try comparing the Leganto author field with any individual Scopus author as well as with them all together 
+            if (isset($extraParameters["LEGANTO-AUTHOR"]) && $extraParameters["LEGANTO-AUTHOR"]) {
                 foreach ($collatedAuthorsShort as $collatedAuthor) { 
-                    $thisSimilarity = max($thisSimilarity, similarity($collatedAuthor, $searchParameters["__auth_raw"], "Levenshtein", FALSE, TRUE)); // final TRUE means sort all words in strings into alphabetical order first
+                    $foundSimilarity = TRUE;
+                    $thisSimilarity = max($thisSimilarity, similarity($collatedAuthor, $extraParameters["LEGANTO-AUTHOR"], "Levenshtein", FALSE));
                 }
                 foreach ($collatedAuthorsLong as $collatedAuthor) {
-                    $thisSimilarity = max($thisSimilarity, similarity($collatedAuthor, $searchParameters["__auth_raw"], "Levenshtein", FALSE, TRUE)); // final TRUE means sort all words in strings into alphabetical order first
+                    $foundSimilarity = TRUE;
+                    $thisSimilarity = max($thisSimilarity, similarity($collatedAuthor, $extraParameters["LEGANTO-AUTHOR"], "Levenshtein", FALSE));
                 }
                 if (count($collatedAuthorsShort)) {
-                    $thisSimilarity = max($thisSimilarity, similarity(implode("", $collatedAuthorsShort), $searchParameters["__auth_raw"], "Levenshtein", FALSE, TRUE)); // final TRUE means sort all words in strings into alphabetical order first
+                    $foundSimilarity = TRUE;
+                    $thisSimilarity = max($thisSimilarity, similarity(implode("", $collatedAuthorsShort), $extraParameters["LEGANTO-AUTHOR"], "Levenshtein", FALSE, TRUE)); // final TRUE means sort all words in strings into alphabetical order first
                 }
                 if (count($collatedAuthorsLong)) {
-                    $thisSimilarity = max($thisSimilarity, similarity(implode("", $collatedAuthorsLong), $searchParameters["__auth_raw"], "Levenshtein", FALSE, TRUE)); // final TRUE means sort all words in strings into alphabetical order first
-                }
-                if (count($collatedAuthorsLong) || count($collatedAuthorsShort)) { 
-                    $citation["Scopus"]["first-match"]["similarity-authors"] = $thisSimilarity;
+                    $foundSimilarity = TRUE;
+                    $thisSimilarity = max($thisSimilarity, similarity(implode("", $collatedAuthorsLong), $extraParameters["LEGANTO-AUTHOR"], "Levenshtein", FALSE, TRUE)); // final TRUE means sort all words in strings into alphabetical order first
                 }
             }
+            // now try comparing the set of Alma creators with the set of Scopus authors 
+            $totalAuthorSimilarity = 0; 
+            foreach ($extraParameters["ALMA-CREATORS"] as $creatorAlma) { 
+                $thisAuthorSimilarity = 0; 
+                foreach ($collatedAuthorsShort as $collatedAuthor) {
+                    $foundSimilarity = TRUE;
+                    if (isset($creatorAlma["collated"])) { 
+                        $thisAuthorSimilarity = max($thisAuthorSimilarity, similarity($collatedAuthor, $creatorAlma["collated"], "Levenshtein", FALSE)); 
+                    }
+                    if (isset($creatorAlma["a"])) {
+                        $thisAuthorSimilarity = max($thisAuthorSimilarity, similarity($collatedAuthor, $creatorAlma["a"], "Levenshtein", FALSE));
+                    }
+                }
+                foreach ($collatedAuthorsLong as $collatedAuthor) {
+                    $foundSimilarity = TRUE;
+                    if (isset($creatorAlma["collated"])) {
+                        $thisAuthorSimilarity = max($thisAuthorSimilarity, similarity($collatedAuthor, $creatorAlma["collated"], "Levenshtein", FALSE));
+                    }
+                    if (isset($creatorAlma["a"])) {
+                        $thisAuthorSimilarity = max($thisAuthorSimilarity, similarity($collatedAuthor, $creatorAlma["a"], "Levenshtein", FALSE));
+                    }
+                }
+                $totalAuthorSimilarity += $thisAuthorSimilarity; 
+            }
+            if (count($extraParameters["ALMA-CREATORS"])) { 
+                $thisSimilarity = max($thisSimilarity, $totalAuthorSimilarity/count($extraParameters["ALMA-CREATORS"])); 
+            }
+            // now save the best match we found by any means  
+            if ($foundSimilarity) {
+                $citation["Scopus"]["first-match"]["similarity-authors"] = $thisSimilarity;
+            }
+            
             
         }
     }
@@ -295,7 +464,10 @@ print json_encode($citations, JSON_PRETTY_PRINT);
 
 
 /** 
- * Fetches 
+ * Fetches data from Scopus API 
+ * 
+ * Checks the local cache first before making a call to the API 
+ * 
  * @param String  $URL              API URL without httpAccept, apiKey and reqId 
  * @param Array   $citationScopus   The value of the Scopus entry in the citation - modified by this function as a side effect
  * @param String  $type             Used e.g. to identify the source of any errors  

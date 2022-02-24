@@ -1,9 +1,75 @@
 <?php 
 
-/*
- * Expects JSON input from stdin
+/**
+ * 
+ * =======================================================================
+ * 
+ * Script to enhance reading list citations using data from the VIAF API 
+ * 
+ * =======================================================================
+ * 
+ * Input: 
+ * JSON-encoded list of citations on STDIN 
+ * 
+ * Output: 
+ * JSON-encoded list of enhanced citations on STDOUT
+ * 
+ * =======================================================================
+ *
+ * Typical usage: 
+ * php enhanceCitationsFromViaf.php <Data/3.json >Data/4.json 
+ * 
+ * The input citation data is assumed to already contain data from Leganto and Alma *and Scopus* 
+ * 
+ * See getCitationsByCourseAndList.php and enhanceCitationsFromAlma.php 
+ * and enhanceCitationsFrom Scopus.php for how this data is prepared  
+ * 
+ * =======================================================================
+ * 
+ * General process: 
+ * 
+ * Loop over citations - for each citation: 
+ * 
+ *  - Collect metadata that might potentially be useful in a VIAF search, from either Alma or Scopus or Leganto metadata
+ *    Alma is our first-choice source, then Scopus, then Leganto 
+ *  - For some of the sources (Alma and Scopus) we have two forms of each author name 
+ *    e.g. from Alma we have the 100$a as well as the (more qualified) 100$abcdq 
+ *    These two forms are called "a" and "collated" in the code
+ *  - Search the VIAF API using a names exact search for the "collated" author 
+ *    - If no results, search again a (looser) names all search for the "collated" author
+ *    - If still no results, search again a names exact search for the "a" author
+ *    - If still no results, search again a names all search for the "a" author
+ *  - If results, then go through all results, fetch the "works by this author" data, and calculate the similarity of each work 
+ *    to each of the titles in the source record
+ *  - Find the best matching pair in all the data and work with this VIAF record  
+ *    i.e. unlike Scopus, we are *not* just taking the first match whatever it is 
+ *  - Extract the affiliation data from 5xx, Nationalities and Countries of publication  
+ *  - Save all the data (including the similarity of author and title between source and VIAF record plus any errors) in the citation object 
+ *  
+ * Export the enhanced citations 
+ * 
+ * =======================================================================
+ * 
+ * 
+ * 
+ * !! Gotchas !!  
+ * 
+ * 
+ * The code below includes a small delay (usleep(250000)) between API calls to avoid overloading the service
+ * 
+ * The VIAF API returns data in XML 
+ * TODO: can we get data in JSON? 
+ * This XML is namespaced e.g. <ns2:VIAFCluster>... 
+ * The PHP tool we are using below to parse the data (SimpleXmlElement) cannot handle namespaces 
+ * and so the code below strips out "ns2:" etc using a preg_replace 
+ * Even though this is fairly safe, it is not ideal - we may want a better solution 
+ * 
+ * NB unlike the Scopus API, this API is *not* limited by IP address and does *not* require a key 
+ * So testing during development can be done on any local machine 
+ * 
+ * 
+ * 
  */
-
 
 
 
@@ -15,9 +81,11 @@ require_once("utils.php");
 
 
 
+// fetch the data from STDIN
 $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 
 
+// main loop: process each citation
 foreach ($citations as &$citation) { 
     
     $searchDataSource = FALSE; 
@@ -264,6 +332,7 @@ foreach ($citations as &$citation) {
                         $viafDataParsedItem["about"] = $viafCluster->Document["about"]->__toString();
                     }
                     
+                    // placeholder for title similarity and add the author similarity we fetched earlier 
                     $viafDataParsedItem["similarity-title"] = FALSE; // will populate below
                     if ($foundMainHeading) {
                         $viafDataParsedItem["similarity-author"] = $authorSimilarity; 

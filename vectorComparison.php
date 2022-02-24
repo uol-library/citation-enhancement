@@ -10,12 +10,12 @@
 /**
  * e.g. 
  * 
- * $dictionary = Array("GB", "US", "IT"); // expected country codes 
- * $hash = Array("GB"=>2, "US"=>1, "DK"=>2); 
+ * $dictionary = Array("GB", "US", "IT");               // expected country codes 
+ * $hash = Array("GB"=>2, "US"=>1, "DK"=>2);            // actual country codes and counts 
  * 
- * hashToVector($dictionary, $hash) => Array(2,1,0); // 2 x GB, 1 x US, 0 x IT; DK ignored 
+ * hashToVector($dictionary, $hash) => Array(2,1,0);    // 2 x GB, 1 x US, 0 x IT; DK ignored 
  * 
- * this does not normalise the vector 
+ * this does not normalise the vector - normaliseVector($vector) can accomplish this 
  *   
  */
 function hashToVector($dictionary, $hash) { 
@@ -45,7 +45,14 @@ function normaliseVector($vector) {
     
 }
 
-function cosineDifference($vector1, $vector2) { 
+/**
+ * Computes cosine simiarity between two vectors
+ * to allow us to say how similar two lists are to each other 
+ * 
+ * Assumes input vectors have already been normalised with normaliseVector($vector) 
+ * 
+ */
+function cosineSimilarity($vector1, $vector2) { 
     if (count($vector1) != count($vector2)) { throw new Exception("Cannot compute cosine difference between vectors with different dimensions"); }
     $result = 0; 
     for ($i=0; $i<count($vector1); $i++) { 

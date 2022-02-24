@@ -114,11 +114,16 @@ foreach ($citations as $citation) {
         
         $outputRecord["DATA"][] = "VIAF"; 
         
+        if (count($citation["VIAF"])) {
+            $outputRecord["VIAF-SA"] = 0; // we will sum these across all authors and then divide by number of authors after the loop 
+            $outputRecord["VIAF-ST"] = 0; 
+        }
+        
         foreach ($citation["VIAF"] as $viafCitation) { 
             if (isset($viafCitation["best-match"]) && isset($viafCitation["best-match"]["nationalities"])) {
                 
-                $outputRecord["VIAF-SA"] = $viafCitation["best-match"]["similarity-author"]; 
-                $outputRecord["VIAF-ST"] = $viafCitation["best-match"]["similarity-title"];
+                $outputRecord["VIAF-SA"] += $viafCitation["best-match"]["similarity-author"]; 
+                $outputRecord["VIAF-ST"] += $viafCitation["best-match"]["similarity-title"];
                 
                 $gniRanksAuthorSource = Array(); // just for this author, this source 
                 
@@ -169,6 +174,12 @@ foreach ($citations as $citation) {
                 }
             }
         }
+        
+        if (count($citation["VIAF"])) {
+            $outputRecord["VIAF-SA"] = $outputRecord["VIAF-SA"]/count($citation["VIAF"]); 
+            $outputRecord["VIAF-ST"] = $outputRecord["VIAF-ST"]/count($citation["VIAF"]); 
+        }
+        
     }
     if (isset($citation["Scopus"])) {
         
