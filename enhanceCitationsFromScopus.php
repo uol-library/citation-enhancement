@@ -61,6 +61,9 @@
  * 
  * The code below includes a small delay (usleep(100000)) between API calls to avoid overloading the service
  * 
+ * API calls use the function utils.php:curl_get_file_contents() rather than the more natural file_get_contents  
+ * Because the http wrappers for the latter are not enabled on lib5hv, where development has been carried out 
+ * 
  * Double-quote characters should to be encoded within phrase searches {like \"this\"} or "like \"this\"" 
  * But even with this, I am still seeing errors from some searches including double-quotes 
  * For now I am removing double-quotes altogether from titles - looks like things are still found, 

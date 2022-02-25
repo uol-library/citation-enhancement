@@ -1,64 +1,92 @@
 <?php 
 
-/*
- * Writes JSON output to stdout
+/**
+ * 
+ * =======================================================================
+ * 
+ * Script to export reading list citations from the Alma Courses API 
+ * 
+ * =======================================================================
+ * 
+ * Input: 
+ * None 
+ * 
+ * Output: 
+ * JSON-encoded list of citations on STDOUT
+ * 
+ * =======================================================================
+ *
+ * Typical usage: 
+ * php getCitationsByCourseAndList.php >Data/1.json 
+ * 
+ * This script is the start of the typical citation-enhancement process: 
+ * It will typically be followed by the various enhanceCItationsFrom....php scripts  
+ * 
+ * =======================================================================
+ * 
+ * General process: 
+ * 
+ * Make an empty list of citations 
+ * 
+ * For each list to process we have a course code and a list code: 
+ * 
+ *  - Using the Courses API, turn the course code into a course ID 
+ *  - Using the Courses API, fetch the list of reading lists belonging to this Course ID 
+ *    - When we find a list that matches the desired list code, fetch all the citations in the reading list 
+ *    - Select the data of interest and save it in a citation object 
+ *    - Add the new citation object to the list of citations 
+ *  
+ * Export the list of citations as JSON 
+ * 
+ * =======================================================================
+ * 
+ * 
+ * 
+ * !! Gotchas !!  
+ * 
+ * Data from Leganto is cleaned using utils.php:standardise() which 
+ * allows better comparison between data from different sources  
+ * Specifically, it removes the Heavy Asterisk characters that are present at the start of some titles in Leganto - 
+ * These are present in some lists migrated from the Leeds reading lists system, where the tutor has used an 
+ * asterisk to indicate essential reading - but their presence in the Title field will cause problems later 
+ * when we search APIs to find matching records 
+ * 
+ * 
+ * 
  */
 
 
 error_reporting(E_ALL);                     // we want to know about all problems
 
-
-require_once("utils.php"); 
-
+require_once("utils.php");                  // Helper functions 
 
 
+// Configuration - hardcode the lists we want to extract 
+//TODO: Provide a better way to identify the lists for processing 
+$lists_to_process = Array(
+    /*
+     Array("course_code"=>"28573_SOEE5531M", "list_code"=>"202122_SOEE5531M__8970365_1"),
+     Array("course_code"=>"32925_MEDS5107M", "list_code"=>"202122_MEDS5107M__9256341_1_B"),
+     Array("course_code"=>"37648_LLLC0189", "list_code"=>"202122_LLLC0189__9226086_1")
+     */
+    Array("course_code"=>"29679_HIST1055", "list_code"=>"202122_HIST1055__9463092_1")
+);
+
+
+
+// Alma Courses API 
+// NB this assiumes a copy of this client is installed
+// in a sibling-folder to this project, so that the relative paths work
+// The client is in:
+// https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&version=GBrl-export&_a=contents
 require '../AlmaAPI/private/AlmaAPI/LULAlmaCourses.php';
 require '../AlmaAPI/private/AlmaAPI/LULAlmaCodeTables.php';
 require '../AlmaAPI/private/AlmaAPI/LULAlmaReadingLists.php';
-
 $course_endpoint = new LULAlmaCourses();
 $list_endpoint = new LULAlmaReadingLists();
-// $course_endpoint->setDebug(TRUE);
+// $course_endpoint->setDebug(TRUE);        // during testing 
 // $list_endpoint->setDebug(TRUE);
 
-/*
-$course_code = "25874_PSYC3505";
-$list_code = "202122_PSYC3505__8994937_1"; 
-
-$course_code = "29679_HIST1055";
-$list_code = "202122_HIST1055__8661554_1";
-
-$course_code = "30214_LUBS2680";
-$list_code = "202122_LUBS2680__8694118_1";
-
-$course_code = "38495_LAW5358M";
-$list_code = "202122_LAW5358M__9442593_1";
-
-$course_code = "35627_EDUC5264M";
-$list_code = "202122_EDUC5264M__8629446_1";
-
-
-28573_SOEE5531M
-202122_SOEE5531M__8970365_1
-
-32925_MEDS5107M
-202122_MEDS5107M__9256341_1
-
-37648_LLLC0189
-202122_LLLC0189_9226086_1
-
-
-*/
-
-
-$lists_to_process = Array(
-    /*
-    Array("course_code"=>"28573_SOEE5531M", "list_code"=>"202122_SOEE5531M__8970365_1"),  
-    Array("course_code"=>"32925_MEDS5107M", "list_code"=>"202122_MEDS5107M__9256341_1_B"),
-    Array("course_code"=>"37648_LLLC0189", "list_code"=>"202122_LLLC0189__9226086_1")
-    */
-    Array("course_code"=>"29679_HIST1055", "list_code"=>"202122_HIST1055__9463092_1")
-);
 
 $citations = Array(); 
 

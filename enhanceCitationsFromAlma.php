@@ -1,24 +1,86 @@
 <?php 
 
-/*
- * Expects JSON input from stdin
+/**
+ * 
+ * =======================================================================
+ * 
+ * Script to enhance reading list citations using data from the Alma Bib API 
+ * 
+ * =======================================================================
+ * 
+ * Input: 
+ * JSON-encoded list of citations on STDIN 
+ * 
+ * Output: 
+ * JSON-encoded list of enhanced citations on STDOUT
+ * 
+ * =======================================================================
+ *
+ * Typical usage: 
+ * php enhanceCitationsFromAlma.php <Data/1.json >Data/2.json 
+ * 
+ * The input citation data is assumed to already contain data from Leganto  
+ * 
+ * See getCitationsByCourseAndList.php for how this data is prepared  
+ * 
+ * =======================================================================
+ * 
+ * General process: 
+ * 
+ * Loop over citations - for each citation: 
+ * 
+ *  - Check whether Leganto contains an MMS ID 
+ *    - If it does not, skip to the next 
+ *    - If it does, query the Alma Bib API by this MMS ID and retrieve relevant fields 
+ *      e.g. titles, authors, ISBN, ISSN, LCCN
+ *      For Title and Author field, save each subfield-of-interest and also save the data from these subfields 
+ *      collated together, e.g.:  
+ *      {
+ *          "tag": "210",
+ *          "collated": "Am. hist. rev. (Online)",
+ *          "a": "Am. hist. rev.",
+ *          "b": "(Online)"
+ *      }
+ *      Which Marc tags to query, and which subfields we are interested in, are hardcoded below 
+ *      TODO: Store this Marc field and subfield information in config.ini?  
+ *      Data from some of the fields is cleaned using utils.php:standardise() which 
+ *      allows better comparison between data from different sources 
+ *  
+ * Export the enhanced citations 
+ * 
+ * =======================================================================
+ * 
+ * 
+ * 
+ * !! Gotchas !!  
+ * 
+ * 
+ * 
+ * 
+ * 
  */
 
 
 error_reporting(E_ALL);                     // we want to know about all problems
 
-require_once("utils.php"); 
+require_once("utils.php");                  // helper functions 
 
 
-require '../AlmaAPI/private/AlmaAPI/LULAlmaBibs.php';
+require '../AlmaAPI/private/AlmaAPI/LULAlmaBibs.php';   // client for the Alma Bib API 
+                                                        // NB this assiumes a copy of this client is installed 
+                                                        // in a sibling-folder to this project, so that the relative paths work
+                                                        // The client is in: 
+                                                        // https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&version=GBrl-export&_a=contents
 
-$bib_endpoint = new LULAlmaBibs('bibs');
-// $bib_endpoint->setDebug(TRUE);
+$bib_endpoint = new LULAlmaBibs('bibs');                // we'll use this in any calls to the API 
+// $bib_endpoint->setDebug(TRUE);                       // during testing 
 
 
+// fetch the data from STDIN
 $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 
 
+// main loop: process each citation
 foreach ($citations as &$citation) { 
     
     if (isset($citation["Leganto"]["metadata"]["mms_id"]) && $citation["Leganto"]["metadata"]["mms_id"]) {

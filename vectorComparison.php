@@ -1,7 +1,10 @@
 <?php 
 /**
- * Tools for converting string data (e.g. lists of countries) to numeric vectors, 
+ * Tools for converting sets of arbitrary data (e.g. lists of countries) into numeric vectors, 
  * and comparing vectors with each other 
+ * 
+ * e.g. to allow numeric a measure of similarity between the country-affiliations for a citation 
+ * derived from Scopus, with those from WoS or VIAF 
  * 
  * 
  */
@@ -13,9 +16,9 @@
  * $dictionary = Array("GB", "US", "IT");               // expected country codes 
  * $hash = Array("GB"=>2, "US"=>1, "DK"=>2);            // actual country codes and counts 
  * 
- * hashToVector($dictionary, $hash) => Array(2,1,0);    // 2 x GB, 1 x US, 0 x IT; DK ignored 
+ * hashToVector($dictionary, $hash) => Array(2,1,0);    // 2 x GB + 1 x US + 0 x IT [ DK is ignored ]  
  * 
- * this does not normalise the vector - normaliseVector($vector) can accomplish this 
+ * this does *not* normalise the vector - normaliseVector($vector) can accomplish this 
  *   
  */
 function hashToVector($dictionary, $hash) { 
@@ -30,6 +33,14 @@ function hashToVector($dictionary, $hash) {
     return $result; 
 }
 
+/**
+ * Turn any vector into one of unit length 
+ * 
+ * e.g. normaliseVector(Array(3,4)) => Array(0.6,0.8) 
+ * 
+ * Useful e.g. for using cosineSimilarity() on vectors created with hashToVector()  
+ * 
+ */
 function normaliseVector($vector) { 
     $sumsq = 0;
     foreach ($vector as $component) { 
@@ -49,7 +60,7 @@ function normaliseVector($vector) {
  * Computes cosine simiarity between two vectors
  * to allow us to say how similar two lists are to each other 
  * 
- * Assumes input vectors have already been normalised with normaliseVector($vector) 
+ * Assumes input vectors have already been normalised (e.g. with normaliseVector())  
  * 
  */
 function cosineSimilarity($vector1, $vector2) { 

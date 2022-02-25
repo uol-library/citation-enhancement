@@ -1,6 +1,20 @@
 <?php 
 
-$config = parse_ini_file("config.ini", true);
+
+/**
+ * Helper utilties for scripts in this project 
+ * e.g. string normalisation and comparison 
+ *  
+ * and a function curl_get_file_contents() to replace the standard PHP file_get_contents() 
+ * because lib5hv does not have the http wrappers enabled for file_get_contents  
+ * 
+ */
+
+
+
+$config = parse_ini_file("config.ini", true);       // from now on, keep as much config in this ini file as possible - 
+                                                    // all scripts include utils.php so all will have access to 
+                                                    // config through $config 
 
 
 
@@ -28,7 +42,7 @@ function standardise($string) {
   
     $string = preg_replace('/[\t\r\n]/', ' ', $string); // whitespace
     
-    $string = preg_replace('/\s*\/\s*$/', "", $string);
+    $string = preg_replace('/\s*\/\s*$/', "", $string); // trailing /
     $string = trim($string);
     return $string;
 }

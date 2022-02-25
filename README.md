@@ -34,7 +34,7 @@ cURL support in PHP including support for https
 Project https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&version=GBrl-export&_a=contents 
 
 ## 3. Latest releases
-v1.11 
+v1.13 
 
 ## 4. API references
 Scopus: https://dev.elsevier.com/api_docs.html
@@ -81,7 +81,7 @@ Each script reads a JSON-encoded list of citations from STDIN, and writes an enh
 
 This script reads a JSON-encoded list of enhanced citations from STDIN and combines it with the World Bank data saved in Step 1 
 
-TODO: This script outputs UTF-encoded data but Excel expects CSV files to be ANSI-encoded and so special characters will hash. 
+TODO: This script outputs UTF-8-encoded data but Excel expects CSV files to be ANSI-encoded and so special characters will hash. 
 This does not matter in development, but we need to modify this script e.g. to export a UTF-8-encoded Excel .xlsx file that Excel can open 
 directly with the correct encoding 
 

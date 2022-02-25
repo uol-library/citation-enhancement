@@ -31,20 +31,22 @@
  * Loop over citations - for each citation: 
  * 
  *  - Collect metadata that might potentially be useful in a VIAF search, from either Alma or Scopus or Leganto metadata
- *    Alma is our first-choice source, then Scopus, then Leganto 
+ *    (Alma is our first-choice source, then Scopus, then Leganto)  
  *  - For some of the sources (Alma and Scopus) we have two forms of each author name 
- *    e.g. from Alma we have the 100$a as well as the (more qualified) 100$abcdq 
- *    These two forms are called "a" and "collated" in the code
- *  - Search the VIAF API using a names exact search for the "collated" author 
- *    - If no results, search again a (looser) names all search for the "collated" author
- *    - If still no results, search again a names exact search for the "a" author
- *    - If still no results, search again a names all search for the "a" author
- *  - If results, then go through all results, fetch the "works by this author" data, and calculate the similarity of each work 
- *    to each of the titles in the source record
- *  - Find the best matching pair in all the data and work with this VIAF record  
- *    i.e. unlike Scopus, we are *not* just taking the first match whatever it is 
- *  - Extract the affiliation data from 5xx, Nationalities and Countries of publication  
- *  - Save all the data (including the similarity of author and title between source and VIAF record plus any errors) in the citation object 
+ *    (e.g. from Alma we have the 100$a as well as the (more qualified) 100$abcdq)  
+ *    These two forms are labelled "a" and "collated" in the code
+ *  - Search the VIAF API using a names-exact search for the "collated" author 
+ *    - If no results, search again, using a (looser) names-all search for the "collated" author
+ *    - If still no results, search again a names-exact search for the "a" author
+ *    - If still no results, search again a names-all search for the "a" author
+ *  - If any results, then go through them: 
+ *    - Fetching relevant data including affiliation data from 5xx, Nationalities and Countries of publication 
+ *    - Calculate the best similarity between the author name in our citation, and the main headings in the result 
+ *    - Calculate the best similarity between the titles in our citation, and the works-by-this-author in the result
+ *    - If this title similarity is better than the best so far for this search, save the details to our citation 
+ *      (including any error messages from the API, and the similarity scores we have calculated)  
+ *    - If this title similarity is 100%, don't check any more results
+ *    - NB Unlike with Scopus, we do not just take the first result - we try to find the best (by title)     
  *  
  * Export the enhanced citations 
  * 
@@ -57,12 +59,15 @@
  * 
  * The code below includes a small delay (usleep(250000)) between API calls to avoid overloading the service
  * 
+ * API calls use the function utils.php:curl_get_file_contents() rather than the more natural file_get_contents  
+ * Because the http wrappers for the latter are not enabled on lib5hv, where development has been carried out 
+ * 
  * The VIAF API returns data in XML 
  * TODO: can we get data in JSON? 
  * This XML is namespaced e.g. <ns2:VIAFCluster>... 
  * The PHP tool we are using below to parse the data (SimpleXmlElement) cannot handle namespaces 
  * and so the code below strips out "ns2:" etc using a preg_replace 
- * Even though this is fairly safe, it is not ideal - we may want a better solution 
+ * Even though this is fairly safe, we may want a better solution long-term  
  * 
  * NB unlike the Scopus API, this API is *not* limited by IP address and does *not* require a key 
  * So testing during development can be done on any local machine 
