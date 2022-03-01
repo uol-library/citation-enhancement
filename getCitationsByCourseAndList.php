@@ -9,7 +9,8 @@
  * =======================================================================
  * 
  * Input: 
- * None 
+ * None from STDIN 
+ * Reading-lists-of-interest hardcoded in script  
  * 
  * Output: 
  * JSON-encoded list of citations on STDOUT
@@ -20,7 +21,7 @@
  * php getCitationsByCourseAndList.php >Data/1.json 
  * 
  * This script is the start of the typical citation-enhancement process: 
- * It will typically be followed by the various enhanceCItationsFrom....php scripts  
+ * It will typically be followed by the various enhanceCitationsFrom....php scripts  
  * 
  * =======================================================================
  * 
@@ -69,7 +70,13 @@ $lists_to_process = Array(
      Array("course_code"=>"32925_MEDS5107M", "list_code"=>"202122_MEDS5107M__9256341_1_B"),
      Array("course_code"=>"37648_LLLC0189", "list_code"=>"202122_LLLC0189__9226086_1")
      */
-    Array("course_code"=>"29679_HIST1055", "list_code"=>"202122_HIST1055__9463092_1")
+    // Array("course_code"=>"29679_HIST1055", "list_code"=>"202122_HIST1055__9463092_1")
+    
+    // Array("course_code"=>"25874_PSYC3505", "list_code"=>"202122_PSYC3505__8994937_1")
+    
+    Array("course_code"=>"34851_DESN5150M", "list_code"=>"202122_DESN5150M__8670289_1")
+    
+
 );
 
 

@@ -285,7 +285,7 @@ foreach ($citations as &$citation) {
             
             $citation["Scopus"]["first-match"] = Array(); 
             $citation["Scopus"]["results"] = Array(); 
-            $summaryFields = Array("eid"=>TRUE, "dc:title"=>TRUE, "dc:creator"=>TRUE, "prism:publicationName"=>TRUE, "subtype"=>TRUE);
+            $summaryFields = Array("eid"=>TRUE, "dc:title"=>TRUE, "dc:creator"=>TRUE, "prism:doi"=>TRUE, "prism:publicationName"=>TRUE, "subtype"=>TRUE);
             foreach ($scopusSearchData["search-results"]["entry"] as $entry) {
                 $citation["Scopus"]["results"][] = array_filter(array_intersect_key($entry, $summaryFields));
             }
@@ -293,6 +293,8 @@ foreach ($citations as &$citation) {
             $entry = $scopusSearchData["search-results"]["entry"][0]; // now only interested in first result 
             $links = $entry["link"]; 
             $linkAuthorAffiliation = FALSE; 
+            
+            $citation["Scopus"]["first-match"]["summary"] = array_filter(array_intersect_key($entry, $summaryFields)); // repeat the summary fields we already collected 
             
             foreach ($links as $link) { 
                 if ($link["@ref"]=="self") {
@@ -302,6 +304,30 @@ foreach ($citations as &$citation) {
                     $linkAuthorAffiliation = $link["@href"];
                 }
             }
+            
+            // find the similarity in title between our citation and Scopus data - 
+            // we will save this both at the citation-level and the individual author-level 
+            // (originally we kept citation-level similarities but I think author-level similarities may be more useful) 
+            $titleSimilarity = 0;
+            $foundTitleSimilarity = FALSE;
+            if (isset($entry["dc:title"]) && $entry["dc:title"])  {
+                // first just use the title we searched for (the Leganto title)
+                if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
+                    $foundTitleSimilarity = TRUE;
+                    $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $searchParameters["TITLE"], "Levenshtein", FALSE));
+                }
+                // now try comparing with all the Alma titles
+                foreach ($extraParameters["ALMA-TITLES"] as $titleAlma) {
+                    $foundTitleSimilarity = TRUE;
+                    if (isset($titleAlma["collated"])) {
+                        $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $titleAlma["collated"], "Levenshtein", FALSE));
+                    }
+                    if (isset($titleAlma["a"])) {
+                        $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $titleAlma["a"], "Levenshtein", FALSE));
+                    }
+                }
+            }
+
             
             
             $collatedAuthorsShort = Array(); 
@@ -317,19 +343,7 @@ foreach ($citations as &$citation) {
                 if (isset($scopusAuthorAffiliationData["abstracts-retrieval-response"]["authors"]["author"])) {
                     foreach ($scopusAuthorAffiliationData["abstracts-retrieval-response"]["authors"]["author"] as $author) {
                         $citationScopusAuthor = array_filter(array_intersect_key($author, Array("@auid"=>TRUE, "author-url"=>TRUE, "preferred-name"=>TRUE, "ce:indexed-name"=>TRUE, "ce:surname"=>TRUE, "ce:initials"=>TRUE, "ce:given-name"=>TRUE, "affiliation"=>TRUE)));
-                        
-                        // assemble string list of authors for later comparison with source metadata 
-                        if (isset($author["ce:indexed-name"]) && $author["ce:indexed-name"]) { 
-                            $collatedAuthorsShort[] = $author["ce:indexed-name"];
-                        }
-                        if (isset($author["ce:surname"]) && $author["ce:surname"]) {
-                            $collatedAuthorLong = $author["ce:surname"]." ";
-                            if (isset($author["ce:given-name"]) && $author["ce:given-name"]) {
-                                $collatedAuthorLong .= $author["ce:given-name"];
-                            }
-                            $collatedAuthorsLong[] = $collatedAuthorLong; 
-                        }
-                        
+
                         // (contemporary) affiliation from the abstract information 
                         if (isset($citationScopusAuthor["affiliation"]) && is_array($citationScopusAuthor["affiliation"])) {
                             // affiliation may be single or a list - for simplicity, *always* turn it into a list
@@ -371,35 +385,83 @@ foreach ($citations as &$citation) {
                                 }
                             }
                         }
+                        
+                        // author-level similarities 
+                        // title just duplicates the citation-level similarity 
+                        if ($foundTitleSimilarity) { $citationScopusAuthor["similarity-title"] = $titleSimilarity; } 
+                        
+                        // now do author-level author similarity 
+                        
+                        
+                        // assemble string list of authors for later comparison with source metadata
+                        $collatedAuthorShort = FALSE;
+                        $collatedAuthorLong = FALSE; 
+                        if (isset($author["ce:indexed-name"]) && $author["ce:indexed-name"]) {
+                            $collatedAuthorShort = $author["ce:indexed-name"];
+                            $collatedAuthorsShort[] = $collatedAuthorShort;
+                        }
+                        if (isset($author["ce:surname"]) && $author["ce:surname"]) {
+                            $collatedAuthorLong = $author["ce:surname"]." ";
+                            if (isset($author["ce:given-name"]) && $author["ce:given-name"]) {
+                                $collatedAuthorLong .= ", ".$author["ce:given-name"];
+                            }
+                            $collatedAuthorsLong[] = $collatedAuthorLong;
+                        }
+                        
+                        
+                        $thisSimilarity = 0;
+                        $foundSimilarity = FALSE;
+                        // try taking any Alma authors 
+                        foreach ($extraParameters["ALMA-CREATORS"] as $creatorAlma) {
+                            if ($creatorAlma) { 
+                                if (isset($creatorAlma["collated"]) && $creatorAlma["collated"]) { 
+                                    if ($collatedAuthorLong) { 
+                                        $foundSimilarity = TRUE;
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorLong, $creatorAlma["collated"], "Levenshtein", FALSE));
+                                    } else if ($collatedAuthorShort) {
+                                        $foundSimilarity = TRUE;
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorAlma["collated"], "Levenshtein", FALSE));
+                                    }
+                                } else if (isset($creatorAlma["a"]) && $creatorAlma["a"]) {
+                                    if ($collatedAuthorLong) {
+                                        $foundSimilarity = TRUE;
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorLong, $creatorAlma["collated"], "Levenshtein", FALSE));
+                                    } else if ($collatedAuthorShort) {
+                                        $foundSimilarity = TRUE;
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorAlma["collated"], "Levenshtein", FALSE));
+                                    }
+                                }
+                            }
+                        }
+                        // now try splitting the Leganto author field and comparing with any individual Scopus author
+                        $creatorsLeganto = preg_split('/(\s*;\s*|\s+and\s+|\s+&\s+)/', $extraParameters["LEGANTO-AUTHOR"]); // separate multiple authors
+                        if ($creatorsLeganto) {
+                            foreach ($creatorsLeganto as $creatorLeganto) {
+                                if ($creatorLeganto) {
+                                    if ($collatedAuthorLong) {
+                                        $foundSimilarity = TRUE;
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorLong, $creatorLeganto, "Levenshtein", FALSE));
+                                    } else if ($collatedAuthorShort) {
+                                        $foundSimilarity = TRUE;
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorLeganto, "Levenshtein", FALSE));
+                                    }
+                                }
+                            }
+                        }
+                        if ($foundSimilarity) { $citationScopusAuthor["similarity-author"] = $thisSimilarity; }
+                        
                         $citation["Scopus"]["first-match"]["authors"][] = $citationScopusAuthor;
                     }
                 }
             }
             
-            // try to quantify the similarity of title and authors between source and Scopus 
+            // try to quantify the citation-level similarity of title and authors between source and Scopus
+            // we are now also collecting author-level similarity so this may be redundant  
+            
             // titles first 
-            $thisSimilarity = 0;
-            $foundSimilarity = FALSE;
-            if (isset($entry["dc:title"]) && $entry["dc:title"])  {
-                // first just use the title we searched for (the Leganto title) 
-                if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
-                    $foundSimilarity = TRUE;
-                    $thisSimilarity = max($thisSimilarity, similarity($entry["dc:title"], $searchParameters["TITLE"], "Levenshtein", FALSE));
-                }
-                // now try comparing with all the Alma titles
-                foreach ($extraParameters["ALMA-TITLES"] as $titleAlma) {
-                    $foundSimilarity = TRUE;
-                    if (isset($titleAlma["collated"])) {
-                        $thisSimilarity = max($thisSimilarity, similarity($entry["dc:title"], $titleAlma["collated"], "Levenshtein", FALSE));
-                    }
-                    if (isset($titleAlma["a"])) {
-                        $thisSimilarity = max($thisSimilarity, similarity($entry["dc:title"], $titleAlma["a"], "Levenshtein", FALSE));
-                    }
-                }
-            }
-            // now save the best match we found by any means
-            if ($foundSimilarity) {
-                $citation["Scopus"]["first-match"]["similarity-title"] = $thisSimilarity;
+            // we've already done this above, before the author-level work 
+            if ($foundTitleSimilarity) {
+                // $citation["Scopus"]["first-match"]["similarity-title"] = $titleSimilarity;
             }
             
             // now authors 
@@ -453,7 +515,7 @@ foreach ($citations as &$citation) {
             }
             // now save the best match we found by any means  
             if ($foundSimilarity) {
-                $citation["Scopus"]["first-match"]["similarity-authors"] = $thisSimilarity;
+                // $citation["Scopus"]["first-match"]["similarity-authors"] = $thisSimilarity;
             }
             
             

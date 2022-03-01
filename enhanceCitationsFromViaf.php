@@ -235,37 +235,30 @@ foreach ($citations as &$citation) {
         
         $citation["VIAF"] = Array(); // to populate
         
-        foreach ($creators as &$creator) {
-            
-            usleep(250000);
-            
-            $citationViaf = Array();
-            
-            $citationViaf["search-fields"] = "local.names+exact";
-            $citationViaf["search-pref"] = 1; 
-            $citationViaf["data-source"] = $searchDataSource;
-            $citationViaf["search-term-source"] = "collated";
-            
-            $citationViaf["search-term"] = $creator[$citationViaf["search-term-source"]];
-            
-               
-            try { 
-                $viafSearchData = viafApiQuery($citationViaf["search-fields"], $citationViaf["search-term"]);
-                $citationViaf["records"] = $viafSearchData->records->record ? count($viafSearchData->records->record) : FALSE;
-            } catch (Exception $e) { 
-                if (!isset($citationViaf["errors"])) {
-                    $citationViaf["errors"] = Array(); 
-                }
-                $citationViaf["records"] = FALSE; 
-                $citationViaf["errors"][] = Array("search-fields"=>$citationViaf["search-fields"], "search-term"=>$citationViaf["search-term"], "message"=>$e->getMessage()); 
-            }
         
-            if (!$citationViaf["records"]) {
-                // try again with a slightly more generous search
-                $citationViaf["search-fields"] = "local.names+all";
-                $citationViaf["search-pref"] = 2;
+        $searchStrategies = Array(); 
+        $searchStrategies[] = Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"exact", "search-pref"=>1, "data-source"=>$searchDataSource, "search-term-source"=>"collated"); 
+        $searchStrategies[] = Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"exact", "search-pref"=>2, "data-source"=>$searchDataSource, "search-term-source"=>"a");
+        $searchStrategies[] = Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"all",   "search-pref"=>3, "data-source"=>$searchDataSource, "search-term-source"=>"collated");
+        $searchStrategies[] = Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"all",   "search-pref"=>4, "data-source"=>$searchDataSource, "search-term-source"=>"a");
+        $searchStrategies[] = Array("search-fields"=>"local.personalNames", "search-relation"=>"exact", "search-pref"=>5, "data-source"=>$searchDataSource, "search-term-source"=>"collated");
+        $searchStrategies[] = Array("search-fields"=>"local.personalNames", "search-relation"=>"exact", "search-pref"=>6, "data-source"=>$searchDataSource, "search-term-source"=>"a");
+        $searchStrategies[] = Array("search-fields"=>"local.personalNames", "search-relation"=>"all",   "search-pref"=>7, "data-source"=>$searchDataSource, "search-term-source"=>"collated");
+        $searchStrategies[] = Array("search-fields"=>"local.personalNames", "search-relation"=>"all",   "search-pref"=>8, "data-source"=>$searchDataSource, "search-term-source"=>"a");
+        
+        
+        
+        foreach ($creators as &$creator) {
+
+            foreach ($searchStrategies as $searchStrategy) {
+                
+                if (!isset($creator[$searchStrategy["search-term-source"]]) || !$creator[$searchStrategy["search-term-source"]]) { continue; } // we can't do anything if this strategy uses a field that isn't there 
+                
+                $citationViaf = $searchStrategy; 
+                $citationViaf["search-term"] = $creator[$citationViaf["search-term-source"]];
+                usleep(150000);
                 try {
-                    $viafSearchData = viafApiQuery($citationViaf["search-fields"], $citationViaf["search-term"]);
+                    $viafSearchData = viafApiQuery($citationViaf["search-fields"], $citationViaf["search-relation"], $citationViaf["search-term"]);
                     $citationViaf["records"] = $viafSearchData->records->record ? count($viafSearchData->records->record) : FALSE;
                 } catch (Exception $e) {
                     if (!isset($citationViaf["errors"])) {
@@ -274,32 +267,16 @@ foreach ($citations as &$citation) {
                     $citationViaf["records"] = FALSE;
                     $citationViaf["errors"][] = Array("search-fields"=>$citationViaf["search-fields"], "search-term"=>$citationViaf["search-term"], "message"=>$e->getMessage());
                 }
-            }
-            if (!$citationViaf["records"]) {
-                // try again but only look in the $a for the author
-                $citationViaf["search-term-source"] = "a";
-                if (isset($creator[$citationViaf["search-term-source"]])) { 
-                    $citationViaf["search-term"] = $creator[$citationViaf["search-term-source"]];
-                    $citationViaf["search-fields"] = "local.names+exact";
-                    $citationViaf["search-pref"] = 3;
-                    
-                    $viafSearchData = viafApiQuery($citationViaf["search-fields"], $citationViaf["search-term"]);
-                    $citationViaf["records"] = $viafSearchData->records->record ? count($viafSearchData->records->record) : FALSE;
+                if ($citationViaf["records"]) {
+                    break; // no need to try a broader search 
                 }
+                
             }
-            if (!$citationViaf["records"]) {
-                // try again with a slightly more generous search
-                if (isset($creator[$citationViaf["search-term-source"]])) {
-                    $citationViaf["search-fields"] = "local.names+all";
-                    $citationViaf["search-pref"] = 4;
-                    
-                    $viafSearchData = viafApiQuery($citationViaf["search-fields"], $citationViaf["search-term"]);
-                    $citationViaf["records"] = $viafSearchData->records->record ? count($viafSearchData->records->record) : FALSE;
-                }
-            }
-            
+            // we either found a result using one of the search strategies, or they all failed 
             
             if ($citationViaf["records"]) {
+                
+                // we *did* find something 
                 
                 $viafDataParsed = FALSE;
                 $viafBestSimilarity = FALSE; // set to integer 0-100 when we find potential match
@@ -312,6 +289,7 @@ foreach ($citations as &$citation) {
                     
                     $viafCluster = $record->recordData->VIAFCluster;
                     
+                    $viafDataParsedItem["type"] = $viafCluster->nameType->__toString();
                     // fetch the first main heading, 
                     // and calculate a similarity score for the best match between main heading and source authors 
                     $authorSimilarity = 0;
@@ -320,18 +298,29 @@ foreach ($citations as &$citation) {
                         foreach ($viafCluster->mainHeadings->data as $viafHeadingObject) {
                             //TODO is there a better way to identify the most authoritative form of the name?
                             if (!$foundMainHeading) { $viafDataParsedItem["heading"] = $viafHeadingObject->text->__toString(); } 
-                            $foundMainHeading = TRUE; 
-                            $authorSimilarity = max($authorSimilarity, similarity($viafHeadingObject->text->__toString(), $creator["collated"], "Levenshtein", FALSE, TRUE)); 
-                            $authorSimilarity = max($authorSimilarity, similarity($viafHeadingObject->text->__toString(), $creator["collated"], "Levenshtein", FALSE, TRUE));
+                            $foundMainHeading = TRUE;
+                            // normally, just use the collated form of the author name - 
+                            if (isset($creator["collated"]) && $creator["collated"]) { 
+                                $authorSimilarity = max($authorSimilarity, similarity($viafHeadingObject->text->__toString(), $creator["collated"], "Levenshtein", FALSE, TRUE));
+                            } else if (isset($creator["a"]) && $creator["a"]) {
+                                $authorSimilarity = max($authorSimilarity, similarity($viafHeadingObject->text->__toString(), $creator["a"], "Levenshtein", FALSE, TRUE));
+                            }
                         }
                     }
-                    // we'll add the author similarity a little lower, so it is close to the title similarity 
+                    // we'll add the author similarity a little lower, so it appears close to the title similarity in the resulting object  
                     
                     $citationViafResult = Array(); 
+                    if (isset($viafDataParsedItem["type"])) {
+                        $citationViafResult["type"] = $viafDataParsedItem["type"];
+                    }
                     if (isset($viafDataParsedItem["heading"])) { 
                         $citationViafResult["heading"] = $viafDataParsedItem["heading"]; 
                     }
                     $citationViaf["results"][] = $citationViafResult;
+                    
+                    // check it is a person (mainHeadingEl search finds other things as well)
+                    if ($viafDataParsedItem["type"]!="Personal") { continue; }
+                    
                     
                     if ($viafCluster->Document) {
                         $viafDataParsedItem["about"] = $viafCluster->Document["about"]->__toString();
@@ -442,10 +431,16 @@ foreach ($citations as &$citation) {
                             }
                         }
                     } else if ($citationViaf["records"]==1) {   // special case - only one result, which has no titles 
-                                                                // no choice but to load this though title similarity will zero  
+                                                                // provisionally load this though title similarity will zero  
                         $viafDataParsedItem["similarity-title"] = 0;  
                         $viafDataParsed = $viafDataParsedItem;
                     }
+                    
+                    // filter on similarities?
+                    /* 
+                    if ( ($viafDataParsedItem["similarity-title"]*$viafDataParsedItem["similarity-author"]/100) < 30 ) { continue; }
+                    */ 
+                    
                 }
                 
                 if ($viafDataParsed) {
@@ -478,11 +473,11 @@ print json_encode($citations, JSON_PRETTY_PRINT);
 
 
 
-function viafApiQuery($fields, $term) { 
+function viafApiQuery($fields, $relation, $term) { 
     
     global $config, $http_response_header; // latter needed to allow curl_get_file_contents to mimic file_get_contents side-effect
     
-    $viafSearchURL = "http://viaf.org/viaf/search?query=".$fields."+%22".urlencode($term)."%22&maximumRecords=10&startRecord=1&sortKeys=holdingscount&httpAccept=text/xml";
+    $viafSearchURL = "http://viaf.org/viaf/search?query=".$fields."+".$relation."+%22".urlencode($term)."%22&maximumRecords=10&startRecord=1&sortKeys=holdingscount&httpAccept=text/xml";
     $viafSearchResponse = curl_get_file_contents($viafSearchURL);
 
     

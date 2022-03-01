@@ -90,6 +90,14 @@ function similarity($string1, $string2, $type="Levenshtein", $crop=FALSE, $alpha
         $string2 = implode(" ", $stringArray);
     }
     
+    if ($type=="Levenshtein") {
+        if (strlen($string1)>255 || strlen($string2)>255) {
+            // can't do anything about this 
+            $type="similar_text"; 
+        }
+    }
+        
+    
     if ($type=="Levenshtein") { 
         $lev = levenshtein($string1, $string2);
         // $pc = 100 * (1 - 2*$lev/(strlen($string1)+strlen($string2)));
