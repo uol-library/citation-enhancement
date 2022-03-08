@@ -295,6 +295,9 @@ foreach ($citations as &$citation) {
                     $authorSimilarity = 0;
                     $foundMainHeading = FALSE; 
                     if ($viafCluster->mainHeadings) {
+                        
+                        /* 
+                         * Main headings text  
                         foreach ($viafCluster->mainHeadings->data as $viafHeadingObject) {
                             //TODO is there a better way to identify the most authoritative form of the name?
                             if (!$foundMainHeading) { $viafDataParsedItem["heading"] = $viafHeadingObject->text->__toString(); } 
@@ -306,6 +309,52 @@ foreach ($citations as &$citation) {
                                 $authorSimilarity = max($authorSimilarity, similarity($viafHeadingObject->text->__toString(), $creator["a"], "Levenshtein", FALSE, TRUE));
                             }
                         }
+                         */
+                        
+                        // Main headings structured 
+                        $firstMainHeading = NULL; 
+                        $lcMainHeading = NULL; 
+                        foreach ($viafCluster->mainHeadings->mainHeadingEl as $viafHeadingObject) {
+                            $lcSource = FALSE; // unless we find differently 
+                            $thisMainHeadingA = FALSE; 
+                            $thisMainHeadingCollated = "";
+                            foreach ($viafHeadingObject->sources->s as $source) {
+                                if (trim($source->__toString())=="LC") {
+                                    $lcSource = TRUE;  
+                                }
+                            }
+                            foreach ($viafHeadingObject->datafield->subfield as $subfield) {
+                                $acceptedSubfields = Array("a","b","d","q");
+                                if (in_array($subfield["code"], $acceptedSubfields)) {
+                                    $thisMainHeadingCollated .= trim($subfield->__toString()); 
+                                }
+                                if ($subfield["code"]=="a") {
+                                    $thisMainHeadingA = trim($subfield->__toString()); 
+                                    if ($firstMainHeading==NULL) {
+                                        $firstMainHeading = $thisMainHeadingA; 
+                                    }
+                                    if ($lcSource && $lcMainHeading==NULL) { 
+                                        $lcMainHeading = $thisMainHeadingA; 
+                                    }
+                                }
+                            }
+                            // normally, use the collated form of the author name to get maximum confidence for common names -
+                            if (isset($creator["collated"]) && $creator["collated"] && $thisMainHeadingCollated) {
+                                $authorSimilarity = max($authorSimilarity, similarity($thisMainHeadingCollated, $creator["collated"], "Levenshtein", FALSE, TRUE));
+                            } else if (isset($creator["a"]) && $creator["a"] && $thisMainHeadingA) {
+                                $authorSimilarity = max($authorSimilarity, similarity($thisMainHeadingA, $creator["a"], "Levenshtein", FALSE, TRUE));
+                            }
+                        }
+                        if ($lcMainHeading) {
+                            // prefer an LC-sourced heading 
+                            $foundMainHeading = TRUE; 
+                            $viafDataParsedItem["heading"] = $lcMainHeading; 
+                        } else if ($firstMainHeading) { 
+                            // take the first one in the list 
+                            $foundMainHeading = TRUE;
+                            $viafDataParsedItem["heading"] = $firstMainHeading; 
+                        }
+                        
                     }
                     // we'll add the author similarity a little lower, so it appears close to the title similarity in the resulting object  
                     
@@ -328,9 +377,7 @@ foreach ($citations as &$citation) {
                     
                     // placeholder for title similarity and add the author similarity we fetched earlier 
                     $viafDataParsedItem["similarity-title"] = FALSE; // will populate below
-                    if ($foundMainHeading) {
-                        $viafDataParsedItem["similarity-author"] = $authorSimilarity; 
-                    }
+                    if ($foundMainHeading) { $viafDataParsedItem["similarity-author"] = $authorSimilarity; } 
                     
                     $viafTitles = $viafCluster->titles;
                     if ($viafTitles) {

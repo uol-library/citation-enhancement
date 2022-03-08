@@ -68,11 +68,11 @@ Step 4 will later consume these
 This script (like the following ones) writes a JSON-encoded list of citations to STDOUT, so just save it somewhere suitable 
 
 ## Step 3: enhance citations with data from Alma, Scopus, VIAF  
-> php enhanceCitationsFromAlma.php <Data/1.json >Data/2.json 
-> 
-> php enhanceCitationsFromViaf.php <Data/2.json >Data/3.json 
+> php enhanceCitationsFromAlma.php   <Data/1.json >Data/2.json 
 > 
 > php enhanceCitationsFromScopus.php <Data/3.json >Data/4.json 
+> 
+> php enhanceCitationsFromViaf.php   <Data/2.json >Data/3.json 
 
 Each script reads a JSON-encoded list of citations from STDIN, and writes an enhanced list of citations to STDOUT, so use the input filename from the previous step and write to a new file ready for the next  
 
