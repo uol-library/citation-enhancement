@@ -183,5 +183,57 @@ function curl_get_file_contents($URL) {
 }
 
 
+/**
+ * Calculate a CSI (Citation Source Index) from
+ * an array of country codes 
+ * 
+ * Uses essentially the same algorithm as Imperial in their study 
+ * except that where an author has multiple affiliations they are 
+ * averaged (Imperial only took the first) 
+ * 
+ * Expects an array of arrays of country codes 
+ * e.g. [ [ "GB", "IT"], ["US"] ] means two authors, 
+ * first one has dual affiliation (GB and IT) and the second has single affiliation (US)    
+ *   
+ * Accepts 2-letter country codes only   
+ * 
+ * Second parameter is mapping from 2-letter codes to GNI ranks 
+ *   
+ */
+function csi($authorAffiliations, $worldBankRank) { 
+    
+    $allAuthorAffiliationCount = 0; 
+    $allAuthorAffiliationRankSum = 0; 
+    
+    foreach ($authorAffiliations as $authorAffiliation) { 
+        $authorAffiliationCount = 0; 
+        $authorAffiliationRankSum = 0; 
+        foreach ($authorAffiliation as $authorAffiliationInstance) {
+            if ($authorAffiliationInstance) {
+                if (isset($worldBankRank[$authorAffiliationInstance])) {
+                    $authorAffiliationCount++; 
+                    $authorAffiliationRankSum += $worldBankRank[$authorAffiliationInstance];
+                } else {
+                    trigger_error("No World Bank ranking for ".$authorAffiliationInstance, E_USER_ERROR);
+                }
+                
+            }
+        }
+        if ($authorAffiliationCount) { 
+            $allAuthorAffiliationCount++; 
+            $allAuthorAffiliationRankSum += ($authorAffiliationRankSum/$authorAffiliationCount); 
+        }
+    }
+    if ($allAuthorAffiliationCount) {
+        $allAuthorAffiliationRankAvg = ($allAuthorAffiliationRankSum/$allAuthorAffiliationCount);
+        return $allAuthorAffiliationRankAvg/max($worldBankRank); 
+    } else {
+        return NULL; 
+    }
+    
+    
+    
+}
+
 
 ?>
