@@ -95,6 +95,8 @@ $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 // main loop: process each citation 
 foreach ($citations as &$citation) { 
     
+    if (isset($citation["Leganto"])) { // only do any enhancement for entries in the citations file that have an actual list
+    
     $searchParameters = Array();    // collect things in here for the Scopus search
     $extraParameters = Array();     // not using in search query but may use e.g. to calculate result to source similarity 
     
@@ -102,8 +104,24 @@ foreach ($citations as &$citation) {
         $doi = $citation["Leganto"]["metadata"]["doi"];
         $doi = preg_replace('/^https?:\/\/doi\.org\//', '', $doi);
         $searchParameters["DOI"] = $doi; 
+        
+        // fetch some Leganto metadata purely to do similarity check - not for searching 
+        if (isset($citation["Leganto"]["metadata"]["chapter_author"])) { 
+            $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["chapter_author"];
+        } else if (isset($citation["Leganto"]["metadata"]["author"])) {
+            $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["author"];
+        }
+        if (isset($citation["Leganto"]["metadata"]["article_title"])) {
+            $extraParameters["LEGANTO-TITLE"] = $citation["Leganto"]["metadata"]["article_title"];
+        } else if (isset($citation["Leganto"]["metadata"]["chapter_title"])) {
+            $extraParameters["LEGANTO-TITLE"] = $citation["Leganto"]["metadata"]["chapter_title"];
+        } else if (isset($citation["Leganto"]["metadata"]["title"])) {
+            $extraParameters["LEGANTO-TITLE"] = $citation["Leganto"]["metadata"]["title"];
+        }
+        
     }
-    if (isset($citation["Leganto"]["secondary_type"]["value"]) && in_array($citation["Leganto"]["secondary_type"]["value"], Array("CR", "E_CR"))
+    // we see some articles with type JR - better include them? 
+    if (isset($citation["Leganto"]["secondary_type"]["value"]) && in_array($citation["Leganto"]["secondary_type"]["value"], Array("CR", "E_CR", "JR"))
         && isset($citation["Leganto"]["metadata"]["article_title"]) && $citation["Leganto"]["metadata"]["article_title"]) {
             $searchParameters["TITLE"] = $citation["Leganto"]["metadata"]["article_title"];
             if (isset($citation["Leganto"]["metadata"]["issn"]) && $citation["Leganto"]["metadata"]["issn"]) {
@@ -115,7 +133,7 @@ foreach ($citations as &$citation) {
                 $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["author"];
             }
             $searchParameters["DOCTYPE"] = Array("ar", "re"); // this parameter may have multiple possible values (to join with "or") 
-    } else if (isset($citation["Leganto"]["secondary_type"]["value"]) && $citation["Leganto"]["secondary_type"]["value"]=="BK"
+    } else if (isset($citation["Leganto"]["secondary_type"]["value"]) && in_array($citation["Leganto"]["secondary_type"]["value"], Array("BK", "E_BK"))
         && isset($citation["Leganto"]["metadata"]["title"]) && $citation["Leganto"]["metadata"]["title"]) {
             $searchParameters["TITLE"] = $citation["Leganto"]["metadata"]["title"];
             if (isset($citation["Leganto"]["metadata"]["isbn"]) && $citation["Leganto"]["metadata"]["isbn"]) {
@@ -317,19 +335,27 @@ foreach ($citations as &$citation) {
                     $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $searchParameters["TITLE"], "Levenshtein", FALSE));
                 }
                 // now try comparing with all the Alma titles
-                foreach ($extraParameters["ALMA-TITLES"] as $titleAlma) {
+                if (isset($extraParameters["ALMA-TITLES"])) {
+                    foreach ($extraParameters["ALMA-TITLES"] as $titleAlma) {
+                        $foundTitleSimilarity = TRUE;
+                        if (isset($titleAlma["collated"])) {
+                            $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $titleAlma["collated"], "Levenshtein", FALSE));
+                        }
+                        if (isset($titleAlma["a"])) {
+                            $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $titleAlma["a"], "Levenshtein", FALSE));
+                        }
+                    }
+                }
+                if (isset($extraParameters["LEGANTO-TITLE"]) && $extraParameters["LEGANTO-TITLE"]) {
                     $foundTitleSimilarity = TRUE;
                     if (isset($titleAlma["collated"])) {
-                        $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $titleAlma["collated"], "Levenshtein", FALSE));
-                    }
-                    if (isset($titleAlma["a"])) {
-                        $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $titleAlma["a"], "Levenshtein", FALSE));
+                        $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $extraParameters["LEGANTO-TITLE"], "Levenshtein", FALSE));
                     }
                 }
             }
 
             
-            
+            $collatedAuthorsSurname = Array();
             $collatedAuthorsShort = Array(); 
             $collatedAuthorsLong = Array();
             
@@ -394,8 +420,13 @@ foreach ($citations as &$citation) {
                         
                         
                         // assemble string list of authors for later comparison with source metadata
+                        $collatedAuthorSurname = FALSE;
                         $collatedAuthorShort = FALSE;
                         $collatedAuthorLong = FALSE; 
+                        if (isset($author["ce:ce:surname"]) && $author["ce:ce:surname"]) {
+                            $collatedAuthorSurname = $author["ce:ce:surname"];
+                            $collatedAuthorsSurname[] = $collatedAuthorSurname;
+                        }
                         if (isset($author["ce:indexed-name"]) && $author["ce:indexed-name"]) {
                             $collatedAuthorShort = $author["ce:indexed-name"];
                             $collatedAuthorsShort[] = $collatedAuthorShort;
@@ -404,6 +435,8 @@ foreach ($citations as &$citation) {
                             $collatedAuthorLong = $author["ce:surname"]." ";
                             if (isset($author["ce:given-name"]) && $author["ce:given-name"]) {
                                 $collatedAuthorLong .= ", ".$author["ce:given-name"];
+                            } else if (isset($author["ce:initials"]) && $author["ce:initials"]) {
+                                $collatedAuthorLong .= ", ".$author["ce:initials"];
                             }
                             $collatedAuthorsLong[] = $collatedAuthorLong;
                         }
@@ -412,114 +445,86 @@ foreach ($citations as &$citation) {
                         $thisSimilarity = 0;
                         $foundSimilarity = FALSE;
                         // try taking any Alma authors 
-                        foreach ($extraParameters["ALMA-CREATORS"] as $creatorAlma) {
-                            if ($creatorAlma) { 
-                                if (isset($creatorAlma["collated"]) && $creatorAlma["collated"]) { 
-                                    if ($collatedAuthorLong) { 
-                                        $foundSimilarity = TRUE;
-                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorLong, $creatorAlma["collated"], "Levenshtein", FALSE));
-                                    } else if ($collatedAuthorShort) {
-                                        $foundSimilarity = TRUE;
-                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorAlma["collated"], "Levenshtein", FALSE));
-                                    }
-                                } else if (isset($creatorAlma["a"]) && $creatorAlma["a"]) {
-                                    if ($collatedAuthorLong) {
-                                        $foundSimilarity = TRUE;
-                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorLong, $creatorAlma["collated"], "Levenshtein", FALSE));
-                                    } else if ($collatedAuthorShort) {
-                                        $foundSimilarity = TRUE;
-                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorAlma["collated"], "Levenshtein", FALSE));
+                        if (isset($extraParameters["ALMA-CREATORS"])) {
+                            foreach ($extraParameters["ALMA-CREATORS"] as $creatorAlma) {
+                                if ($creatorAlma) {
+                                    if (isset($creatorAlma["collated"]) && $creatorAlma["collated"]) {
+                                        if ($collatedAuthorLong) {
+                                            $foundSimilarity = TRUE;
+                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorLong, $creatorAlma["collated"], "Levenshtein", FALSE));
+                                        } 
+                                        if ($collatedAuthorShort) {
+                                            $foundSimilarity = TRUE;
+                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorAlma["collated"], "Levenshtein", FALSE));
+                                        }
+                                        // actually don't match on just surname - we do need some corroboration 
+                                        /*
+                                        if ($collatedAuthorSurname) {
+                                            $foundSimilarity = TRUE;
+                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorSurname, $creatorAlma["collated"], "Levenshtein", FALSE));
+                                        }
+                                        */
+                                    } 
+                                    if (isset($creatorAlma["a"]) && $creatorAlma["a"]) {
+                                        if ($collatedAuthorLong) {
+                                            $foundSimilarity = TRUE;
+                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorLong, $creatorAlma["a"], "Levenshtein", FALSE));
+                                        } 
+                                        if ($collatedAuthorShort) {
+                                            $foundSimilarity = TRUE;
+                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorAlma["a"], "Levenshtein", FALSE));
+                                        }
+                                        // actually don't match on just surname - we do need some corroboration
+                                        /*
+                                         if ($collatedAuthorSurname) {
+                                            $foundSimilarity = TRUE;
+                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorSurname, $creatorAlma["a"], "Levenshtein", FALSE));
+                                        }
+                                        */
                                     }
                                 }
                             }
                         }
                         // now try splitting the Leganto author field and comparing with any individual Scopus author
-                        $creatorsLeganto = preg_split('/(\s*;\s*|\s+and\s+|\s+&\s+)/', $extraParameters["LEGANTO-AUTHOR"]); // separate multiple authors
-                        if ($creatorsLeganto) {
-                            foreach ($creatorsLeganto as $creatorLeganto) {
-                                if ($creatorLeganto) {
-                                    if ($collatedAuthorLong) {
-                                        $foundSimilarity = TRUE;
-                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorLong, $creatorLeganto, "Levenshtein", FALSE));
-                                    } else if ($collatedAuthorShort) {
-                                        $foundSimilarity = TRUE;
-                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorLeganto, "Levenshtein", FALSE));
+                        if (isset($extraParameters["LEGANTO-AUTHOR"]) && $extraParameters["LEGANTO-AUTHOR"]) { 
+                            $creatorsLeganto = preg_split('/(\s*;\s*|\s+and\s+|\s+&\s+)/', $extraParameters["LEGANTO-AUTHOR"]); // separate multiple authors
+                            if ($creatorsLeganto) {
+                                foreach ($creatorsLeganto as $creatorLeganto) {
+                                    if ($creatorLeganto) {
+                                        if ($collatedAuthorLong) {
+                                            $foundSimilarity = TRUE;
+                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorLong, $creatorLeganto, "Levenshtein", FALSE));
+                                        } 
+                                        if ($collatedAuthorShort) {
+                                            $foundSimilarity = TRUE;
+                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorLeganto, "Levenshtein", FALSE));
+                                        }
+                                        // actually don't match on just surname - we do need some corroboration
+                                        /*
+                                         if ($collatedAuthorSurname) {
+                                            $foundSimilarity = TRUE;
+                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorSurname, $creatorLeganto, "Levenshtein", FALSE));
+                                        }
+                                        */
                                     }
                                 }
                             }
                         }
                         if ($foundSimilarity) { $citationScopusAuthor["similarity-author"] = $thisSimilarity; }
                         
+                        $citationScopusAuthor["search-parameters"] = $searchParameters; 
+                        $citationScopusAuthor["extra-parameters"] = $extraParameters;
+                        
+                        
                         $citation["Scopus"]["first-match"]["authors"][] = $citationScopusAuthor;
                     }
                 }
             }
             
-            // try to quantify the citation-level similarity of title and authors between source and Scopus
-            // we are now also collecting author-level similarity so this may be redundant  
-            
-            // titles first 
-            // we've already done this above, before the author-level work 
-            if ($foundTitleSimilarity) {
-                // $citation["Scopus"]["first-match"]["similarity-title"] = $titleSimilarity;
-            }
-            
-            // now authors 
-            $thisSimilarity = 0;
-            $foundSimilarity = FALSE; 
-            // first try comparing the Leganto author field with any individual Scopus author as well as with them all together 
-            if (isset($extraParameters["LEGANTO-AUTHOR"]) && $extraParameters["LEGANTO-AUTHOR"]) {
-                foreach ($collatedAuthorsShort as $collatedAuthor) { 
-                    $foundSimilarity = TRUE;
-                    $thisSimilarity = max($thisSimilarity, similarity($collatedAuthor, $extraParameters["LEGANTO-AUTHOR"], "Levenshtein", FALSE));
-                }
-                foreach ($collatedAuthorsLong as $collatedAuthor) {
-                    $foundSimilarity = TRUE;
-                    $thisSimilarity = max($thisSimilarity, similarity($collatedAuthor, $extraParameters["LEGANTO-AUTHOR"], "Levenshtein", FALSE));
-                }
-                if (count($collatedAuthorsShort)) {
-                    $foundSimilarity = TRUE;
-                    $thisSimilarity = max($thisSimilarity, similarity(implode("", $collatedAuthorsShort), $extraParameters["LEGANTO-AUTHOR"], "Levenshtein", FALSE, TRUE)); // final TRUE means sort all words in strings into alphabetical order first
-                }
-                if (count($collatedAuthorsLong)) {
-                    $foundSimilarity = TRUE;
-                    $thisSimilarity = max($thisSimilarity, similarity(implode("", $collatedAuthorsLong), $extraParameters["LEGANTO-AUTHOR"], "Levenshtein", FALSE, TRUE)); // final TRUE means sort all words in strings into alphabetical order first
-                }
-            }
-            // now try comparing the set of Alma creators with the set of Scopus authors 
-            $totalAuthorSimilarity = 0; 
-            foreach ($extraParameters["ALMA-CREATORS"] as $creatorAlma) { 
-                $thisAuthorSimilarity = 0; 
-                foreach ($collatedAuthorsShort as $collatedAuthor) {
-                    $foundSimilarity = TRUE;
-                    if (isset($creatorAlma["collated"])) { 
-                        $thisAuthorSimilarity = max($thisAuthorSimilarity, similarity($collatedAuthor, $creatorAlma["collated"], "Levenshtein", FALSE)); 
-                    }
-                    if (isset($creatorAlma["a"])) {
-                        $thisAuthorSimilarity = max($thisAuthorSimilarity, similarity($collatedAuthor, $creatorAlma["a"], "Levenshtein", FALSE));
-                    }
-                }
-                foreach ($collatedAuthorsLong as $collatedAuthor) {
-                    $foundSimilarity = TRUE;
-                    if (isset($creatorAlma["collated"])) {
-                        $thisAuthorSimilarity = max($thisAuthorSimilarity, similarity($collatedAuthor, $creatorAlma["collated"], "Levenshtein", FALSE));
-                    }
-                    if (isset($creatorAlma["a"])) {
-                        $thisAuthorSimilarity = max($thisAuthorSimilarity, similarity($collatedAuthor, $creatorAlma["a"], "Levenshtein", FALSE));
-                    }
-                }
-                $totalAuthorSimilarity += $thisAuthorSimilarity; 
-            }
-            if (count($extraParameters["ALMA-CREATORS"])) { 
-                $thisSimilarity = max($thisSimilarity, $totalAuthorSimilarity/count($extraParameters["ALMA-CREATORS"])); 
-            }
-            // now save the best match we found by any means  
-            if ($foundSimilarity) {
-                // $citation["Scopus"]["first-match"]["similarity-authors"] = $thisSimilarity;
-            }
-            
-            
+
         }
+        
+    }
     }
 }
 

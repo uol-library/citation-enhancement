@@ -69,17 +69,20 @@ function simplify($string) {
 function similarity($string1, $string2, $type="Levenshtein", $crop=FALSE, $alphabeticise=FALSE) {
 
     if ($string1==$string2) { return 100; }
+
+    if ($crop && strlen($string1)!=strlen($string2)) {
+        if (strlen($string1)>strlen($string2)) {
+            $string1 = cropto($string1, strlen($string2), $crop); // $crop may indicate the cropping method
+        } else {
+            $string2 = cropto($string2, strlen($string1), $crop);
+        }
+    }
+    
     $string1 = normalise($string1);
     $string2 = normalise($string2);
     if (!$string1 || !$string2) { return 0; }
     
-    if ($crop && strlen($string1)!=strlen($string2)) { 
-        if (strlen($string1)>strlen($string2)) { 
-            $string1 = cropto($string1, strlen($string2)); 
-        } else { 
-            $string2 = cropto($string2, strlen($string1));
-        }
-    }
+
     
     if ($alphabeticise) { 
         $stringArray = explode(" ", $string1); 
@@ -131,7 +134,25 @@ function similarity($string1, $string2, $type="Levenshtein", $crop=FALSE, $alpha
 }
 
 
-function cropto($string, $length) { 
+function cropto($string, $length, $type) { 
+
+    if ($type=="colon") {
+        $stringParts = explode(":", $string);
+        $cropped = $stringParts[0];
+        
+        $originalLengthDiff = abs(strlen($string) - $length); 
+        $croppedLengthDiff = abs(strlen($cropped) - $length);
+        
+        if ($croppedLengthDiff<$originalLengthDiff) { 
+            return $cropped; 
+        } else { 
+            return $string;
+        }
+        
+    }
+    
+    // else 
+    
     // can't just use substr because we only want to split at a space or punctuation 
     $left = substr($string, 0, $length); 
     $right = substr($string, $length);
@@ -211,8 +232,10 @@ function csi($authorAffiliations, $worldBankRank) {
         foreach ($authorAffiliation as $authorAffiliationInstance) {
             if ($authorAffiliationInstance) {
                 if (isset($worldBankRank[$authorAffiliationInstance])) {
-                    $authorAffiliationCount++; 
-                    $authorAffiliationRankSum += $worldBankRank[$authorAffiliationInstance];
+                    if ($worldBankRank[$authorAffiliationInstance]!==FALSE) {   // false is a special case - we don't have data but don't want an error 
+                        $authorAffiliationCount++; 
+                        $authorAffiliationRankSum += $worldBankRank[$authorAffiliationInstance];
+                    }
                 } else {
                     trigger_error("No World Bank ranking for ".$authorAffiliationInstance, E_USER_ERROR);
                 }

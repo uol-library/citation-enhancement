@@ -93,9 +93,13 @@ $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 // main loop: process each citation
 foreach ($citations as &$citation) { 
     
+    if (isset($citation["Leganto"])) { // only do any enhancement for entries in the citations file that have an actual list
+        
+    
     $searchDataSource = FALSE; 
     $creators = Array();
     $titles = Array();
+    $primaryTitle = null; 
     $creatorsSeen = Array();
     $titlesSeen = Array();
     
@@ -118,13 +122,19 @@ foreach ($citations as &$citation) {
             }
         }
         if (isset($citation["Alma"]) && isset($citation["Alma"]["titles"])) {
+            $firstTitle = null; 
             foreach ($citation["Alma"]["titles"] as $titleAlma) {
                 $titleAlmaSerialised = print_r($titleAlma, TRUE);
                 if (isset($titleAlma["collated"]) && $titleAlma["collated"] && !in_array($titleAlmaSerialised, $titlesSeen)) {
                     $titles[] = $titleAlma;
                     $titlesSeen[] = $titleAlmaSerialised;
+                    if ($firstTitle===null) { $firstTitle = $titleAlma; } 
+                    if ($titleAlma["tag"]=="245" && $primaryTitle===null) { 
+                        $primaryTitle = $titleAlma; 
+                    }
                 }
             }
+            if ($primaryTitle===null) { $primaryTitle = $firstTitle; } 
         }
 
         
@@ -184,11 +194,12 @@ foreach ($citations as &$citation) {
                     }
                 }
                 
-                $titleLeganto = Array("collated"=>$citation["Scopus"]["results"][0]["dc:title"]);
-                $titlerLegantoSerialised = print_r($titleLeganto, TRUE);
-                if (isset($titleLeganto["collated"]) && $titleLeganto["collated"] && !in_array($titlerLegantoSerialised, $titlesSeen)) {
-                    $titles[] = $titleLeganto;
-                    $titlesSeen[] = $titlerLegantoSerialised;
+                $titleScopus = Array("collated"=>$citation["Scopus"]["results"][0]["dc:title"]);
+                $titleScopusSerialised = print_r($titleScopus, TRUE);
+                if (isset($titleScopus["collated"]) && $titleScopus["collated"] && !in_array($titleScopusSerialised, $titlesSeen)) {
+                    $titles[] = $titleScopus;
+                    $titlesSeen[] = $titleScopusSerialised;
+                    $primaryTitle = $titleScopus; 
                 }
 
                 
@@ -220,10 +231,11 @@ foreach ($citations as &$citation) {
         }
         if (isset($citation["Leganto"]["metadata"][$legantoTitleField]) && $citation["Leganto"]["metadata"][$legantoTitleField]) {
             $titleLeganto = Array("collated"=>$citation["Leganto"]["metadata"][$legantoTitleField]);
-            $titlerLegantoSerialised = print_r($titleLeganto, TRUE);
-            if (isset($titleLeganto["collated"]) && $titleLeganto["collated"] && !in_array($titlerLegantoSerialised, $titlesSeen)) {
+            $titleLegantoSerialised = print_r($titleLeganto, TRUE);
+            if (isset($titleLeganto["collated"]) && $titleLeganto["collated"] && !in_array($titleLegantoSerialised, $titlesSeen)) {
                 $titles[] = $titleLeganto;
-                $titlesSeen[] = $titlerLegantoSerialised;
+                $titlesSeen[] = $titleLegantoSerialised;
+                $primaryTitle = $titleLeganto; 
             }
         }
                 
@@ -237,6 +249,8 @@ foreach ($citations as &$citation) {
         
         
         $searchStrategies = Array(); 
+        
+        /*
         $searchStrategies[] = Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"exact", "search-pref"=>1, "data-source"=>$searchDataSource, "search-term-source"=>"collated"); 
         $searchStrategies[] = Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"exact", "search-pref"=>2, "data-source"=>$searchDataSource, "search-term-source"=>"a");
         $searchStrategies[] = Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"all",   "search-pref"=>3, "data-source"=>$searchDataSource, "search-term-source"=>"collated");
@@ -245,6 +259,56 @@ foreach ($citations as &$citation) {
         $searchStrategies[] = Array("search-fields"=>"local.personalNames", "search-relation"=>"exact", "search-pref"=>6, "data-source"=>$searchDataSource, "search-term-source"=>"a");
         $searchStrategies[] = Array("search-fields"=>"local.personalNames", "search-relation"=>"all",   "search-pref"=>7, "data-source"=>$searchDataSource, "search-term-source"=>"collated");
         $searchStrategies[] = Array("search-fields"=>"local.personalNames", "search-relation"=>"all",   "search-pref"=>8, "data-source"=>$searchDataSource, "search-term-source"=>"a");
+        */ 
+        
+        $searchStrategies[] = Array(
+            "searches"=>array(
+                "AU"=>Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"all", "search-term-source"=>"collated"),
+                "TI"=>Array("search-fields"=>"local.title", "search-relation"=>"all", "search-term-source"=>"collated"),
+            ), 
+            "search-pref"=>1, 
+            "data-source"=>$searchDataSource 
+        );
+        $searchStrategies[] = Array(
+            "searches"=>array(
+                "AU"=>Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"all", "search-term-source"=>"a"),
+                "TI"=>Array("search-fields"=>"local.title", "search-relation"=>"all", "search-term-source"=>"a"),
+            ),
+            "search-pref"=>2,
+            "data-source"=>$searchDataSource
+        );
+        $searchStrategies[] = Array(
+            "searches"=>array(
+                "AU"=>Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"all", "search-term-source"=>"collated"),
+                "TI"=>Array("search-fields"=>"local.title", "search-relation"=>"any", "search-term-source"=>"collated"),
+            ),
+            "search-pref"=>3,
+            "data-source"=>$searchDataSource
+        );
+        $searchStrategies[] = Array(
+            "searches"=>array(
+                "AU"=>Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"all", "search-term-source"=>"a"),
+                "TI"=>Array("search-fields"=>"local.title", "search-relation"=>"any", "search-term-source"=>"collated"),
+            ),
+            "search-pref"=>4,
+            "data-source"=>$searchDataSource
+        );
+        $searchStrategies[] = Array(
+            "searches"=>array(
+                "AU"=>Array("search-fields"=>"local.personalNames", "search-relation"=>"all", "search-term-source"=>"collated"),
+                "TI"=>Array("search-fields"=>"local.title", "search-relation"=>"any", "search-term-source"=>"collated"),
+            ),
+            "search-pref"=>5,
+            "data-source"=>$searchDataSource
+        );
+        $searchStrategies[] = Array(
+            "searches"=>array(
+                "AU"=>Array("search-fields"=>"local.personalNames", "search-relation"=>"all", "search-term-source"=>"a"),
+                "TI"=>Array("search-fields"=>"local.title", "search-relation"=>"any", "search-term-source"=>"collated"),
+            ),
+            "search-pref"=>5,
+            "data-source"=>$searchDataSource
+        );
         
         
         
@@ -252,23 +316,52 @@ foreach ($citations as &$citation) {
 
             foreach ($searchStrategies as $searchStrategy) {
                 
-                if (!isset($creator[$searchStrategy["search-term-source"]]) || !$creator[$searchStrategy["search-term-source"]]) { continue; } // we can't do anything if this strategy uses a field that isn't there 
+                $searchStrategyAU = isset($searchStrategy["searches"]) ? $searchStrategy["searches"]["AU"] : $searchStrategy; 
+                $searchStrategyTI = isset($searchStrategy["searches"] ) ? $searchStrategy["searches"]["TI"] : null;
+                
+                if (!isset($creator[$searchStrategyAU["search-term-source"]]) || !$creator[$searchStrategyAU["search-term-source"]]) { continue; } // we can't do anything if this strategy uses a field that isn't there 
                 
                 $citationViaf = $searchStrategy; 
-                $citationViaf["search-term"] = $creator[$citationViaf["search-term-source"]];
+                $citationViaf["search-term-au"] = $creator[$searchStrategyAU["search-term-source"]];
+                if ($searchStrategyTI) { 
+                    if (!isset($primaryTitle[$searchStrategyTI["search-term-source"]])) {
+                        continue; // move to the next search 
+                    }
+                    $citationViaf["search-term-ti"] = $primaryTitle[$searchStrategyTI["search-term-source"]];
+                } else {
+                    $citationViaf["search-term-ti"] = null; 
+                }
                 usleep(150000);
                 try {
-                    $viafSearchData = viafApiQuery($citationViaf["search-fields"], $citationViaf["search-relation"], $citationViaf["search-term"]);
+                    if (isset($searchStrategy["searches"])) { 
+                        $viafSearchData = viafApiQuery2($searchStrategyAU, $citationViaf["search-term-au"], $searchStrategyTI, $citationViaf["search-term-ti"]);
+                    } else {
+                        $viafSearchData = viafApiQuery($citationViaf["search-fields"], $citationViaf["search-relation"], $citationViaf["search-term-au"]);
+                    }
                     $citationViaf["records"] = $viafSearchData->records->record ? count($viafSearchData->records->record) : FALSE;
                 } catch (Exception $e) {
                     if (!isset($citationViaf["errors"])) {
                         $citationViaf["errors"] = Array();
                     }
                     $citationViaf["records"] = FALSE;
-                    $citationViaf["errors"][] = Array("search-fields"=>$citationViaf["search-fields"], "search-term"=>$citationViaf["search-term"], "message"=>$e->getMessage());
+                    
+                    if (isset($searchStrategy["searches"])) {
+                        $citationViaf["errors"][] = Array("search"=>$searchStrategy["searches"], "search-term-au"=>$citationViaf["search-term-au"], "search-term-ti"=>$citationViaf["search-term-ti"], "message"=>$e->getMessage());
+                    } else {
+                        $citationViaf["errors"][] = Array("search-fields"=>$citationViaf["search-fields"], "search-term"=>$citationViaf["search-term"], "message"=>$e->getMessage());
+                    }
+                    
+                    
                 }
                 if ($citationViaf["records"]) {
-                    break; // no need to try a broader search 
+                    // first, we need to double-check whether there is at least one personal name record here
+                    foreach ($viafSearchData->records->record as $record) {
+                        $viafCluster = $record->recordData->VIAFCluster;
+                        $viafType = $viafCluster->nameType->__toString();
+                        if ($viafType=="Personal") { 
+                            break 2;  
+                        }
+                    }
                 }
                 
             }
@@ -455,12 +548,15 @@ foreach ($citations as &$citation) {
                                     */ 
                                     $thisSimilarity = 0; 
                                     if (isset($citationTitle["collated"])) { 
-                                        // first try comparing the full source title with the full VIAF title 
-                                        $thisSimilarity = similarity($viafTitle, $citationTitle["collated"], "Levenshtein", FALSE);
+                                        // first try comparing the full source title with the full VIAF title
+                                        // try two different comparisons - without and with truncation of longer title at colon 
+                                        $thisSimilarity = similarity($viafTitle, $citationTitle["collated"], "Levenshtein");
+                                        $thisSimilarity = max($thisSimilarity, similarity($viafTitle, $citationTitle["collated"], "Levenshtein", "colon"));
                                     }
                                     if (isset($citationTitle["a"])) {
                                         // now compare the shorter ($a) source title with the full VIAF title 
-                                        $thisSimilarity = max($thisSimilarity, similarity($viafTitle, $citationTitle["a"], "Levenshtein", FALSE));
+                                        $thisSimilarity = max($thisSimilarity, similarity($viafTitle, $citationTitle["a"], "Levenshtein"));
+                                        $thisSimilarity = max($thisSimilarity, similarity($viafTitle, $citationTitle["a"], "Levenshtein", "colon"));
                                     }
                                     if ($viafBestSimilarity===FALSE || $thisSimilarity>$viafBestSimilarity) {
                                         if ($thisSimilarity>0 || $citationViaf["records"]==1) { // set a higher threshold? 
@@ -507,7 +603,7 @@ foreach ($citations as &$citation) {
         
     }
     
-    
+    }
     
     
     
@@ -538,6 +634,31 @@ function viafApiQuery($fields, $relation, $term) {
     }
 }
 
+function viafApiQuery2($searchStrategyAU, $searchTermAU, $searchStrategyTI, $searchTermTI) { 
+
+    global $config, $http_response_header; // latter needed to allow curl_get_file_contents to mimic file_get_contents side-effect
+    
+    $subQuery = $searchStrategyAU["search-fields"]."+".$searchStrategyAU["search-relation"]."+%22".urlencode(str_replace('"', '', $searchTermAU))."%22";
+    if ($searchStrategyTI && $searchTermTI) {  
+        $subQuery .= "+and+".$searchStrategyTI["search-fields"]."+".$searchStrategyTI["search-relation"]."+%22".urlencode(str_replace('"', '', $searchTermTI))."%22";
+    }
+    
+    $viafSearchURL = "http://viaf.org/viaf/search?query=".$subQuery."&maximumRecords=10&startRecord=1&sortKeys=holdingscount&httpAccept=text/xml";
+    
+    $viafSearchResponse = curl_get_file_contents($viafSearchURL);
+    
+    //TODO error checking
+    $viafSearchResponse = preg_replace('/(<\/?)ns\d+:/', "$1", $viafSearchResponse); // kludge - need to parse namespaced document properly
+    try {
+        return new SimpleXmlElement($viafSearchResponse);
+    }
+    catch (Exception $e) {
+        throw new Exception("Could not parse response: $viafSearchResponse");
+    }
+    
+    
+    
+}
 
 
 

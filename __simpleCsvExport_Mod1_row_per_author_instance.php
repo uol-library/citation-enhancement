@@ -111,7 +111,11 @@ foreach ($worldBankRankLines as $worldBankRankLine) {
 $worldBankAlias = json_decode(file_get_contents("Config/WorldBank/alias.json"), TRUE); 
 foreach ($worldBankAlias as $source=>$target) {
     if (!isset($worldBankRank[$source])) { // only alias if we really don't have it  
-        $worldBankRank[$source] = $worldBankRank[$target];
+        if ($target===FALSE) { 
+            $worldBankRank[$source] = FALSE; // special case - FALSE in alias file means we know we don't have it 
+        } else { 
+            $worldBankRank[$source] = $worldBankRank[$target];
+        }
     }
 } 
 
@@ -184,7 +188,12 @@ foreach ($citations as $citation) {
                 $outputRecord["EXT-SEARCH-FIELD"] = preg_replace('/^(\w+).*$/', '$1', $citation["Scopus"]["search-active"]);
                 
                 // $outputRecord["SIMILARITY"] = floor($citation["Scopus"]["first-match"]["similarity-title"]*$citation["Scopus"]["first-match"]["similarity-authors"]/100);
-                $outputRecord["SIMILARITY"] = floor($author["similarity-title"]*$author["similarity-author"]/100);
+                if (isset($author["similarity-title"]) && isset($author["similarity-author"])) { 
+                    $outputRecord["SIMILARITY"] = floor($author["similarity-title"]*$author["similarity-author"]/100);
+                } else {
+                    print_r($author);
+                    exit; 
+                }
                 
                 
                 $outputRecord["EXT-AUTHOR"] = $author["ce:indexed-name"];
