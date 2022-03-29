@@ -31,7 +31,7 @@ Make a developer account on the Clarivate Portal https://developer.clarivate.com
 > apiKey = "----------------------------------------"
 
 ## 2. Software dependencies
-Host machine must be on 129.11.0.0 network for at least the Scopus Integration test because of restrictions on Scopus API - it might be easiest to carry out all steps on a machine on 129.11.0.0 network
+Host machine must be on 129.11.0.0 network because of restrictions on Scopus API 
 
 PHP - tested against versions 5.6.40 and 8.0.7 
 
@@ -40,7 +40,7 @@ cURL support in PHP including support for https
 Project https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&version=GBrl-export&_a=contents 
 
 ## 3. Latest releases
-v2.1 
+v2.2
 
 ## 4. API references
 Scopus: https://dev.elsevier.com/api_docs.html
