@@ -17,11 +17,11 @@
  * =======================================================================
  *
  * Typical usage: 
- * php enhanceCitationsFromScopus.php <Data/2.json >Data/3.json 
+ * php enhanceCitationsFromScopus.php <Data/1AS.json >Data/1ASW.json 
  * 
  * The input citation data is assumed to already contain data from Leganto and Alma, and possibly Scopus 
  * 
- * See getCitationsByCourseAndList.php and enhanceCitationsFromAlma.php for how this data is prepared  
+ * See getCitationsByModule.php and enhanceCitationsFromAlma.php for how this data is prepared  
  * 
  * =======================================================================
  * 
@@ -34,10 +34,7 @@
  *  - Try these searches in turn, until a search returns at least one result   
  *  - Take the *first* record in the result set - 
  *    TODO: may need an intelligent way of picking the best record where multiple records are returned 
- *  - Fetch the abstract for this record (some relevant data is in here) 
- *  - For each author in the abstract - 
- *    - Fetch the contemporary affiliation of the author 
- *    - Fetch the author profile which includes current affiliation   
+ *  - Fetch the relevant metadata from this record    
  *  - Calculate string similarities between source and WoS authors and titles 
  *  - Save all the data (including any WoS rate-limit data and errors) in the citation object 
  *  

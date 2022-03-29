@@ -17,11 +17,11 @@
  * =======================================================================
  *
  * Typical usage: 
- * php enhanceCitationsFromAlma.php <Data/1.json >Data/2.json 
+ * php enhanceCitationsFromAlma.php <Data/1.json >Data/1A.json 
  * 
  * The input citation data is assumed to already contain data from Leganto  
  * 
- * See getCitationsByCourseAndList.php for how this data is prepared  
+ * See getCitationsByModule.php for how this data is prepared  
  * 
  * =======================================================================
  * 

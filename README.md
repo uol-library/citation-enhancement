@@ -40,7 +40,7 @@ cURL support in PHP including support for https
 Project https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&version=GBrl-export&_a=contents 
 
 ## 3. Latest releases
-v2.2
+v2.2.2
 
 ## 4. API references
 Scopus: https://dev.elsevier.com/api_docs.html
@@ -55,7 +55,7 @@ Alma: https://developers.exlibrisgroup.com/alma/apis/
 The software does not need building once the steps in the Installation process are complete 
 
 ## Configuration 
-Choose a module code or codes to run against e.g. "PSYC3505" and list those in the value of the array $modulesToInclude in getCitationsByCourseAndList.php, e.g.: 
+Choose a module code or codes to run against e.g. "PSYC3505" and list those in the value of the array $modulesToInclude in getCitationsByModule.php, e.g.: 
 
 > $modulesToInclude = Array("LUBS1295","LUBS3340","HPSC2400","HPSC3450","HECS5169M","HECS3295","HECS5186M","HECS5189M","COMP2121","COMP5840M","XJCO2121","OCOM5204M","GEOG1081","GEOG2000","DSUR5130M","DSUR5022M","BLGY3135","SOEE1640");
 
@@ -69,7 +69,7 @@ This outputs data files to Config/WorldBank/ (the locations are set in config.in
 Step 4 will later consume these 
 
 ## Step 2: collect reading list citations  
-> php getCitationsByCourseAndList.php >Data/1.json 
+> php getCitationsByModule.php >Data/1.json 
 
 This script (like the following ones) writes a JSON-encoded list of citations to STDOUT, so just save it somewhere suitable 
 

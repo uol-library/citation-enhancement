@@ -18,7 +18,7 @@
  * =======================================================================
  *
  * Typical usage: 
- * php getCitationsByCourseAndList.php >Data/1.json 
+ * php getCitationsByModule.php >Data/1.json 
  * 
  * This script is the start of the typical citation-enhancement process: 
  * It will typically be followed by the various enhanceCitationsFrom....php scripts  
