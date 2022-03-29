@@ -1,0 +1,94 @@
+https://api.elsevier.com/content/abstract/scopus_id/27844581221?field=authors,affiliation&httpAccept=application/json&apiKey=ace0da58224b7aafa53389ebb4b157ad
+=>
+{"abstracts-retrieval-response": {
+    "affiliation": {
+        "affiliation-city": null,
+        "@id": "60022403",
+        "affilname": "Technion - Israel Institute of Technology",
+        "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/60022403",
+        "affiliation-country": null
+    },
+    "coredata": null,
+    "authors": {"author": [
+        {
+            "ce:given-name": "Erez",
+            "preferred-name": {
+                "ce:given-name": "Erez",
+                "ce:initials": "E.",
+                "ce:surname": "Hasman",
+                "ce:indexed-name": "Hasman E."
+            },
+            "@seq": "1",
+            "ce:initials": "E.",
+            "@_fa": "true",
+            "affiliation": {
+                "@id": "60022403",
+                "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/60022403"
+            },
+            "ce:surname": "Hasman",
+            "@auid": "7005954128",
+            "author-url": "https://api.elsevier.com/content/author/author_id/7005954128",
+            "ce:indexed-name": "Hasman E."
+        },
+        {
+            "ce:given-name": "Gabriel",
+            "preferred-name": {
+                "ce:given-name": "Gabriel",
+                "ce:initials": "G.",
+                "ce:surname": "Biener",
+                "ce:indexed-name": "Biener G."
+            },
+            "@seq": "2",
+            "ce:initials": "G.",
+            "@_fa": "true",
+            "affiliation": {
+                "@id": "60022403",
+                "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/60022403"
+            },
+            "ce:surname": "Biener",
+            "@auid": "6701449603",
+            "author-url": "https://api.elsevier.com/content/author/author_id/6701449603",
+            "ce:indexed-name": "Biener G."
+        },
+        {
+            "ce:given-name": "Avi",
+            "preferred-name": {
+                "ce:given-name": "Avi",
+                "ce:initials": "A.",
+                "ce:surname": "Niv",
+                "ce:indexed-name": "Niv A."
+            },
+            "@seq": "3",
+            "ce:initials": "A.",
+            "@_fa": "true",
+            "affiliation": {
+                "@id": "60022403",
+                "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/60022403"
+            },
+            "ce:surname": "Niv",
+            "@auid": "6603752915",
+            "author-url": "https://api.elsevier.com/content/author/author_id/6603752915",
+            "ce:indexed-name": "Niv A."
+        },
+        {
+            "ce:given-name": "Vladimir",
+            "preferred-name": {
+                "ce:given-name": "Vladimir",
+                "ce:initials": "V.",
+                "ce:surname": "Kleiner",
+                "ce:indexed-name": "Kleiner V."
+            },
+            "@seq": "4",
+            "ce:initials": "V.",
+            "@_fa": "true",
+            "affiliation": {
+                "@id": "60022403",
+                "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/60022403"
+            },
+            "ce:surname": "Kleiner",
+            "@auid": "7003576755",
+            "author-url": "https://api.elsevier.com/content/author/author_id/7003576755",
+            "ce:indexed-name": "Kleiner V."
+        }
+    ]}
+}}

@@ -1,0 +1,94 @@
+https://api.elsevier.com/content/affiliation/affiliation_id/122910499?httpAccept=application/json&apiKey=ace0da58224b7aafa53389ebb4b157ad
+=>
+{
+  "affiliation-retrieval-response": {
+    "coredata": {
+      "prism:url": "https://api.elsevier.com/content/affiliation/affiliation_id/122910499",
+      "dc:identifier": "AFFILIATION_ID:122910499",
+      "eid": "10-s2.0-122910499",
+      "author-count": "8",
+      "document-count": "7",
+      "link": [
+        {
+          "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/122910499",
+          "@rel": "self",
+          "@_fa": "true"
+        },
+        {
+          "@href": "https://api.elsevier.com/content/search/scopus?query=af-id%28122910499%29",
+          "@rel": "search",
+          "@_fa": "true"
+        },
+        {
+          "@_fa": "true",
+          "@href": "https://www.scopus.com/affil/profile.uri?afid=122910499&partnerID=HzOxMe3b&origin=inward",
+          "@rel": "scopus-affiliation"
+        }
+      ]
+    },
+    "affiliation-name": "Phileo by Lesaffre",
+    "name-variants": {
+      "name-variant": [
+        {
+          "@_fa": "true",
+          "@doc-count": "5",
+          "@source": "internal-ani",
+          "$": "Phileo By Lesaffre"
+        },
+        {
+          "@_fa": "true",
+          "@doc-count": "1",
+          "@source": "internal-ani",
+          "$": "Phileo Lesaffre Animal Care"
+        },
+        {
+          "@_fa": "true",
+          "@doc-count": "1",
+          "@source": "internal-ani",
+          "$": "Gnosis By Lesaffre"
+        }
+      ]
+    },
+    "address": "137 Rue Gabriel Péri",
+    "city": "Marcq-en-Baroeul",
+    "country": "France",
+    "institution-profile": {
+      "@affiliation-id": "122910499",
+      "status": "update",
+      "date-created": {
+        "@day": "30",
+        "@month": "07",
+        "@year": "2019"
+      },
+      "preferred-name": {
+        "@source": "internal-ani",
+        "$": "Phileo by Lesaffre"
+      },
+      "sort-name": "Phileo by Lesaffre",
+      "name-variant": [
+        {
+          "@doc-count": "5",
+          "@source": "internal-ani",
+          "$": "Phileo By Lesaffre"
+        },
+        {
+          "@doc-count": "1",
+          "@source": "internal-ani",
+          "$": "Phileo Lesaffre Animal Care"
+        },
+        {
+          "@doc-count": "1",
+          "@source": "internal-ani",
+          "$": "Gnosis By Lesaffre"
+        }
+      ],
+      "address": {
+        "@country": "fra",
+        "address-part": "137 Rue Gabriel Péri",
+        "city": "Marcq-en-Baroeul",
+        "postal-code": "F-59700",
+        "country": "France"
+      }
+    }
+  }
+}

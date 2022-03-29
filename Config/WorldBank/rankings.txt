@@ -1,0 +1,205 @@
+Rank	Country Name	Country Code [3]	Country Code [2]	Income Group	GNI/capita	Log(GNI/capita)	GNI Year
+1	Burundi	BDI	BI	Low income	230	2.3617278360176	2020
+2	Somalia	SOM	SO	Low income	320	2.5051499783199	2020
+3	Mozambique	MOZ	MZ	Low income	460	2.6627578316816	2020
+4	Madagascar	MDG	MG	Low income	470	2.6720978579357	2020
+5	Afghanistan	AFG	AF	Low income	500	2.698970004336	2020
+6	Central African Republic	CAF	CF	Low income	500	2.698970004336	2020
+7	Sierra Leone	SLE	SL	Low income	510	2.7075701760979	2020
+8	Congo, Dem. Rep.	COD	CD	Low income	550	2.7403626894942	2020
+9	Niger	NER	NE	Low income	550	2.7403626894942	2020
+10	Liberia	LBR	LR	Low income	570	2.7558748556725	2020
+11	Malawi	MWI	MW	Low income	580	2.7634279935629	2020
+12	Eritrea	ERI	ER	Low income	600	2.7781512503836	2011
+13	Chad	TCD	TD	Low income	630	2.7993405494536	2020
+14	Sudan	SDN	SD	Low income	650	2.8129133566429	2020
+15	Gambia, The	GMB	GM	Low income	750	2.8750612633917	2020
+16	Guinea-Bissau	GNB	GW	Low income	760	2.8808135922808	2020
+17	Burkina Faso	BFA	BF	Low income	770	2.8864907251725	2020
+18	Rwanda	RWA	RW	Low income	780	2.8920946026905	2020
+19	Uganda	UGA	UG	Low income	800	2.9030899869919	2020
+20	Mali	MLI	ML	Low income	830	2.9190780923761	2020
+21	Ethiopia	ETH	ET	Low income	890	2.9493900066449	2020
+22	Yemen, Rep.	YEM	YE	Low income	910	2.9590413923211	2018
+23	Togo	TGO	TG	Low income	920	2.9637878273456	2020
+24	Guinea	GIN	GN	Low income	1020	3.0086001717619	2020
+25	Tajikistan	TJK	TJ	Lower middle income	1060	3.0253058652648	2020
+26	Tanzania	TZA	TZ	Lower middle income	1080	3.0334237554869	2020
+27	South Sudan	SSD	SS	Low income	1090	3.0374264979406	2015
+28	Lesotho	LSO	LS	Lower middle income	1100	3.0413926851582	2020
+29	Zimbabwe	ZWE	ZW	Lower middle income	1140	3.0569048513365	2020
+30	Kyrgyz Republic	KGZ	KG	Lower middle income	1160	3.0644579892269	2020
+31	Zambia	ZMB	ZM	Lower middle income	1160	3.0644579892269	2020
+32	Syrian Arab Republic	SYR	SY	Low income	1170	3.0681858617462	2019
+33	Nepal	NPL	NP	Lower middle income	1190	3.0755469613925	2020
+34	Pakistan	PAK	PK	Lower middle income	1270	3.103803720956	2020
+35	Benin	BEN	BJ	Lower middle income	1280	3.1072099696479	2020
+36	Haiti	HTI	HT	Lower middle income	1320	3.1205739312059	2020
+37	Myanmar	MMR	MM	Lower middle income	1350	3.130333768495	2020
+38	Comoros	COM	KM	Lower middle income	1400	3.1461280356782	2020
+39	Senegal	SEN	SN	Lower middle income	1430	3.1553360374651	2020
+40	Cambodia	KHM	KH	Lower middle income	1500	3.1760912590557	2020
+41	Cameroon	CMR	CM	Lower middle income	1520	3.1818435879448	2020
+42	Mauritania	MRT	MR	Lower middle income	1670	3.2227164711476	2020
+43	Uzbekistan	UZB	UZ	Lower middle income	1740	3.2405492482826	2020
+44	Congo, Rep.	COG	CG	Lower middle income	1770	3.2479732663618	2020
+45	Kenya	KEN	KE	Lower middle income	1840	3.2648178230095	2020
+46	Nicaragua	NIC	NI	Lower middle income	1850	3.267171728403	2020
+47	India	IND	IN	Lower middle income	1920	3.2833012287035	2020
+48	Timor-Leste	TLS	TL	Lower middle income	1990	3.2988530764097	2020
+49	Nigeria	NGA	NG	Lower middle income	2000	3.301029995664	2020
+50	Bangladesh	BGD	BD	Lower middle income	2030	3.3074960379132	2020
+51	Sao Tome and Principe	STP	ST	Lower middle income	2060	3.3138672203692	2020
+52	Angola	AGO	AO	Lower middle income	2140	3.3304137733492	2020
+53	Honduras	HND	HN	Lower middle income	2180	3.3384564936046	2020
+54	Cote d'Ivoire	CIV	CI	Lower middle income	2280	3.3579348470005	2020
+55	Solomon Islands	SLB	SB	Lower middle income	2300	3.3617278360176	2020
+56	Ghana	GHA	GH	Lower middle income	2340	3.3692158574101	2020
+57	Lao PDR	LAO	LA	Lower middle income	2520	3.4014005407815	2020
+58	Vietnam	VNM	VN	Lower middle income	2650	3.4232458739368	2020
+59	Papua New Guinea	PNG	PG	Lower middle income	2720	3.4345689040342	2020
+60	Bhutan	BTN	BT	Lower middle income	2840	3.453318340047	2020
+61	Iran, Islamic Rep.	IRN	IR	Lower middle income	2960	3.4712917110589	2020
+62	Kiribati	KIR	KI	Lower middle income	2960	3.4712917110589	2020
+63	Morocco	MAR	MA	Lower middle income	2980	3.4742162640763	2020
+64	Egypt, Arab Rep.	EGY	EG	Lower middle income	3000	3.4771212547197	2020
+65	Cabo Verde	CPV	CV	Lower middle income	3060	3.4857214264816	2020
+66	Bolivia	BOL	BO	Lower middle income	3180	3.5024271199844	2020
+67	Vanuatu	VUT	VU	Lower middle income	3190	3.5037906830572	2020
+68	Tunisia	TUN	TN	Lower middle income	3300	3.5185139398779	2020
+69	Djibouti	DJI	DJ	Lower middle income	3310	3.5198279937757	2020
+70	Eswatini	SWZ	SZ	Lower middle income	3410	3.5327543789925	2020
+71	Philippines	PHL	PH	Lower middle income	3430	3.5352941200428	2020
+72	Ukraine	UKR	UA	Lower middle income	3540	3.5490032620258	2020
+73	Algeria	DZA	DZ	Lower middle income	3570	3.5526682161122	2020
+74	El Salvador	SLV	SV	Lower middle income	3630	3.5599066250361	2020
+75	West Bank and Gaza	PSE	PS	Lower middle income	3710	3.569373909615	2020
+76	Sri Lanka	LKA	LK	Lower middle income	3720	3.5705429398819	2020
+77	Mongolia	MNG	MN	Lower middle income	3740	3.5728716022005	2020
+78	Indonesia	IDN	ID	Lower middle income	3870	3.5877109650189	2020
+79	Micronesia, Fed. Sts.	FSM	FM	Lower middle income	3950	3.5965970956265	2020
+80	Samoa	WSM	WS	Lower middle income	4050	3.6074550232147	2020
+81	Belize	BLZ	BZ	Lower middle income	4110	3.6138418218761	2020
+82	Armenia	ARM	AM	Upper middle income	4220	3.6253124509617	2020
+83	Georgia	GEO	GE	Upper middle income	4270	3.630427875025	2020
+84	Jordan	JOR	JO	Upper middle income	4310	3.6344772701607	2020
+85	Azerbaijan	AZE	AZ	Upper middle income	4480	3.6512780139981	2020
+86	Kosovo	XKX	XK	Upper middle income	4480	3.6512780139981	2020
+87	Guatemala	GTM	GT	Upper middle income	4490	3.6522463410033	2020
+88	Namibia	NAM	NA	Upper middle income	4500	3.6532125137753	2020
+89	Moldova	MDA	MD	Upper middle income	4560	3.6589648426644	2020
+90	Suriname	SUR	SR	Upper middle income	4620	3.6646419755561	2020
+91	Jamaica	JAM	JM	Upper middle income	4670	3.6693168805661	2020
+92	Iraq	IRQ	IQ	Upper middle income	4680	3.6702458530741	2020
+93	Fiji	FJI	FJ	Upper middle income	4890	3.6893088591236	2020
+94	Marshall Islands	MHL	MH	Upper middle income	4940	3.6937269489236	2020
+95	Libya	LBY	LY	Upper middle income	4960	3.6954816764902	2020
+96	Paraguay	PRY	PY	Upper middle income	5180	3.7143297597452	2020
+97	Tonga	TON	TO	Upper middle income	5190	3.7151673578485	2020
+98	Albania	ALB	AL	Upper middle income	5210	3.7168377232995	2020
+99	Lebanon	LBN	LB	Upper middle income	5370	3.7299742856996	2020
+100	Ecuador	ECU	EC	Upper middle income	5530	3.7427251313047	2020
+101	North Macedonia	MKD	MK	Upper middle income	5750	3.7596678446896	2020
+102	Colombia	COL	CO	Upper middle income	5790	3.7626785637274	2020
+103	Equatorial Guinea	GNQ	GQ	Upper middle income	5810	3.7641761323903	2020
+104	Tuvalu	TUV	TV	Upper middle income	5820	3.7649229846499	2020
+105	South Africa	ZAF	ZA	Upper middle income	6010	3.7788744720027	2020
+106	Peru	PER	PE	Upper middle income	6030	3.7803173121402	2020
+107	Bosnia and Herzegovina	BIH	BA	Upper middle income	6080	3.7839035792727	2020
+108	Belarus	BLR	BY	Upper middle income	6360	3.8034571156484	2020
+109	Maldives	MDV	MV	Upper middle income	6490	3.8122446968004	2020
+110	Botswana	BWA	BW	Upper middle income	6640	3.822168079368	2020
+111	Gabon	GAB	GA	Upper middle income	7030	3.8469553250198	2020
+112	Thailand	THA	TH	Upper middle income	7040	3.8475726591421	2020
+113	Guyana	GUY	GY	Upper middle income	7130	3.8530895298519	2020
+114	Turkmenistan	TKM	TM	Upper middle income	7220	3.8585371975696	2019
+115	Dominican Republic	DOM	DO	Upper middle income	7260	3.8609366207001	2020
+116	Dominica	DMA	DM	Upper middle income	7270	3.861534410859	2020
+117	St. Vincent and the Grenadines	VCT	VC	Upper middle income	7310	3.8639173769579	2020
+118	Serbia	SRB	RS	Upper middle income	7420	3.870403905279	2020
+119	Brazil	BRA	BR	Upper middle income	7850	3.8948696567453	2020
+120	Montenegro	MNE	ME	Upper middle income	7900	3.8976270912904	2020
+121	Mexico	MEX	MX	Upper middle income	8480	3.9283958522567	2020
+122	St. Lucia	LCA	LC	Upper middle income	8560	3.9324737646772	2020
+123	Cuba	CUB	CU	Upper middle income	8630	3.9360107957152	2018
+124	Kazakhstan	KAZ	KZ	Upper middle income	8710	3.9400181550077	2020
+125	Turkey	TUR	TR	Upper middle income	9050	3.9566485792052	2020
+126	Argentina	ARG	AR	Upper middle income	9070	3.9576072870601	2020
+127	Grenada	GRD	GD	Upper middle income	9410	3.9735896234273	2020
+128	Bulgaria	BGR	BG	Upper middle income	9630	3.9836262871245	2020
+129	Mauritius	MUS	MU	Upper middle income	10230	4.0098756337122	2020
+130	China	CHN	CN	Upper middle income	10550	4.0232524596337	2020
+131	Malaysia	MYS	MY	Upper middle income	10570	4.0240749873074	2020
+132	Russian Federation	RUS	RU	Upper middle income	10690	4.0289777052088	2020
+133	Costa Rica	CRI	CR	Upper middle income	11530	4.0618293072947	2020
+134	Seychelles	SYC	SC	High income	12200	4.0863598306747	2020
+135	Panama	PAN	PA	Upper middle income	12420	4.0941215958406	2020
+136	Romania	ROU	RO	Upper middle income	12580	4.0996806411093	2020
+137	Venezuela, RB	VEN	VE		13080	4.1166077439882	2014
+138	New Caledonia	NCL	NC	High income	13210	4.1209028176145	2000
+139	Chile	CHL	CL	High income	13470	4.129367595723	2020
+140	Antigua and Barbuda	ATG	AG	High income	13750	4.1383026981663	2020
+141	Oman	OMN	OM	High income	14170	4.1513698502475	2019
+142	Barbados	BRB	BB	High income	14350	4.15685190107	2020
+143	Palau	PLW	PW	High income	14390	4.1580607939366	2020
+144	Croatia	HRV	HR	High income	14530	4.162265614298	2020
+145	Poland	POL	PL	High income	15240	4.1829849670036	2020
+146	Trinidad and Tobago	TTO	TT	High income	15420	4.1880843737149	2020
+147	French Polynesia	PYF	PF	High income	15770	4.1978316933289	2000
+148	Uruguay	URY	UY	High income	15790	4.1983821300083	2020
+149	Hungary	HUN	HU	High income	15890	4.2011238972074	2020
+150	Nauru	NRU	NR	High income	15990	4.2038484637462	2020
+151	Curacao	CUW	CW	High income	17140	4.2340108175872	2020
+152	Latvia	LVA	LV	High income	17880	4.2523675144599	2020
+153	Greece	GRC	GR	High income	17930	4.2535802895622	2020
+154	Slovak Republic	SVK	SK	High income	18920	4.2769211320658	2020
+155	St. Kitts and Nevis	KNA	KN	High income	19080	4.2805783703681	2020
+156	Lithuania	LTU	LT	High income	19620	4.2926990030439	2020
+157	Bahrain	BHR	BH	High income	19900	4.2988530764097	2020
+158	Puerto Rico	PRI	PR	High income	21740	4.3372595397503	2020
+159	Portugal	PRT	PT	High income	21790	4.3382572302463	2020
+160	Saudi Arabia	SAU	SA	High income	21930	4.3410386316775	2020
+161	Czech Republic	CZE	CZ	High income	22070	4.3438023331617	2020
+162	Estonia	EST	EE	High income	23170	4.36492603379	2020
+163	Slovenia	SVN	SI	High income	25360	4.4041492492097	2020
+164	Malta	MLT	MT	High income	25370	4.4043204672217	2020
+165	Bahamas, The	BHS	BS	High income	26070	4.4161410311683	2020
+166	Cyprus	CYP	CY	High income	26110	4.4168068718229	2020
+167	Aruba	ABW	AW	High income	27120	4.433289685195	2017
+168	Spain	ESP	ES	High income	27360	4.4371160930481	2020
+169	Sint Maarten (Dutch part)	SXM	SX	High income	27680	4.4421660857847	2018
+170	Turks and Caicos Islands	TCA	TC	High income	30250	4.4807253789885	2019
+171	Brunei Darussalam	BRN	BN	High income	31510	4.498448403174	2020
+172	Italy	ITA	IT	High income	32290	4.5090680450172	2020
+173	Korea, Rep.	KOR	KR	High income	32960	4.5179872030251	2020
+174	Greenland	GRL	GL	High income	34800	4.5415792439466	2007
+175	Kuwait	KWT	KW	High income	36290	4.5597869682006	2019
+176	United Arab Emirates	ARE	AE	High income	39410	4.5956064348656	2020
+177	France	FRA	FR	High income	39480	4.5963771439976	2020
+178	United Kingdom	GBR	GB	High income	39700	4.5987905067631	2020
+179	Japan	JPN	JP	High income	40360	4.6059511575649	2020
+180	New Zealand	NZL	NZ	High income	41550	4.6185710281201	2020
+181	Israel	ISR	IL	High income	42600	4.6294095991027	2020
+182	Canada	CAN	CA	High income	43530	4.6387886671574	2020
+183	Belgium	BEL	BE	High income	45750	4.6603910984025	2020
+184	Germany	DEU	DE	High income	47470	4.6764192317184	2020
+185	Austria	AUT	AT	High income	48350	4.684396478419	2020
+186	Hong Kong SAR, China	HKG	HK	High income	48630	4.6869042695682	2020
+187	Finland	FIN	FI	High income	49780	4.6970548922726	2020
+188	Netherlands	NLD	NL	High income	51060	4.7080808104682	2020
+189	Australia	AUS	AU	High income	53690	4.7298934039632	2020
+190	Sweden	SWE	SE	High income	54050	4.7327956982893	2020
+191	Singapore	SGP	SG	High income	54920	4.7397305285647	2020
+192	Qatar	QAT	QA	High income	55990	4.748110467495	2020
+193	Iceland	ISL	IS	High income	62420	4.7953237643293	2020
+194	Denmark	DNK	DK	High income	63010	4.7994094796151	2020
+195	Cayman Islands	CYM	KY	High income	64000	4.8061799739839	2020
+196	United States	USA	US	High income	64550	4.8098962466024	2020
+197	Ireland	IRL	IE	High income	65620	4.81703622605	2020
+198	Macao SAR, China	MAC	MO	High income	75690	4.8790385052372	2019
+199	Norway	NOR	NO	High income	78290	4.8937062930647	2020
+200	Luxembourg	LUX	LU	High income	80860	4.9077337369977	2020
+201	Switzerland	CHE	CH	High income	82620	4.9170851906406	2020
+202	Isle of Man	IMN	IM	High income	83920	4.9238654751855	2019
+203	Bermuda	BMU	BM	High income	112240	5.0501476580203	2020
+204	Liechtenstein	LIE	LI	High income	116440	5.0661021967668	2009

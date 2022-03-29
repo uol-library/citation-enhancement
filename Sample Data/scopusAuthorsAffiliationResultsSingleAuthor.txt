@@ -1,0 +1,33 @@
+https://api.elsevier.com/content/abstract/eid/2-s2.0-85123361587?field=authors,affiliation&httpAccept=application/json&apiKey=ace0da58224b7aafa53389ebb4b157ad
+=>
+{"abstracts-retrieval-response": {
+    "affiliation": {
+        "affiliation-city": null,
+        "@id": "60022826",
+        "affilname": "Albert Einstein Medical Center",
+        "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/60022826",
+        "affiliation-country": null
+    },
+    "coredata": null,
+    "authors": {"author": [{
+        "ce:given-name": "Rachel",
+        "preferred-name": {
+            "ce:given-name": "Rachel",
+            "ce:initials": "R.",
+            "ce:surname": "Fleishman",
+            "ce:indexed-name": "Fleishman R."
+        },
+        "@seq": "1",
+        "ce:initials": "R.",
+        "@_fa": "true",
+        "affiliation": {
+            "@id": "60022826",
+            "@href": "https://api.elsevier.com/content/affiliation/affiliation_id/60022826"
+        },
+        "ce:degrees": "MD",
+        "ce:surname": "Fleishman",
+        "@auid": "56014129200",
+        "author-url": "https://api.elsevier.com/content/author/author_id/56014129200",
+        "ce:indexed-name": "Fleishman R."
+    }]}
+}}
