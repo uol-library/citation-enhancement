@@ -218,6 +218,12 @@ foreach ($citations as $citation) {
     
     if (isset($citation["Scopus"])) {
         
+        //TODO allow a "force" option to bypass errors
+        if (isset($citation["Scopus"]["errors"])) {
+            trigger_error("Error from Scopus integration: ".print_r($citation["Scopus"]["errors"], TRUE), E_USER_ERROR);
+            exit;
+        }
+        
         
         if (isset($citation["Scopus"]["first-match"]) && isset($citation["Scopus"]["first-match"]["authors"])) {
             
@@ -316,6 +322,13 @@ foreach ($citations as $citation) {
 
     
     if (isset($citation["VIAF"])) { 
+        
+        //TODO allow a "force" option to bypass errors
+        if (isset($citation["VIAF"]["errors"])) {
+            trigger_error("Error from VIAF integration: ".print_r($citation["VIAF"]["errors"], TRUE), E_USER_ERROR);
+            exit;
+        }
+        
         
         $outputRecord["DATA"][] = "VIAF"; 
         $outputRecord["VIAF-MATCH"] = "Y"; 

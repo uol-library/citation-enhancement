@@ -28,7 +28,7 @@ Make a developer account on the Clarivate Portal https://developer.clarivate.com
 
 > \[WoS\]
 > 
-> apiKey = "----------------------------------------"
+> apiKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 ## 2. Software dependencies
 Host machine must be on 129.11.0.0 network because of restrictions on Scopus API 
