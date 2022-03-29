@@ -131,6 +131,8 @@ $rowHeadings = Array("CIT-TYPE", "CIT-TITLE", "CIT-CONTAINER", "CIT-AUTHOR", "EX
 
 foreach ($citations as $citation) { 
     
+    if (isset($citation["Leganto"]) && $citation["Leganto"]["secondary_type"]["value"]!="NOTE") {
+        
     $outputRecordBase = Array();    // base information used by all lines  
     $outputRecordBaseEmpty = Array(); 
     
@@ -191,8 +193,7 @@ foreach ($citations as $citation) {
                 if (isset($author["similarity-title"]) && isset($author["similarity-author"])) { 
                     $outputRecord["SIMILARITY"] = floor($author["similarity-title"]*$author["similarity-author"]/100);
                 } else {
-                    print_r($author);
-                    exit; 
+                    $outputRecord["SIMILARITY"] = 0;
                 }
                 
                 
@@ -203,7 +204,9 @@ foreach ($citations as $citation) {
                 $outputRecord["EXT-AUTHOR-LOC"] = Array();
                 if (isset($author["affiliation"]) && is_array($author["affiliation"])) {
                     foreach ($author["affiliation"] as $authorAffiliation) {
-                        $outputRecord["EXT-AUTHOR-LOC"][] = $authorAffiliation["country"];
+                        if (isset($authorAffiliation["country"])) { 
+                            $outputRecord["EXT-AUTHOR-LOC"][] = $authorAffiliation["country"];
+                        }
                     }
                 }
                 $outputRecords[] = $outputRecord;
@@ -226,6 +229,7 @@ foreach ($citations as $citation) {
                 $outputRecords[] = $outputRecord;
             }
         }
+    }
     }
     
     if (isset($citation["VIAF"])) { 

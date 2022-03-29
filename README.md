@@ -24,8 +24,14 @@ In your local copy of this project, edit config.ini to contain your Scopus api k
 > 
 > apiKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
+Make a developer account on the Clarivate Portal https://developer.clarivate.com/ and either arrange with colleagues at Leeds to have access to their application readinglistanalysis_leeds_ac_uk, and get its key, or create your own Application and subscribe it to the WoS Enhanced API, and get the key for that - either way, edit config.ini to contain your WoS api key e.g. 
+
+> \[WoS\]
+> 
+> apiKey = "----------------------------------------"
+
 ## 2. Software dependencies
-Host machine must be on 129.11.0.0 network because of restrictions on Scopus API 
+Host machine must be on 129.11.0.0 network for at least the Scopus Integration test because of restrictions on Scopus API - it might be easiest to carry out all steps on a machine on 129.11.0.0 network
 
 PHP - tested against versions 5.6.40 and 8.0.7 
 
@@ -34,7 +40,7 @@ cURL support in PHP including support for https
 Project https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&version=GBrl-export&_a=contents 
 
 ## 3. Latest releases
-v1.13 
+v2.1 
 
 ## 4. API references
 Scopus: https://dev.elsevier.com/api_docs.html
@@ -49,13 +55,13 @@ Alma: https://developers.exlibrisgroup.com/alma/apis/
 The software does not need building once the steps in the Installation process are complete 
 
 ## Configuration 
-Choose a reading list or lists to run against, and get the course code and list code for each (e.g. "course_code"=>"29679_HIST1055", "list_code"=>"202122_HIST1055__9463092_1")
+Choose a module code or codes to run against e.g. "PSYC3505" and list those in the value of the array $modulesToInclude in getCitationsByCourseAndList.php, e.g.: 
 
-In getCitationsByCourseAndList.php, edit the value of $lists_to_process so that it contains this list or lists e.g. 
-
-> $lists_to_process = Array( Array("course_code"=>"28573_SOEE5531M", "list_code"=>"202122_SOEE5531M__8970365_1"), Array("course_code"=>"32925_MEDS5107M", "list_code"=>"202122_MEDS5107M__9256341_1_B") );
+> $modulesToInclude = Array("LUBS1295","LUBS3340","HPSC2400","HPSC3450","HECS5169M","HECS3295","HECS5186M","HECS5189M","COMP2121","COMP5840M","XJCO2121","OCOM5204M","GEOG1081","GEOG2000","DSUR5130M","DSUR5022M","BLGY3135","SOEE1640");
 
 ## Step 1: assemble World Bank GNI ranking file  
+You only need to do this if you are wanting to use more recent World Bank data than prepared already in this project, or than the last time you ran this step. 
+
 > php makeWorldBankRankings.php 
 
 This outputs data files to Config/WorldBank/ (the locations are set in config.ini) 
@@ -67,42 +73,27 @@ Step 4 will later consume these
 
 This script (like the following ones) writes a JSON-encoded list of citations to STDOUT, so just save it somewhere suitable 
 
-## Step 3: enhance citations with data from Alma, Scopus, VIAF  
-> php enhanceCitationsFromAlma.php   <Data/1.json >Data/2.json 
+## Step 3: enhance citations with data from Alma, Scopus, WoS, VIAF  
+> php enhanceCitationsFromAlma.php   <Data/1.json >Data/1A.json 
 > 
-> php enhanceCitationsFromScopus.php <Data/3.json >Data/4.json 
+> php enhanceCitationsFromScopus.php <Data/1A.json >Data/1AS.json 
 > 
-> php enhanceCitationsFromViaf.php   <Data/2.json >Data/3.json 
+> php enhanceCitationsFromWoS.php <Data/1AS.json >Data/1ASW.json 
+>
+> php enhanceCitationsFromViaf.php   <Data/1ASW.json >Data/1ASWV.json 
 
 Each script reads a JSON-encoded list of citations from STDIN, and writes an enhanced list of citations to STDOUT, so use the input filename from the previous step and write to a new file ready for the next  
 
 ## Step 4: process data and export spreadsheet  
-> php simpleCsvExport.php <Data/4.json >Data/5.csv 
+This step is not finalised, and can be modified independently of the collection of raw data in the previous steps. 
+
+> php simpleCsvExport.php <Data/1ASWV.json 
 
 This script reads a JSON-encoded list of enhanced citations from STDIN and combines it with the World Bank data saved in Step 1 
 
-TODO: This script outputs UTF-8-encoded data but Excel expects CSV files to be ANSI-encoded and so special characters will hash. 
-This does not matter in development, but we need to modify this script e.g. to export a UTF-8-encoded Excel .xlsx file that Excel can open 
-directly with the correct encoding 
+It writes a set of tab-delimited (UTF-8-encoded) text files suitable for opening in Excel: one per reading list, plus a summary listing stats for each reading list. 
 
 ## Possible errors 
-Step 4 might fail with the error: 
-
-> No World Bank ranking for COUNTRY-CODE 
-
-This means the reading list affiliation data includes a 2-letter ISO country code that is not in the World Bank ranking file generated in step 1 
-
-Long term we might choose to ignore these but for now while we train and test the system, manually add the 2-letter code to the file: 
-
-> Config/WorldBank/alias.json 
-
-In the form absent code => a suitable replacement code that is present 
-
-e.g. this file currently contains 
-
-> {"NF":"AU"}
-
-which indicates that where we have data for "NF" (Norfolk Island) we will use the World Bank data for its parent territory "AU" (Australia) instead
 
 ## Other issues to note 
-The individual enhancement scripts enhanceCitationsFromViaf.php and enhanceCitationsFromScopus.php contain specific notes about interaction with these APIs and the issues that might arise 
+The individual enhancement scripts enhanceCitationsFromViaf.php, enhanceCitationsFromScopus.php etc contain specific notes about interaction with these APIs and the issues that might arise 

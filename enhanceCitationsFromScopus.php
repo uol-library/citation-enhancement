@@ -110,6 +110,8 @@ foreach ($citations as &$citation) {
             $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["chapter_author"];
         } else if (isset($citation["Leganto"]["metadata"]["author"])) {
             $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["author"];
+        } else if (isset($citation["Leganto"]["metadata"]["editor"])) {
+            $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["editor"];
         }
         if (isset($citation["Leganto"]["metadata"]["article_title"])) {
             $extraParameters["LEGANTO-TITLE"] = $citation["Leganto"]["metadata"]["article_title"];
@@ -127,10 +129,18 @@ foreach ($citations as &$citation) {
             if (isset($citation["Leganto"]["metadata"]["issn"]) && $citation["Leganto"]["metadata"]["issn"]) {
                 $searchParameters["ISSN"] = $citation["Leganto"]["metadata"]["issn"];
             }
-            if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
+            if (isset($citation["Leganto"]["metadata"]["chapter_author"]) && $citation["Leganto"]["metadata"]["chapter_author"]) {
+                $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["chapter_author"]);
+                $searchParameters["AUTH"] = $legantoAuthor;
+                $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["chapter_author"];
+            } else if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
                 $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["author"]);
                 $searchParameters["AUTH"] = $legantoAuthor;
                 $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["author"];
+            } else if (isset($citation["Leganto"]["metadata"]["editor"]) && $citation["Leganto"]["metadata"]["editor"]) {
+                $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["editor"]);
+                $searchParameters["AUTH"] = $legantoAuthor;
+                $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["editor"];
             }
             $searchParameters["DOCTYPE"] = Array("ar", "re"); // this parameter may have multiple possible values (to join with "or") 
     } else if (isset($citation["Leganto"]["secondary_type"]["value"]) && in_array($citation["Leganto"]["secondary_type"]["value"], Array("BK", "E_BK"))
@@ -139,15 +149,30 @@ foreach ($citations as &$citation) {
             if (isset($citation["Leganto"]["metadata"]["isbn"]) && $citation["Leganto"]["metadata"]["isbn"]) {
                 $searchParameters["ISBN"] = $citation["Leganto"]["metadata"]["isbn"];
             }
-            if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
+            if (isset($citation["Leganto"]["metadata"]["chapter_author"]) && $citation["Leganto"]["metadata"]["chapter_author"]) {
+                $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["chapter_author"]);
+                $searchParameters["AUTH"] = $legantoAuthor;
+                $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["chapter_author"];
+            } else if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
                 $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["author"]);
                 $searchParameters["AUTH"] = $legantoAuthor;
                 $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["author"];
+            } else if (isset($citation["Leganto"]["metadata"]["editor"]) && $citation["Leganto"]["metadata"]["editor"]) {
+                $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["editor"]);
+                $searchParameters["AUTH"] = $legantoAuthor;
+                $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["editor"];
             }
             $searchParameters["DOCTYPE"] = Array("bk");
-    } else if (isset($citation["Leganto"]["secondary_type"]["value"]) && in_array($citation["Leganto"]["secondary_type"]["value"], Array("WS", "CONFERENCE", "E_BK", "OTHER"))
+    } else if (isset($citation["Leganto"]["secondary_type"]["value"]) && in_array($citation["Leganto"]["secondary_type"]["value"], Array("WS", "CONFERENCE", "OTHER"))
         && isset($citation["Leganto"]["metadata"]["title"]) && $citation["Leganto"]["metadata"]["title"]
-        && isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
+        && (
+            ( isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"] )
+            ||
+            ( isset($citation["Leganto"]["metadata"]["editor"]) && $citation["Leganto"]["metadata"]["editor"] )
+            ||
+            ( isset($citation["Leganto"]["metadata"]["chapter_author"]) && $citation["Leganto"]["metadata"]["chapter_author"] )
+            )
+        ) {
             $searchParameters["TITLE"] = $citation["Leganto"]["metadata"]["title"];
             if (isset($citation["Leganto"]["metadata"]["isbn"]) && $citation["Leganto"]["metadata"]["isbn"]) {
                 $searchParameters["ISBN"] = $citation["Leganto"]["metadata"]["isbn"];
@@ -155,11 +180,20 @@ foreach ($citations as &$citation) {
             if (isset($citation["Leganto"]["metadata"]["issn"]) && $citation["Leganto"]["metadata"]["issn"]) {
                 $searchParameters["ISSN"] = $citation["Leganto"]["metadata"]["issn"];
             }
-            if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
+            if (isset($citation["Leganto"]["metadata"]["chapter_author"]) && $citation["Leganto"]["metadata"]["chapter_author"]) {
+                $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["chapter_author"]);
+                $searchParameters["AUTH"] = $legantoAuthor;
+                $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["chapter_author"];
+            } else if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
                 $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["author"]);
                 $searchParameters["AUTH"] = $legantoAuthor;
                 $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["author"];
+            } else if (isset($citation["Leganto"]["metadata"]["editor"]) && $citation["Leganto"]["metadata"]["editor"]) {
+                $legantoAuthor = preg_replace('/^([^,\s]*).*$/', '$1', $citation["Leganto"]["metadata"]["editor"]);
+                $searchParameters["AUTH"] = $legantoAuthor;
+                $extraParameters["LEGANTO-AUTHOR"] = $citation["Leganto"]["metadata"]["editor"];
             }
+            
     }
     
     // now also collect some a-t data from Alma, that we can use to calculate source-Scopus similarity
@@ -333,6 +367,7 @@ foreach ($citations as &$citation) {
                 if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
                     $foundTitleSimilarity = TRUE;
                     $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $searchParameters["TITLE"], "Levenshtein", FALSE));
+                    $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $searchParameters["TITLE"], "Levenshtein", "colon"));
                 }
                 // now try comparing with all the Alma titles
                 if (isset($extraParameters["ALMA-TITLES"])) {
@@ -340,9 +375,11 @@ foreach ($citations as &$citation) {
                         $foundTitleSimilarity = TRUE;
                         if (isset($titleAlma["collated"])) {
                             $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $titleAlma["collated"], "Levenshtein", FALSE));
+                            $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $titleAlma["collated"], "Levenshtein", "colon"));
                         }
                         if (isset($titleAlma["a"])) {
                             $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $titleAlma["a"], "Levenshtein", FALSE));
+                            $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $titleAlma["a"], "Levenshtein", "colon"));
                         }
                     }
                 }
@@ -350,6 +387,7 @@ foreach ($citations as &$citation) {
                     $foundTitleSimilarity = TRUE;
                     if (isset($titleAlma["collated"])) {
                         $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $extraParameters["LEGANTO-TITLE"], "Levenshtein", FALSE));
+                        $titleSimilarity = max($titleSimilarity, similarity($entry["dc:title"], $extraParameters["LEGANTO-TITLE"], "Levenshtein", "colon"));
                     }
                 }
             }

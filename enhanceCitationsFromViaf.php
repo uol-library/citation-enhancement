@@ -207,11 +207,22 @@ foreach ($citations as &$citation) {
         
     // third choice - data from Leganto
         } else if (isset($citation["Leganto"]["secondary_type"]["value"]) && in_array($citation["Leganto"]["secondary_type"]["value"], Array("CR", "BK", "WS", "CONFERENCE", "E_BK", "E_CR", "OTHER"))
-        && isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) {
+        && (
+            ( isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"] ) 
+            ||
+            ( isset($citation["Leganto"]["metadata"]["editor"]) && $citation["Leganto"]["metadata"]["editor"] )
+            )
+        ) {
             
         $searchDataSource = "Leganto";
-                
-        $creatorsLeganto = preg_split('/(\s*;\s*|\s+and\s+|\s+&\s+)/', $citation["Leganto"]["metadata"]["author"]); // separate multiple authors 
+            
+        $rawCreatorsLeganto = NULL; 
+        if (isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"]) { 
+            $rawCreatorsLeganto = $citation["Leganto"]["metadata"]["author"]; 
+        } else if (isset($citation["Leganto"]["metadata"]["editor"]) && $citation["Leganto"]["metadata"]["editor"]) {
+            $rawCreatorsLeganto = $citation["Leganto"]["metadata"]["editor"];
+        }
+        $creatorsLeganto = preg_split('/(\s*;\s*|\s+and\s+|\s+&\s+)/', $rawCreatorsLeganto); // separate multiple authors 
                 
         if ($creatorsLeganto) {
             foreach ($creatorsLeganto as $creatorLeganto) {

@@ -84,6 +84,20 @@ error_reporting(E_ALL);                     // we want to know about all problem
 require_once("utils.php"); 
 
 
+
+$shortopts = 'a';
+$longopts = array('append');
+$options = getopt($shortopts,$longopts);
+// defaults
+$append = FALSE;
+// set options
+if (isset($options['append']) || isset($options['a'])) {
+    $append = TRUE;
+}
+
+
+
+
 $outFormat = "TXT"; // TXT | CSV 
 function outFilename($record) { return $record["LIST-CODE"]; };  
 $fileSummary = "Summary";
@@ -515,12 +529,14 @@ $outSummary = NULL;
 
 // open the summary file 
 if ($outFormat == "CSV") {
-    $outSummary = fopen($outFolder.$fileSummary.".".$outFormat, 'w');
+    $outSummary = fopen($outFolder.$fileSummary.".".$outFormat, $append ? 'a' : 'w');
 }
-if ($outFormat == "CSV") {
-    fputcsv($outSummary, $summaryHeadings);
-} else if ($outFormat == "TXT") {
-    file_put_contents($outFolder.$fileSummary.".".$outFormat, implode("\t", $summaryHeadings)."\n");
+if (!$append) { 
+    if ($outFormat == "CSV") {
+        fputcsv($outSummary, $summaryHeadings);
+    } else if ($outFormat == "TXT") {
+        file_put_contents($outFolder.$fileSummary.".".$outFormat, implode("\t", $summaryHeadings)."\n");
+    }
 }
 
 foreach ($outputRecords as $outputRecord) {

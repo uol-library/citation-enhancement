@@ -96,6 +96,8 @@ foreach ($citations as &$citation) {
             $citation["Alma"]["creators"] = Array();
             $citation["Alma"]["ids"] = Array();
             
+            if ($bib_record && isset($bib_record["anies"])) {
+            
             $anies = $bib_record["anies"];
             foreach ($anies as $anie) {
                 $anie = str_replace("encoding=\"UTF-16\"?>", "encoding=\"UTF-8\"?>", $anie); // kludge
@@ -179,7 +181,7 @@ foreach ($citations as &$citation) {
                 }
                 
             }
-            
+            }
             
             
         }
