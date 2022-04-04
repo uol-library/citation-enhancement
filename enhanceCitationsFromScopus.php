@@ -461,8 +461,8 @@ foreach ($citations as &$citation) {
                         $collatedAuthorSurname = FALSE;
                         $collatedAuthorShort = FALSE;
                         $collatedAuthorLong = FALSE; 
-                        if (isset($author["ce:ce:surname"]) && $author["ce:ce:surname"]) {
-                            $collatedAuthorSurname = $author["ce:ce:surname"];
+                        if (isset($author["ce:surname"]) && $author["ce:surname"]) {
+                            $collatedAuthorSurname = $author["ce:surname"];
                             $collatedAuthorsSurname[] = $collatedAuthorSurname;
                         }
                         if (isset($author["ce:indexed-name"]) && $author["ce:indexed-name"]) {

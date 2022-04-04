@@ -4,10 +4,8 @@
  * 
  * =======================================================================
  * 
- * Script to export reading list author affiliation data to TXT or CSV files  
+ * Script to export reading list author affiliation data to a TXT or CSV file 
  * for Library staff to do further processing   
- * 
- * Based on simpleExport.php but modified to write a separate file per reading list 
  * 
  * =======================================================================
  * 
@@ -15,15 +13,12 @@
  * JSON-encoded list of citations on STDIN 
  * 
  * Output: 
- * Tab-delim-TXT- or CSV-format files - one file per reading list 
+ * Tab-delim-TXT- or CSV-format table of citations with affiliation data 
  * 
  * =======================================================================
  *
  * Typical usage: 
- * php simpleExport.php <Data/4.json 
- * 
- * Unlike other scripts this does not write to STDOUT but instead to a set of files 
- * with names defined by the function outFilename($record) 
+ * php simpleExport.php <Data/4.json >Data/5.txt 
  * 
  * The input citation data is assumed to already contain data from Leganto, Alma, Scopus and VIAF  
  * 
@@ -84,24 +79,7 @@ error_reporting(E_ALL);                     // we want to know about all problem
 require_once("utils.php"); 
 
 
-
-$shortopts = 'a';
-$longopts = array('append');
-$options = getopt($shortopts,$longopts);
-// defaults
-$append = FALSE;
-// set options
-if (isset($options['append']) || isset($options['a'])) {
-    $append = TRUE;
-}
-
-
-
-
 $outFormat = "TXT"; // TXT | CSV 
-function outFilename($record) { return $record["LIST-CODE"]; };  
-$fileSummary = "Summary";
-$outFolder = "Data/"; 
 
 // country codes 
 $iso3Map = json_decode(file_get_contents("Config/CountryCodes/iso3.json"), TRUE);               // 2-letter codes -> 3-letter codes 
@@ -140,8 +118,7 @@ $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 
 $outputRecords = Array(); 
 // $rowHeadings = Array("MOD-CODE", "LIST-CODE", "CIT-TYPE", "CIT-TAGS", "CIT-TITLE", "CIT-CONTAINER", "CIT-AUTHOR", "SIMILARITY", "SOURCE", "SOURCE-AUTHORS", "SOURCE-COUNTRIES", "CSI");
-// $rowHeadings = Array("MOD-CODE", "LIST-TITLE", "CIT-TYPE", "CIT-TAGS", "CIT-TITLE", "CIT-CONTAINER", "CIT-AUTHOR", "SIMILARITY", "SOURCE", "SOURCE-AUTHORS", "SOURCE-COUNTRIES");
-$rowHeadings = Array("CIT-TYPE", "CIT-TAGS", "CIT-TITLE", "CIT-CONTAINER", "CIT-AUTHOR", "SIMILARITY", "SOURCE", "SOURCE-AUTHORS", "SOURCE-COUNTRIES");
+$rowHeadings = Array("MOD-CODE", "LIST-CODE", "CIT-TYPE", "CIT-TAGS", "CIT-TITLE", "CIT-CONTAINER", "CIT-AUTHOR", "SIMILARITY", "SOURCE", "SOURCE-AUTHORS", "SOURCE-COUNTRIES");
 
 foreach ($citations as $citation) {
     
@@ -153,7 +130,6 @@ foreach ($citations as $citation) {
     $outputRecord = Array();
     $outputRecord["MOD-CODE"] = $citation["Course"]["modcode"]; 
     $outputRecord["LIST-CODE"] = $citation["Leganto"]["list_code"];
-    $outputRecord["LIST-TITLE"] = $citation["Leganto"]["list_title"];
     $outputRecord["NOTES"] = Array();
     
     if (isset($citation["Leganto"]["secondary_type"])) { 
@@ -218,10 +194,10 @@ foreach ($citations as $citation) {
     
     if (isset($citation["Scopus"])) {
         
-        //TODO allow a "force" option to bypass errors
+        //TODO allow a "force" option to bypass errors  
         if (isset($citation["Scopus"]["errors"])) {
             trigger_error("Error from Scopus integration: ".print_r($citation["Scopus"]["errors"], TRUE), E_USER_ERROR);
-            exit;
+            exit; 
         }
         
         
@@ -240,7 +216,7 @@ foreach ($citations as $citation) {
                 
                 $contemporaryAffiliation = FALSE; // set to TRUE if we find one
                 
-                if (isset($author["similarity-title"]) && isset($author["similarity-author"])) { 
+                if (isset($author["similarity-title"]) && isset($author["similarity-author"])) {
                     $totalSimilarity += floor($author["similarity-title"]*$author["similarity-author"]/100);
                     $countSimilarity++;
                 }
@@ -480,154 +456,24 @@ foreach ($citations as $citation) {
 }
 
 
-// now go through records and collect country counts
-// we could have done this in the above loop but it may be easier to do it separately 
-// NB we need to do it separately foreach output file we're going to make - this is a bit messy 
-
-$countryCodeCounts = Array(); // e.g. [ "202122_EAST3703__8629959_1": [ "GB":5, "US":2 ] ] 
-foreach ($outputRecords as &$outputRecord) { 
-    
-    $thisFilename = outFilename($outputRecord); 
-    if (!isset($countryCodeCounts[$thisFilename])) { $countryCodeCounts[$thisFilename] = Array(); } 
-    
-    $countryCodes = $outputRecord["SOURCE-COUNTRIES"];  // array of arrays 
-                                                        // needs averaging out per-author and per-citation 
-                                                            
-    if ($countryCodes) { 
-    
-        $significantCitationAuthorCount = 0;
-        $citationAuthorCounts = Array();
-        foreach ($countryCodes as $authorCountryCodes) {
-            // within this loop we're processing a single author 
-            $significantAuthorCountryCount = 0;
-            $authorCountryCodeCounts = Array();
-            foreach ($authorCountryCodes as $authorCountryCode) {
-                // within this loop we're processing a single affiliation-instance for an author 
-                if ($authorCountryCode) {
-                    $significantAuthorCountryCount++;
-                    if (!isset($authorCountryCodeCounts[$authorCountryCode])) { $authorCountryCodeCounts[$authorCountryCode] = 0; }
-                    $authorCountryCodeCounts[$authorCountryCode]++;
-                }
-            }
-            // now normalise country code counts so add up to one and add to running total
-            if ($significantAuthorCountryCount) {
-                $significantCitationAuthorCount++;
-                foreach ($authorCountryCodeCounts as $countryCode=>$countryCount) {
-                    if (!isset($citationAuthorCounts[$countryCode])) { $citationAuthorCounts[$countryCode] = 0; }
-                    $citationAuthorCounts[$countryCode] += $countryCount/$significantAuthorCountryCount;
-                }
-            }
-        }
-        // now normalise citation-level country codes counts so add up to one and add to running total
-        if ($significantCitationAuthorCount) {
-            foreach ($citationAuthorCounts as $countryCode=>$countryCount) {
-                $outputRecord[$countryCode] = $countryCount/$significantCitationAuthorCount;
-                if (!isset($countryCodeCounts[$thisFilename][$countryCode])) { $countryCodeCounts[$thisFilename][$countryCode] = 0; }
-                $countryCodeCounts[$thisFilename][$countryCode] += $countryCount/$significantCitationAuthorCount; // grand total for ordering columns
-            }
-        }
-        
-    }
-    
-}
 
 
 
-$lastFilename = FALSE;  // once we hit the first record we'll set this 
-$out = NULL;            // will be a CSV file handle 
-$summary = NULL;        // will be an arry of list-level metadata  
-$summaryHeadings = Array("FILE", "MOD-CODE", "LIST-CODE", "LIST-TITLE", "CITATIONS-NON-NOTE", "CITATIONS-WITH-AFFIL", "COUNTRY-COUNT", "COUNTRIES"); 
-$outSummary = NULL; 
-
-
-// open the summary file 
 if ($outFormat == "CSV") {
-    $outSummary = fopen($outFolder.$fileSummary.".".$outFormat, $append ? 'a' : 'w');
-}
-if (!$append) { 
-    if ($outFormat == "CSV") {
-        fputcsv($outSummary, $summaryHeadings);
-    } else if ($outFormat == "TXT") {
-        file_put_contents($outFolder.$fileSummary.".".$outFormat, implode("\t", $summaryHeadings)."\n");
-    }
+    $out = fopen('php://output', 'w');
+    fputcsv($out, $rowHeadings);
+} else if ($outFormat == "TXT") {
+    print implode("\t", $rowHeadings)."\n";
 }
 
 foreach ($outputRecords as $outputRecord) {
-    
-    $thisFilename = outFilename($outputRecord); 
-    if ($thisFilename!==$lastFilename) {
-        
-        // start a new file 
-        
-        // first, close off any existing ones and export the summary 
-        if ($outFormat == "CSV" && $out!==NULL) {
-            fclose($out);
-            $out = NULL;
-        } 
-        if ($outFormat == "CSV" && $summary) {
-            fputcsv($outSummary, $summary);
-        } else if ($outFormat == "TXT" && $summary) {
-            file_put_contents($outFolder.$fileSummary.".".$outFormat, implode("\t", $summary)."\n", FILE_APPEND);
-        }
-        $summary = NULL; 
-
-        // now open a new file 
-        if ($outFormat == "CSV") {
-            $out = fopen($outFolder.$thisFilename.".".$outFormat, 'w');
-        }
-        
-        // now output the header
-        // add country codes to header row
-        $thisRowHeadings = $rowHeadings; 
-        arsort($countryCodeCounts[$thisFilename]);
-        foreach ($countryCodeCounts[$thisFilename] as $countryCode=>$countryCount) {
-            $thisRowHeadings[] = $countryCode;
-        }
-        if ($outFormat == "CSV") {
-            fputcsv($out, $thisRowHeadings);
-        } else if ($outFormat == "TXT") {
-            file_put_contents($outFolder.$thisFilename.".".$outFormat, implode("\t", $thisRowHeadings)."\n");
-        }
-        
-        // now start off the summary 
-        $summary= array_fill_keys($summaryHeadings, NULL);
-        foreach($summaryHeadings as $summaryHeading) { 
-            // use the data from the output record if it is there 
-            if (isset($outputRecord[$summaryHeading])) { 
-                $summary[$summaryHeading] = $outputRecord[$summaryHeading];
-            }
-        }
-        // other summary initialisation 
-        $summary["FILE"] = $thisFilename; 
-        $summary["CITATIONS-NON-NOTE"] = 0; 
-        $summary["CITATIONS-WITH-AFFIL"] = 0;
-        $summary["COUNTRY-COUNT"] = count($countryCodeCounts[$thisFilename]);
-        $summary["COUNTRIES"] = implode(", ", array_keys($countryCodeCounts[$thisFilename]));
-            
-        // OK remember this filename for future rows             
-        $lastFilename = $thisFilename; 
-        
-    }
-    
-    // now output each row 
-    $summary["CITATIONS-NON-NOTE"]++;
-    if ($outputRecord["SOURCE"]) { $summary["CITATIONS-WITH-AFFIL"]++; } 
-
-    
     $outputRow = Array();
-    
-    $thisRowHeadings = $rowHeadings;
-    arsort($countryCodeCounts[$thisFilename]);
-    foreach ($countryCodeCounts[$thisFilename] as $countryCode=>$countryCount) {
-        $thisRowHeadings[] = $countryCode;
-    }
-    
-    foreach ($thisRowHeadings as $rowHeading) {
+    foreach ($rowHeadings as $rowHeading) {
         $outputField = FALSE;
         if (!isset($outputRecord[$rowHeading])) {
             $outputField = "";
-        } else if (is_array($outputRecord[$rowHeading])) {          // for arrays we will delimit with |
-            $outputFieldParts = Array();
+        } else if (is_array($outputRecord[$rowHeading])) {          // for arrays we will delimit with | 
+            $outputFieldParts = Array(); 
             foreach ($outputRecord[$rowHeading] as $fieldPart) {
                 if (is_array($fieldPart)) {                          // for sub-arrays we will delimit with ,
                     $outputFieldParts[] = implode(";", $fieldPart);
@@ -644,27 +490,14 @@ foreach ($outputRecords as $outputRecord) {
     if ($outFormat == "CSV") {
         fputcsv($out, $outputRow);
     } else if ($outFormat == "TXT") {
-        file_put_contents($outFolder.$thisFilename.".".$outFormat, implode("\t", $outputRow)."\n", FILE_APPEND);
+        print implode("\t", $outputRow)."\n";
     }
-    
 }
 
-
-// finally, close off any existing ones and export the summary
-if ($outFormat == "CSV" && $out!==NULL) {
+if ($outFormat == "CSV") {
     fclose($out);
-    $out = NULL;
+} else if ($outFormat == "TXT") {
 }
-if ($outFormat == "CSV" && $summary) {
-    fputcsv($outSummary, $summary);
-} else if ($outFormat == "TXT" && $summary) {
-    file_put_contents($outFolder.$fileSummary.".".$outFormat, implode("\t", $summary)."\n", FILE_APPEND);
-}
-if ($outFormat == "CSV" && $outSummary!==NULL) {
-    fclose($outSummary);
-    $out = NULL;
-} 
-$summary = NULL;
 
 
 

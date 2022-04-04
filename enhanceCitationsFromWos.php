@@ -50,11 +50,27 @@
  * 
  * Save your key in config.ini 
  * 
- * The API is rate-limited (?) 
+ * The API is rate-limited 
  * NB the code below caches the results of an API call to help limit usage 
  * 
- * The code below includes a small delay (usleep(700000)) between API calls to avoid overloading the service
+ * The code below includes a small delay (usleep(550000)) between API calls because of limit of 2 calls per second  
  * 
+ * 
+ * 
+ * Some nodes in the data may either be single objects, or arrays of more than one object  
+ * To make code simpler we have a function forceArray(&$node) that forces everything into an array of objects 
+ * even if the array only has one member 
+ * 
+ * e.g. we call 
+ *    forceArray($entry["static_data"]["summary"]["titles"]["title"]);
+ * 
+ * before running 
+ * 
+ *    foreach ($entry["static_data"]["summary"]["titles"]["title"] as $title) {
+ *        // do something with this title entry 
+ *    } 
+ * 
+ *  
  * 
  */
 
@@ -250,7 +266,7 @@ foreach ($citations as &$citation) {
         
         // 1st choice - DOI 
         if (isset($searchParameters["DOI"]) && $searchParameters["DOI"]) {
-            $searchStrings[1] = "DO=(".wosQuote($searchParameters["DOI"]).")";
+            $searchStrings[1] = "DO=(".wosQuote($searchParameters["DOI"], TRUE).")";
         }
         // 2nd choice - title match and author surname *and* pub year *and* isbn/issn 
         if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
@@ -308,29 +324,21 @@ foreach ($citations as &$citation) {
             }
             if ($qualifyingAuField && $qualifyingIsField && !in_array($searchString, $searchStrings)) { $searchStrings[4] = $searchString; } // only add this one if we've made a difference
         }
-        // 5th choice - title match and ( date *or* isbn/issn )
+        // 5th choice - title match and date )
         if (isset($searchParameters["TITLE"]) && $searchParameters["TITLE"]) {
             $searchString = "TI=(".wosQuote($searchParameters["TITLE"]).")";
             $qualifyingPyField = FALSE;
-            $qualifyingIsField = FALSE;
             if (isset($searchParameters["DATE"]) && $searchParameters["DATE"]) {
                 $qualifyingPyField = TRUE;
-                $searchString .= " AND ( PY=(".wosQuote($searchParameters["DATE"]).")";  // potentially unbalanced ( but we won't do search unless we also have an IS below
+                $searchString .= " AND PY=(".wosQuote($searchParameters["DATE"]).")";  
             }
-            if (isset($searchParameters["ISSN"]) && $searchParameters["ISSN"]) {
-                $qualifyingIsField = TRUE;
-                $searchString .= " OR IS=(".wosQuote($searchParameters["ISSN"]).") )";
-            } else if (isset($searchParameters["ISBN"]) && $searchParameters["ISBN"]) {     // potentially unbalanced ) but we won't do search unless we also have a PY above
-                $qualifyingIsField = TRUE;
-                $searchString .= " OR IS=(".wosQuote($searchParameters["ISBN"]).") )";      // potentially unbalanced ) but we won't do search unless we also have a PY above
-            }
-            if ($qualifyingPyField && $qualifyingIsField && !in_array($searchString, $searchStrings)) { $searchStrings[5] = $searchString; } // only add this one if we've made a difference
+            if ($qualifyingPyField && !in_array($searchString, $searchStrings)) { $searchStrings[5] = $searchString; } // only add this one if we've made a difference
         }
         
         
         foreach ($searchStrings as $searchPref=>$searchString) { 
             $wosSearchData = wosApiQuery($searchString, $citation["WoS"], "search", TRUE);
-            if ($wosSearchData && isset($wosSearchData["search-results"]) && isset($wosSearchData["search-results"]["opensearch:totalResults"]) && intval($wosSearchData["search-results"]["opensearch:totalResults"])>0) { break; } // first successful result
+            if ($wosSearchData && isset($wosSearchData["Data"]) && isset($wosSearchData["QueryResult"]) && isset($wosSearchData["QueryResult"]["RecordsFound"]) && intval($wosSearchData["QueryResult"]["RecordsFound"])>0) { break; } // first successful result
             if (!isset($citation["WoS"]["searches-no-results"])) { $citation["WoS"]["searches-no-results"] = Array(); } 
             $citation["WoS"]["searches-no-results"][] = $searchString; // record the one we're trying
         }
@@ -346,15 +354,36 @@ foreach ($citations as &$citation) {
             
             $citation["WoS"]["first-match"] = Array(); 
             $citation["WoS"]["results"] = Array(); 
-            foreach ($wosSearchData["Data"]["Records"]["records"]["REC"] as $entry) {
+            foreach ($wosSearchData["Data"]["Records"]["records"]["REC"] as &$entry) {
+                
                 $citationResult = Array(); 
                 $citationResult["UID"] = $entry["UID"]; 
-                $citationResult["title"] = $entry["static_data"]["summary"]["titles"]["title"];
+                
+                // some nodes in the data may have a single value or an array of values - for ease of processing
+                // we want them to always be arrays (even if the array contains only a single value)
+                forceArray($entry["static_data"]["summary"]["titles"]["title"]);
+                forceArray($entry["static_data"]["summary"]["names"]["name"]);  // and we'll keep it like this for the code below 
+                
+                foreach ($entry["static_data"]["summary"]["titles"]["title"] as $title) { 
+                    if ($title["type"]=="item") { 
+                        $citationResult["title"] = $title["content"]; 
+                    }
+                }
                 $citationResult["year"] = $entry["static_data"]["summary"]["pub_info"]["pubyear"];
                 $citationResult["doctype"] = $entry["static_data"]["summary"]["doctypes"]["doctype"];
                 $citationResult["authors"] = Array();
                 foreach ($entry["static_data"]["summary"]["names"]["name"] as $name) { 
-                    $citationResult["authors"][] = $name["display_name"];
+                    if (isset($name["wos_standard"])) {
+                        $citationResult["authors"][] = $name["wos_standard"];
+                    } else if (isset($name["display_name"])) {
+                        $citationResult["authors"][] = $name["display_name"];
+                    } else if (isset($name["full_name"])) {
+                        $citationResult["authors"][] = $name["full_name"];
+                    } else if (isset($name["last_name"])) {
+                        $citationResult["authors"][] = $name["last_name"];
+                    } else {
+                        $citationResult["authors"][] = "?";
+                    }
                 }
                 $citation["WoS"]["results"][] = $citationResult; 
             }
@@ -366,15 +395,62 @@ foreach ($citations as &$citation) {
             //$citation["WoS"]["first-match"]["summary"] = array_filter(array_intersect_key($entry, $summaryFields)); // repeat the summary fields we already collected 
             $citation["WoS"]["first-match"]["metadata"] = Array(); 
             $citation["WoS"]["first-match"]["metadata"]["UID"] = $entry["UID"];
-            $citation["WoS"]["first-match"]["metadata"]["title"] = $entry["static_data"]["summary"]["titles"]["title"];
+            
+            foreach ($entry["static_data"]["summary"]["titles"]["title"] as $title) {
+                if ($title["type"]=="item") {
+                    $citation["WoS"]["first-match"]["metadata"]["title"] = $title["content"];
+                }
+                if ($title["type"]=="source") {
+                    $citation["WoS"]["first-match"]["metadata"]["source"] = $title["content"];
+                }
+            }
             $citation["WoS"]["first-match"]["metadata"]["year"] = $entry["static_data"]["summary"]["pub_info"]["pubyear"];
             $citation["WoS"]["first-match"]["metadata"]["doctype"] = $entry["static_data"]["summary"]["doctypes"]["doctype"];
-            $citation["WoS"]["first-match"]["metadata"]["source"] = $entry["static_data"]["summary"]["titles"]["title"]["content"];
-            $citation["WoS"]["first-match"]["metadata"]["publisher"] = $entry["static_data"]["publishers"]["publisher"]["names"]["name"]["display_name"];
+            
+            if (isset($entry["static_data"]["summary"]["publishers"])) {
+                $citation["WoS"]["first-match"]["metadata"]["publisher"] = $entry["static_data"]["summary"]["publishers"]["publisher"];
+            }
             $citation["WoS"]["first-match"]["metadata"]["citations"] = $entry["dynamic_data"]["citation_related"]["tc_list"]["silo_tc"]["local_count"];
             
-            $citation["WoS"]["first-match"]["metadata"]["addresses"] = $entry["static_data"]["fullrecord_metadata"]["addresses"]["children"];  
-            $citation["WoS"]["first-match"]["metadata"]["authors"] = $entry["static_data"]["summary"]["names"]["name"];
+            $citation["WoS"]["first-match"]["metadata"]["authors"] = $entry["static_data"]["summary"]["names"]["name"]; // we've already dealt with singleton authors above and turned them into arrays of one 
+            
+            forceArray($entry["static_data"]["fullrecord_metadata"]["addresses"]["address_name"]);
+            
+            // step 1 - save the individual addresses by their addr_no 
+            $addresses = Array(); 
+            if (isset($entry["static_data"]["fullrecord_metadata"]["addresses"]["address_name"])) { 
+                $citation["WoS"]["first-match"]["metadata"]["addresses"] = $entry["static_data"]["fullrecord_metadata"]["addresses"]["address_name"]; 
+                foreach ($entry["static_data"]["fullrecord_metadata"]["addresses"]["address_name"] as $address) { 
+                    $addresses[$address["address_spec"]["addr_no"]] = $address["address_spec"]; 
+                }
+            }
+            // step 2 add these to author data already retrieved 
+            foreach ($citation["WoS"]["first-match"]["metadata"]["authors"] as &$author) { 
+                if (isset($author["addr_no"])) {
+                    $author["addresses"] = Array(); 
+                    $addrNos = preg_split('/\s+/', $author["addr_no"]); // authors may have multiple address numbers crammed into a single string
+                    foreach ($addrNos as $addrNo) { 
+                        $author["addresses"][] = $addresses[$addrNo];
+                    }
+                }
+            }
+
+            // reprint addresses 
+            forceArray($entry["static_data"]["fullrecord_metadata"]["reprint_addresses"]["address_name"]);
+            if (isset($entry["static_data"]["fullrecord_metadata"]["reprint_addresses"]["address_name"])) {
+                $citation["WoS"]["first-match"]["metadata"]["reprint_addresses"] = $entry["static_data"]["fullrecord_metadata"]["reprint_addresses"]["address_name"];
+            }
+            
+            forceArray($entry["dynamic_data"]["cluster_related"]["identifiers"]["identifier"]);
+            $citation["WoS"]["first-match"]["metadata"]["identifiers"] = Array();
+            foreach ($entry["dynamic_data"]["cluster_related"]["identifiers"]["identifier"] as $identifier) {
+                // might a record contain multiple identifiers of a give type? allow for the possibility 
+                if (!isset($citation["WoS"]["first-match"]["metadata"]["identifiers"][$identifier["type"]])) { 
+                    $citation["WoS"]["first-match"]["metadata"]["identifiers"][$identifier["type"]] = Array(); 
+                }
+                $citation["WoS"]["first-match"]["metadata"]["identifiers"][$identifier["type"]][] = $identifier["value"];
+            }
+            
             
             // find the similarity in title between our citation and WoS data - 
             // we will save this both at the citation-level and the individual author-level 
@@ -411,12 +487,38 @@ foreach ($citations as &$citation) {
                 }
             }
 
+            $collatedAuthorsSurname = Array();
+            $collatedAuthorsShort = Array();
+            $collatedAuthorsLong = Array();
+            $collatedAuthorsFull = Array();
             
             foreach ($citation["WoS"]["first-match"]["metadata"]["authors"] as &$author) { 
                 
-                if (isset($author["display_name"]) && $author["display_name"]) { 
+                // assemble string list of authors for later comparison with source metadata
+                $collatedAuthorSurname = FALSE;
+                $collatedAuthorShort = FALSE;
+                $collatedAuthorLong = FALSE;
+                $collatedAuthorFull = FALSE;
+                if (isset($author["last_name"]) && $author["last_name"]) {
+                    $collatedAuthorSurname = $author["last_name"];
+                    $collatedAuthorsSurname[] = $collatedAuthorSurname;
+                }
+                if (isset($author["wos_standard"]) && $author["wos_standard"]) {
+                    $collatedAuthorShort = $author["wos_standard"];
+                    $collatedAuthorsShort[] = $collatedAuthorShort;
+                }
+                if (isset($author["display_name"]) && $author["display_name"]) {
+                    $collatedAuthorLong = $author["display_name"];
+                    $collatedAuthorsLong[] = $collatedAuthorLong;
+                }
+                if (isset($author["preferred_name"]) && isset($author["preferred_name"]["full_name"]) && $author["preferred_name"]["full_name"]) { 
+                    $collatedAuthorFull = $author["preferred_name"]["full_name"];
+                    $collatedAuthorsFull[] = $collatedAuthorFull;
+                } else if (isset($author["full_name"]) && $author["full_name"]) {
+                    $collatedAuthorFull = $author["full_name"];
+                    $collatedAuthorsFull[] = $collatedAuthorFull;
+                }
                 
-                    
                     $thisSimilarity = 0;
                     $foundSimilarity = FALSE;
                     // try taking any Alma authors
@@ -424,15 +526,31 @@ foreach ($citations as &$citation) {
                         foreach ($extraParameters["ALMA-CREATORS"] as $creatorAlma) {
                             if ($creatorAlma) {
                                 if (isset($creatorAlma["collated"]) && $creatorAlma["collated"]) {
+                                    if ($collatedAuthorShort) {
+                                        $foundSimilarity = TRUE;
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorAlma["collated"], "Levenshtein", FALSE));
+                                    }
                                     if ($collatedAuthorLong) {
                                         $foundSimilarity = TRUE;
-                                        $thisSimilarity = max($thisSimilarity, similarity($author["display_name"], $creatorAlma["collated"], "Levenshtein", FALSE));
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorLong, $creatorAlma["collated"], "Levenshtein", FALSE));
+                                    }
+                                    if ($collatedAuthorLong) {
+                                        $foundSimilarity = TRUE;
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorFull, $creatorAlma["collated"], "Levenshtein", FALSE));
                                     }
                                 }
                                 if (isset($creatorAlma["a"]) && $creatorAlma["a"]) {
+                                    if ($collatedAuthorShort) {
+                                        $foundSimilarity = TRUE;
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorAlma["a"], "Levenshtein", FALSE));
+                                    }
                                     if ($collatedAuthorLong) {
                                         $foundSimilarity = TRUE;
-                                        $thisSimilarity = max($thisSimilarity, similarity($author["display_name"], $creatorAlma["a"], "Levenshtein", FALSE));
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorLong, $creatorAlma["a"], "Levenshtein", FALSE));
+                                    }
+                                    if ($collatedAuthorLong) {
+                                        $foundSimilarity = TRUE;
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorFull, $creatorAlma["a"], "Levenshtein", FALSE));
                                     }
                                 }
                             }
@@ -444,9 +562,17 @@ foreach ($citations as &$citation) {
                         if ($creatorsLeganto) {
                             foreach ($creatorsLeganto as $creatorLeganto) {
                                 if ($creatorLeganto) {
+                                    if ($collatedAuthorShort) {
+                                        $foundSimilarity = TRUE;
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorLeganto, "Levenshtein", FALSE));
+                                    }
                                     if ($collatedAuthorLong) {
                                         $foundSimilarity = TRUE;
-                                        $thisSimilarity = max($thisSimilarity, similarity($author["display_name"], $creatorLeganto, "Levenshtein", FALSE));
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorLong, $creatorLeganto, "Levenshtein", FALSE));
+                                    }
+                                    if ($collatedAuthorLong) {
+                                        $foundSimilarity = TRUE;
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorFull, $creatorLeganto, "Levenshtein", FALSE));
                                     }
                                 }
                             }
@@ -459,13 +585,13 @@ foreach ($citations as &$citation) {
                     
                     
                     
-                }
-                
                 
             }
             
-
+            
         }
+        
+        
         
     }
     }
@@ -483,9 +609,15 @@ print json_encode($citations, JSON_PRETTY_PRINT);
  * ready for inclusion in WoS query string 
  * 
  * @param String $parameter
+ * @param Boolean $keepParentheses Whether to retain ( ) in string 
  */
-function wosQuote($parameter) { 
-    $parameter = str_replace(Array('"', '(', ')'), '', $parameter);
+function wosQuote($parameter, $keepParentheses=FALSE) { 
+    $toReplace = Array('"'); 
+    if (!$keepParentheses) { 
+        $toReplace[] = "("; 
+        $toReplace[] = ")";
+    }
+    $parameter = str_replace($toReplace, '', $parameter);
     $parameter = '"'.$parameter.'"';
     return $parameter; 
 }
@@ -516,7 +648,7 @@ function wosApiQuery($usrQuery, &$citationWos, $type="default", $checkRateLimit=
     }
     // else 
     
-    usleep(700000); // so as not to hammer the API 
+    usleep(550000); // because of API limits (2 requests per second) 
     
     $c = curl_init();
     curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
@@ -534,12 +666,6 @@ function wosApiQuery($usrQuery, &$citationWos, $type="default", $checkRateLimit=
     $body = substr($response, $header_size);
     
     curl_close($c);
-    
-    print "$URL\n"; 
-    print_r($http_response_header); 
-    print_r($body); 
-    exit; 
-    
     
     if ($checkRateLimit) {
         if (!isset($citationWos["rate-limit"])) {
@@ -610,6 +736,23 @@ function wosApiQuery($usrQuery, &$citationWos, $type="default", $checkRateLimit=
 }
 
 
+/**
+ * Some data in the WoS response may be either a single object (if only one of them) 
+ * or an array of objects (if more than one) 
+ * 
+ * To make code manipulaing the response simpler, have one function to turrn any single objects 
+ * into arrays of a single object
+ * 
+ * This function does not return a value, but modifies its parameter  
+ * 
+ * @param data $node
+ */
+function forceArray(&$node) { 
+    if (is_array($node) && count(array_filter(array_keys($node), 'is_string')) > 0) { 
+        // $node has string keys therefore is an object that needs wrapping in an array 
+        $node = Array($node);
+    }
+}
 
 
 

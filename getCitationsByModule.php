@@ -18,7 +18,9 @@
  * =======================================================================
  *
  * Typical usage: 
- * php getCitationsByModule.php >Data/1.json 
+ * php getCitationsByModule.php -m PSYC3505 >Data/PSYC3505.json 
+ * php getCitationsByModule.php --modcode PSYC3505 >Data/PSYC3505.json 
+ * php getCitationsByModule.php -m PSYC3505,PSYC3506,PSYC3507 >Data/PSYC.json 
  * 
  * This script is the start of the typical citation-enhancement process: 
  * It will typically be followed by the various enhanceCitationsFrom....php scripts  
@@ -62,20 +64,33 @@ error_reporting(E_ALL);                     // we want to know about all problem
 require_once("utils.php");                  // Helper functions 
 
 
-// Configuration - hardcode the modules we want to extract lists for  
-// $modulesToInclude = Array("PHIL1444","PHIL2600","PHIL3320","PHIL3700","THEO3190"); 
-
-// $modulesToInclude = Array("PHIL1444","PHIL2600","PHIL3320","PHIL3700","THEO3190","THEO2720","MODL2015","MODL2016","MODL3620","MODL3620","LAW2146","LAW5637M","MATH5315M","MATH5315M","SOEE2650","LUBS2125","LUBS1620","LUBS1295","LUBS3340","HPSC2400","HPSC3450","HECS5169M","HECS3295","HECS5186M","HECS5189M","COMP2121","COMP5840M","XJCO2121","OCOM5204M","GEOG1081","GEOG2000","DSUR5130M","DSUR5022M","BLGY3135","SOEE1640");
-// $modulesToInclude = Array("PHIL1444","PHIL2600","PHIL3320","PHIL3700","THEO3190","THEO2720","MM9544","MODL3620","MODL3620","LAW2146","LAW5637M","MATH5315M","MATH5315M","SOEE2650","LUBS2125","LUBS1620","LUBS1295","LUBS3340","HPSC2400","HPSC3450","HECS5169M","HECS3295","HECS5186M","HECS5189M","COMP2121","COMP5840M","XJCO2121","OCOM5204M","GEOG1081","GEOG2000","DSUR5130M","DSUR5022M","BLGY3135","SOEE1640");
-
-// $modulesToInclude = Array("PHIL1444","PHIL2600","PHIL3320","PHIL3700","THEO3190","THEO2720","MM9544","MODL3620","MODL3620","LAW2146","LAW5637M","MATH5315M","MATH5315M","SOEE2650","LUBS2125","LUBS1620");
-// $modulesToInclude = Array("LUBS1295","LUBS3340","HPSC2400","HPSC3450","HECS5169M","HECS3295","HECS5186M","HECS5189M","COMP2121","COMP5840M","XJCO2121","OCOM5204M","GEOG1081","GEOG2000","DSUR5130M","DSUR5022M","BLGY3135","SOEE1640");
-$modulesToInclude = Array("GEOG2000");
-
+$shortopts = 'm:';
+$longopts = array('modcode:');
+$options = getopt($shortopts,$longopts);
+// defaults
+$modcodes = FALSE;
+$modulesToInclude = Array(); 
+// set options
+if (isset($options['m']) && $options['m']) {
+    $modcodes = $options['m'];
+} else if (isset($options['modcode']) && $options['modcode']) {
+    $modcodes = $options['modcode'];
+} 
+if ($modcodes) { 
+    foreach (preg_split('/\s*[,;:\.\s]+\s*/', $modcodes) as $modcode) {
+        if (preg_match('/\w+/', $modcode)) {
+            $modulesToInclude[] = $modcode; 
+        }
+    }
+}
+if (!count($modulesToInclude)) {
+    trigger_error("Error: Must specify module codes in -m or --modcode option", E_USER_ERROR);
+    exit;
+}
 
 
 // Alma Courses API 
-// NB this assiumes a copy of this client is installed
+// NB this assumes a copy of this client is installed
 // in a sibling-folder to this project, so that the relative paths work
 // The client is in:
 // https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&version=GBrl-export&_a=contents

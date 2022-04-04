@@ -68,7 +68,9 @@ function simplify($string) {
 
 function similarity($string1, $string2, $type="Levenshtein", $crop=FALSE, $alphabeticise=FALSE) {
 
-    if ($string1==$string2) { return 100; }
+    if ($string1==$string2) {
+        return 100; 
+    }
 
     if ($crop && strlen($string1)!=strlen($string2)) {
         if (strlen($string1)>strlen($string2)) {
@@ -80,7 +82,9 @@ function similarity($string1, $string2, $type="Levenshtein", $crop=FALSE, $alpha
     
     $string1 = normalise($string1);
     $string2 = normalise($string2);
-    if (!$string1 || !$string2) { return 0; }
+    if (!$string1 || !$string2) { 
+        return 0; 
+    }
     
 
     

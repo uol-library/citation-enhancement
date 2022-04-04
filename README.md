@@ -40,7 +40,7 @@ cURL support in PHP including support for https
 Project https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&version=GBrl-export&_a=contents 
 
 ## 3. Latest releases
-v2.2.2
+v2.3.1
 
 ## 4. API references
 Scopus: https://dev.elsevier.com/api_docs.html
@@ -55,9 +55,7 @@ Alma: https://developers.exlibrisgroup.com/alma/apis/
 The software does not need building once the steps in the Installation process are complete 
 
 ## Configuration 
-Choose a module code or codes to run against e.g. "PSYC3505" and list those in the value of the array $modulesToInclude in getCitationsByModule.php, e.g.: 
-
-> $modulesToInclude = Array("LUBS1295","LUBS3340","HPSC2400","HPSC3450","HECS5169M","HECS3295","HECS5186M","HECS5189M","COMP2121","COMP5840M","XJCO2121","OCOM5204M","GEOG1081","GEOG2000","DSUR5130M","DSUR5022M","BLGY3135","SOEE1640");
+No further configuration is needed once you have saved the WoS and Scopus API Keys in the config.ini file 
 
 ## Step 1: assemble World Bank GNI ranking file  
 You only need to do this if you are wanting to use more recent World Bank data than prepared already in this project, or than the last time you ran this step. 
@@ -69,25 +67,34 @@ This outputs data files to Config/WorldBank/ (the locations are set in config.in
 Step 4 will later consume these 
 
 ## Step 2: collect reading list citations  
-> php getCitationsByModule.php >Data/1.json 
+Collect citations a module-at-a-time from Alma/Leganto: 
+
+> php getCitationsByModule.php -m *MODCODE* >Data/*FILE*.json  
+e.g. 
+> php getCitationsByModule.php -m PSYC3505 >Data/PSYC3505.json  
 
 This script (like the following ones) writes a JSON-encoded list of citations to STDOUT, so just save it somewhere suitable 
 
 ## Step 3: enhance citations with data from Alma, Scopus, WoS, VIAF  
-> php enhanceCitationsFromAlma.php   <Data/1.json >Data/1A.json 
+e.g.: 
+
+> php enhanceCitationsFromAlma.php   <Data/PSYC3505.json >Data/PSYC3505_A.json 
 > 
-> php enhanceCitationsFromScopus.php <Data/1A.json >Data/1AS.json 
+> php enhanceCitationsFromScopus.php <Data/PSYC3505_A.json >Data/PSYC3505_AS.json 
 > 
-> php enhanceCitationsFromWoS.php <Data/1AS.json >Data/1ASW.json 
+> php enhanceCitationsFromWoS.php <Data/PSYC3505_AS.json >Data/PSYC3505_ASW.json 
 >
-> php enhanceCitationsFromViaf.php   <Data/1ASW.json >Data/1ASWV.json 
+> php enhanceCitationsFromViaf.php   <Data/PSYC3505_ASW.json >Data/PSYC3505_ASWV.json 
 
 Each script reads a JSON-encoded list of citations from STDIN, and writes an enhanced list of citations to STDOUT, so use the input filename from the previous step and write to a new file ready for the next  
 
 ## Step 4: process data and export spreadsheet  
 This step is not finalised, and can be modified independently of the collection of raw data in the previous steps. 
+e.g.:
 
-> php simpleCsvExport.php <Data/1ASWV.json 
+> php simpleCsvExport.php <Data/PSYC3505_ASWV.json 
+or 
+> php simpleCsvExport.php -a <Data/PSYC3505_ASWV.json 
 
 This script reads a JSON-encoded list of enhanced citations from STDIN and combines it with the World Bank data saved in Step 1 
 
