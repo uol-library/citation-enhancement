@@ -102,6 +102,9 @@ error_reporting(E_ALL);                     // we want to know about all problem
 require_once("utils.php"); 
 
 
+$inclusionThreshold = 80; // author-title similarity threshold 
+
+
 
 $shortopts = 'ai';
 $longopts = array('append', 'initialise');
@@ -276,16 +279,26 @@ if (!$initialise) {
                                 $outputRecord["SCOPUS-COUNTRY-CODES"] = Array();
                                 $outputRecord["SCOPUS-COUNTRIES"] = Array();
                                 
+                                $outputRecord["SCOPUS-SEARCH"] = isset($citation["WoS"]["search-active"]) ? $citation["WoS"]["search-active"] : NULL;
+                                
+                                $outputRecord["SCOPUS-SEARCH-DOI"] = (strpos($outputRecord["SCOPUS-SEARCH"], "DOI")===0) ? TRUE : FALSE;
+                                
+                                
                                 $totalSimilarity = 0;
                                 $countSimilarity = 0;
+                                $maxSimilarity = FALSE;
+                                $minSimilarity = FALSE;
                                 
                                 foreach ($citation["Scopus"]["first-match"]["authors"] as $author) {
                                     
                                     $contemporaryAffiliation = FALSE; // set to TRUE if we find one
                                     
                                     if (isset($author["similarity-title"]) && isset($author["similarity-author"])) {
-                                        $totalSimilarity += floor($author["similarity-title"]*$author["similarity-author"]/100);
+                                        $thisSimilarity = floor($author["similarity-title"]*$author["similarity-author"]/100); 
+                                        $totalSimilarity += $thisSimilarity;
                                         $countSimilarity++;
+                                        if ($maxSimilarity===FALSE || $thisSimilarity>$maxSimilarity) { $maxSimilarity = $thisSimilarity; }
+                                        if ($minSimilarity===FALSE || $thisSimilarity<$minSimilarity) { $minSimilarity = $thisSimilarity; }
                                     }
                                     
                                     $outputRecord["SCOPUS-AUTHORS"][] = $author["ce:indexed-name"];
@@ -356,7 +369,8 @@ if (!$initialise) {
                                 
                                 
                                 if ($countSimilarity) {
-                                    $outputRecord["SCOPUS-SIMILARITY"] = floor($totalSimilarity/$countSimilarity);
+                                    // $outputRecord["SCOPUS-SIMILARITY"] = floor($totalSimilarity/$countSimilarity);
+                                    $outputRecord["SCOPUS-SIMILARITY"] = $maxSimilarity; 
                                 }
                                 
                                 
@@ -386,8 +400,9 @@ if (!$initialise) {
                                 $outputRecord["WOS-FLOAT-COUNTRIES-DISTINCT"] = Array();
                                 $outputRecord["WOS-REPRINT-COUNTRIES-DISTINCT"] = Array();
                                 
-                                
                                 $outputRecord["WOS-SEARCH"] = isset($citation["WoS"]["search-active"]) ? $citation["WoS"]["search-active"] : NULL;
+                                
+                                $outputRecord["WOS-SEARCH-DOI"] = (strpos($outputRecord["WOS-SEARCH"], "DO=")===0) ? TRUE : FALSE; 
                                 
                                 
                                 $outputRecord["WOS-TITLE"] = $citation["WoS"]["first-match"]["metadata"]["title"];
@@ -464,8 +479,8 @@ if (!$initialise) {
                                             }
                                             if (isset($namesToCodesMap[strtolower($countryName)])) {
                                                 $nationalityCode = $namesToCodesMap[strtolower($countryName)];
-                                                $outputRecord["WOS-COUNTRY-CODES"][] = Array($nationalityCode); 
-                                                $outputRecord["WOS-COUNTRIES"][] = Array( ( isset($namesMap[$nationalityCode]) && $namesMap[$nationalityCode] ) ? $namesMap[$nationalityCode] : $nationalityCode ); 
+                                                $outputRecord["WOS-COUNTRY-CODES"][] = $nationalityCode; 
+                                                $outputRecord["WOS-COUNTRIES"][] = ( isset($namesMap[$nationalityCode]) && $namesMap[$nationalityCode] ) ? $namesMap[$nationalityCode] : $nationalityCode; 
                                                 if (!isset($seenAddresses[$address["address_spec"]["addr_no"]]) || !$seenAddresses[$address["address_spec"]["addr_no"]]) {
                                                     $outputRecord["WOS-FLOAT-COUNTRIES-DISTINCT"][] = $nationalityCode;
                                                 }
@@ -493,8 +508,8 @@ if (!$initialise) {
                                                 $nationalityCode = $namesToCodesMap[strtolower($countryName)];
                                                 $thisAuthorCountries[] = $nationalityCode;
                                                 $outputRecord["WOS-REPRINT-COUNTRIES-DISTINCT"][] = $nationalityCode;
-                                                $outputRecord["WOS-COUNTRY-CODES"][] = Array($nationalityCode);
-                                                $outputRecord["WOS-COUNTRIES"][] = Array( ( isset($namesMap[$nationalityCode]) && $namesMap[$nationalityCode] ) ? $namesMap[$nationalityCode] : $nationalityCode );
+                                                $outputRecord["WOS-COUNTRY-CODES"][] = $nationalityCode;
+                                                $outputRecord["WOS-COUNTRIES"][] = ( isset($namesMap[$nationalityCode]) && $namesMap[$nationalityCode] ) ? $namesMap[$nationalityCode] : $nationalityCode;
                                             } else {
                                                 if (TRUE || $config["General"]["Debug"]) {
                                                     trigger_error("Can't derive nation code for $countryName", E_USER_NOTICE);
@@ -510,10 +525,10 @@ if (!$initialise) {
                                 if ($countSimilarity) {
                                     
                                     $outputRecord["WOS-SIMILARITY-AVG"] = floor($totalSimilarity/$countSimilarity);
-                                    $outputRecord["WOS-SIMILARITY"] = floor($totalSimilarity/$countSimilarity);
+                                    // $outputRecord["WOS-SIMILARITY"] = floor($totalSimilarity/$countSimilarity);
                                     $outputRecord["WOS-SIMILARITY-MIN"] = $minSimilarity;
                                     $outputRecord["WOS-SIMILARITY-MAX"] = $maxSimilarity;
-                                    
+                                    $outputRecord["WOS-SIMILARITY"] = $maxSimilarity;
                                 }
                                 
                                 $outputRecord["WOS-AUTHOR-COUNTRIES-DISTINCT"] = array_unique($outputRecord["WOS-AUTHOR-COUNTRIES-DISTINCT"]);
@@ -523,8 +538,13 @@ if (!$initialise) {
                                 $outputRecord["WOS-REPRINT-COUNTRIES-DISTINCT"] = array_unique($outputRecord["WOS-REPRINT-COUNTRIES-DISTINCT"]);
                                 sort($outputRecord["WOS-REPRINT-COUNTRIES-DISTINCT"]); // gives something comparable with other sources
                                 
+                                $outputRecord["WOS-COUNTRY-CODES"] = Array($outputRecord["WOS-COUNTRY-CODES"]); // code below assumes array of arrays
+                                $outputRecord["WOS-COUNTRIES"] = Array($outputRecord["WOS-COUNTRIES"]);
                             }
+                            
                         }
+                        
+                        
                         
                         
                         if (isset($citation["VIAF"])) {
@@ -543,6 +563,9 @@ if (!$initialise) {
                             $outputRecord["VIAF-COUNTRIES"] = Array();
                             
                             
+                            $outputRecord["VIAF-SEARCH-DOI"] = FALSE; // always false  
+                            
+                            
                             if (count($citation["VIAF"])) {
                                 $outputRecord["VIAF-SA"] = 0; // we will sum these across all authors and then divide by number of authors after the loop
                                 $outputRecord["VIAF-ST"] = 0;
@@ -551,6 +574,9 @@ if (!$initialise) {
                             
                             $totalSimilarity = 0;
                             $countSimilarity = 0;
+                            $maxSimilarity = FALSE;
+                            $minSimilarity = FALSE;
+                            
                             foreach ($citation["VIAF"] as $viafCitation) {
                                 
                                 if ($viafCitation["data-source"]=="Scopus") {
@@ -562,65 +588,75 @@ if (!$initialise) {
                                 
                                 if (isset($viafCitation["best-match"])) {
                                     
-                                    $totalSimilarity += floor($viafCitation["best-match"]["similarity-title"]*$viafCitation["best-match"]["similarity-author"]/100);
+                                    $thisSimilarity = floor($viafCitation["best-match"]["similarity-title"]*$viafCitation["best-match"]["similarity-author"]/100);
+                                    $totalSimilarity += $thisSimilarity;
                                     $countSimilarity++;
+                                    if ($maxSimilarity===FALSE || $thisSimilarity>$maxSimilarity) { $maxSimilarity = $thisSimilarity; }
+                                    if ($minSimilarity===FALSE || $thisSimilarity<$minSimilarity) { $minSimilarity = $thisSimilarity; }
                                     
-                                    $outputRecord["VIAF-SA"] += $viafCitation["best-match"]["similarity-author"];
-                                    $outputRecord["VIAF-ST"] += $viafCitation["best-match"]["similarity-title"];
+                                    if ($thisSimilarity>=$inclusionThreshold) { 
                                     
-                                    $outputRecord["VIAF-AUTHORS"][] = $viafCitation["best-match"]["heading"];
-                                    $thisAuthorCountries = Array();
-                                    
-                                    foreach (Array("NAT"=>"nationalities") as $fieldCode=>$countryField) {
+                                        $outputRecord["VIAF-SA"] += $viafCitation["best-match"]["similarity-author"];
+                                        $outputRecord["VIAF-ST"] += $viafCitation["best-match"]["similarity-title"];
                                         
-                                        if (isset($viafCitation["best-match"][$countryField]) && is_array($viafCitation["best-match"][$countryField])) {
+                                        $outputRecord["VIAF-AUTHORS"][] = $viafCitation["best-match"]["heading"];
+                                        $thisAuthorCountries = Array();
+                                        
+                                        foreach (Array("NAT"=>"nationalities") as $fieldCode=>$countryField) {
                                             
-                                            foreach ($viafCitation["best-match"][$countryField] as $nationality) {
+                                            if (isset($viafCitation["best-match"][$countryField]) && is_array($viafCitation["best-match"][$countryField])) {
                                                 
-                                                $nationalityValue = strtoupper($nationality["value"]);
-                                                $nationalityCode = NULL;
-                                                
-                                                if (strlen($nationalityValue)==2) {
-                                                    if (preg_match('/^[A-Z]{2}$/', $nationalityValue) && !preg_match('/^(AA|Q[M-Z]|X[A-Z]|ZZ)$/', $nationalityValue)) {
-                                                        $nationalityCode = $nationalityValue;
-                                                    } else if ($config["General"]["Debug"]) {
-                                                        trigger_error("User-assigned country code ".$nationalityValue, E_USER_NOTICE);
-                                                    }
-                                                } else if (strlen($nationalityValue)==3) {
-                                                    if (isset($iso2Map[$nationalityValue]) && $iso2Map[$nationalityValue]) {
-                                                        if (preg_match('/^[A-Z]{2}$/', $iso2Map[$nationalityValue]) && !preg_match('/^(AA|Q[M-Z]|X[A-Z]|ZZ)$/', $iso2Map[$nationalityValue])) {
-                                                            $nationalityCode = $iso2Map[$nationalityValue];
+                                                foreach ($viafCitation["best-match"][$countryField] as $nationality) {
+                                                    
+                                                    $nationalityValue = strtoupper($nationality["value"]);
+                                                    $nationalityCode = NULL;
+                                                    
+                                                    if (strlen($nationalityValue)==2) {
+                                                        if (preg_match('/^[A-Z]{2}$/', $nationalityValue) && !preg_match('/^(AA|Q[M-Z]|X[A-Z]|ZZ)$/', $nationalityValue)) {
+                                                            $nationalityCode = $nationalityValue;
                                                         } else if ($config["General"]["Debug"]) {
-                                                            trigger_error("User-assigned country code ".$iso2Map[$nationalityValue], E_USER_NOTICE);
+                                                            trigger_error("User-assigned country code ".$nationalityValue, E_USER_NOTICE);
+                                                        }
+                                                    } else if (strlen($nationalityValue)==3) {
+                                                        if (isset($iso2Map[$nationalityValue]) && $iso2Map[$nationalityValue]) {
+                                                            if (preg_match('/^[A-Z]{2}$/', $iso2Map[$nationalityValue]) && !preg_match('/^(AA|Q[M-Z]|X[A-Z]|ZZ)$/', $iso2Map[$nationalityValue])) {
+                                                                $nationalityCode = $iso2Map[$nationalityValue];
+                                                            } else if ($config["General"]["Debug"]) {
+                                                                trigger_error("User-assigned country code ".$iso2Map[$nationalityValue], E_USER_NOTICE);
+                                                            }
+                                                        } else if ($config["General"]["Debug"]) {
+                                                            trigger_error("No 3- to 2-letter mapping for ".$nationalityValue, E_USER_NOTICE);
                                                         }
                                                     } else if ($config["General"]["Debug"]) {
-                                                        trigger_error("No 3- to 2-letter mapping for ".$nationalityValue, E_USER_NOTICE);
+                                                        trigger_error("Neither 2- nor 3-letter code ".$nationalityValue, E_USER_NOTICE);
                                                     }
-                                                } else if ($config["General"]["Debug"]) {
-                                                    trigger_error("Neither 2- nor 3-letter code ".$nationalityValue, E_USER_NOTICE);
-                                                }
-                                                if ($nationalityCode==NULL) {
-                                                    if (isset($namesToCodesMap[strtolower($nationality["value"])])) {
-                                                        // try a country name
-                                                        $nationalityCode = $namesToCodesMap[strtolower($nationality["value"])];
-                                                    } else if ($config["General"]["Debug"]) {
-                                                        trigger_error("No Name to 2-letter mapping for ".$nationality["value"], E_USER_NOTICE);
+                                                    if ($nationalityCode==NULL) {
+                                                        if (isset($namesToCodesMap[strtolower($nationality["value"])])) {
+                                                            // try a country name
+                                                            $nationalityCode = $namesToCodesMap[strtolower($nationality["value"])];
+                                                        } else if ($config["General"]["Debug"]) {
+                                                            trigger_error("No Name to 2-letter mapping for ".$nationality["value"], E_USER_NOTICE);
+                                                        }
                                                     }
-                                                }
-                                                if ($nationalityCode!==NULL) {
-                                                    $thisAuthorCountries[] = $nationalityCode;
-                                                } else {
-                                                    if ($config["General"]["Debug"]) {
-                                                        trigger_error("Can't derive nation code for ".$nationality["value"], E_USER_NOTICE);
+                                                    if ($nationalityCode!==NULL) {
+                                                        $thisAuthorCountries[] = $nationalityCode;
+                                                    } else {
+                                                        if ($config["General"]["Debug"]) {
+                                                            trigger_error("Can't derive nation code for ".$nationality["value"], E_USER_NOTICE);
+                                                        }
                                                     }
+                                                    
                                                 }
-                                                
                                             }
+                                            
                                         }
                                         
+                                        $outputRecord["VIAF-COUNTRY-CODES"][] = array_unique($thisAuthorCountries);
+                                        $outputRecord["VIAF-COUNTRIES"][] = array_map(function($code) use ($namesMap) { return ( isset($namesMap[$code]) && $namesMap[$code] ) ? $namesMap[$code] : $code; }, array_unique($thisAuthorCountries));
+                                        
+                                        
                                     }
-                                    $outputRecord["VIAF-COUNTRY-CODES"][] = array_unique($thisAuthorCountries);
-                                    $outputRecord["VIAF-COUNTRIES"][] = array_map(function($code) use ($namesMap) { return ( isset($namesMap[$code]) && $namesMap[$code] ) ? $namesMap[$code] : $code; }, array_unique($thisAuthorCountries));
+                                    
                                     
                                 }
                                 
@@ -628,7 +664,8 @@ if (!$initialise) {
                             }
                             
                             if ($countSimilarity) {
-                                $outputRecord["VIAF-SIMILARITY"] = floor($totalSimilarity/$countSimilarity);
+                                // $outputRecord["VIAF-SIMILARITY"] = floor($totalSimilarity/$countSimilarity);
+                                $outputRecord["VIAF-SIMILARITY"] = $maxSimilarity; 
                             }
                             
                             if (count($citation["VIAF"])) {
@@ -658,8 +695,16 @@ if (!$initialise) {
                                 is_array($outputRecord["DATA"]) &&
                                 in_array($sourcePreference, $outputRecord["DATA"]) &&
                                 $outputRecord["$sourcePreference-MATCH"]=="Y" &&
+                                (
+                                (
                                 isset($outputRecord["$sourcePreference-SIMILARITY"]) &&
-                                $outputRecord["$sourcePreference-SIMILARITY"]>=80 &&
+                                $outputRecord["$sourcePreference-SIMILARITY"] && 
+                                $outputRecord["$sourcePreference-SIMILARITY"]>=$inclusionThreshold 
+                                ) 
+                                || 
+                                $outputRecord["$sourcePreference-SEARCH-DOI"]
+                                )
+                                && 
                                 count($outputRecord["$sourcePreference-COUNTRIES"]) &&
                                 implode("", array_map(function ($a) { return implode("", $a); }, $outputRecord["$sourcePreference-COUNTRIES"]))>""
                                     ) {
