@@ -92,12 +92,13 @@ do
    if [[ " ${stages[*]} " =~ " get " || -z "${s}" ]]; 
    then 
       printf "Getting citations by module code\n"  
-      php getCitationsByModule.php -m ${modcode} >Data/${modcode}.json
+      php getCitationsByModule.php -m ${modcode} >Data/${modcode}_L.json
       if [ $? -ne 0 ]; 
       then 
          printf "Script ended with error\n"
          exit
       fi 
+      cp Data/${modcode}_L.json Data/${modcode}.json
    fi 
 
    if [[ " ${stages[*]} " =~ " alma " || -z "${s}" ]]; 
@@ -109,45 +110,49 @@ do
          printf "Script ended with error\n"
          exit
       fi 
+      cp Data/${modcode}_A.json Data/${modcode}.json
    fi 
 
    if [[ " ${stages[*]} " =~ " scopus " || -z "${s}" ]]; 
    then 
       printf "Enhancing citations from Scopus\n"
-      php enhanceCitationsFromScopus.php <Data/${modcode}_A.json >Data/${modcode}_AS.json
+      php enhanceCitationsFromScopus.php <Data/${modcode}.json >Data/${modcode}_S.json
       if [ $? -ne 0 ]; 
       then 
          printf "Script ended with error\n"
          exit
       fi
+      cp Data/${modcode}_S.json Data/${modcode}.json
    fi
 
    if [[ " ${stages[*]} " =~ " wos " || -z "${s}" ]]; 
    then 
       printf "Enhancing citations from WoS\n"
-      php enhanceCitationsFromWos.php <Data/${modcode}_AS.json >Data/${modcode}_ASW.json
+      php enhanceCitationsFromWos.php <Data/${modcode}.json >Data/${modcode}_W.json
       if [ $? -ne 0 ]; 
       then 
          printf "Script ended with error\n"
          exit
       fi 
+      cp Data/${modcode}_W.json Data/${modcode}.json
    fi
 
    if [[ " ${stages[*]} " =~ " viaf " || -z "${s}" ]]; 
    then 
       printf "Enhancing citations from VIAF\n"
-      php enhanceCitationsFromViaf.php <Data/${modcode}_ASW.json >Data/${modcode}_ASWV.json
+      php enhanceCitationsFromViaf.php <Data/${modcode}.json >Data/${modcode}_V.json
       if [ $? -ne 0 ]; 
       then 
          printf "Script ended with error\n"
          exit
       fi 
+      cp Data/${modcode}_V.json Data/${modcode}.json
    fi
 
    if [[ " ${stages[*]} " =~ " export " || -z "${s}" ]]; 
    then 
       printf "Exporting digested data\n"
-      php simpleExport.php -a <Data/${modcode}_ASWV.json
+      php simpleExport.php -a <Data/${modcode}.json
       if [ $? -ne 0 ]; 
       then 
          printf "Script ended with error\n"

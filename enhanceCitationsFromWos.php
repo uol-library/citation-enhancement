@@ -441,14 +441,18 @@ foreach ($citations as &$citation) {
                 $citation["WoS"]["first-match"]["metadata"]["reprint_addresses"] = $entry["static_data"]["fullrecord_metadata"]["reprint_addresses"]["address_name"];
             }
             
-            forceArray($entry["dynamic_data"]["cluster_related"]["identifiers"]["identifier"]);
+            
+            
             $citation["WoS"]["first-match"]["metadata"]["identifiers"] = Array();
-            foreach ($entry["dynamic_data"]["cluster_related"]["identifiers"]["identifier"] as $identifier) {
-                // might a record contain multiple identifiers of a give type? allow for the possibility 
-                if (!isset($citation["WoS"]["first-match"]["metadata"]["identifiers"][$identifier["type"]])) { 
-                    $citation["WoS"]["first-match"]["metadata"]["identifiers"][$identifier["type"]] = Array(); 
+            if (is_array($entry["dynamic_data"]["cluster_related"]["identifiers"])) {
+                forceArray($entry["dynamic_data"]["cluster_related"]["identifiers"]["identifier"]);
+                foreach ($entry["dynamic_data"]["cluster_related"]["identifiers"]["identifier"] as $identifier) {
+                    // might a record contain multiple identifiers of a give type? allow for the possibility
+                    if (!isset($citation["WoS"]["first-match"]["metadata"]["identifiers"][$identifier["type"]])) {
+                        $citation["WoS"]["first-match"]["metadata"]["identifiers"][$identifier["type"]] = Array();
+                    }
+                    $citation["WoS"]["first-match"]["metadata"]["identifiers"][$identifier["type"]][] = $identifier["value"];
                 }
-                $citation["WoS"]["first-match"]["metadata"]["identifiers"][$identifier["type"]][] = $identifier["value"];
             }
             
             

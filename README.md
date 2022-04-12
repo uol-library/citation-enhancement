@@ -45,7 +45,7 @@ Project https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&ve
 
 ## 3. Latest releases
 
-v2.4.1
+v2.4.2
 
 ## 4. API references
 
