@@ -20,6 +20,8 @@ $config = parse_ini_file("config.ini", true);       // from now on, keep as much
 
 function standardise($string) {
     
+    if ($string===null) { return $string; }
+    
     $dashes = Array("\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\x95");
     $dblQuotes = Array("\xe2\x80\x9c", "\xe2\x80\x9d", "\xc2\xab}", "\xc2\xbb}");
     $quotes = Array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\xb9", "\xe2\x80\xba");
@@ -48,6 +50,9 @@ function standardise($string) {
 }
 
 function normalise($string) {
+    
+    if ($string===null) { return FALSE; }
+    
     $string = standardise($string);
     $string = strtolower($string);
     $string = preg_replace('/[\.,\-_;:\/\\\'"\?!\+\&]/', " ", $string);
@@ -57,6 +62,9 @@ function normalise($string) {
 }
 
 function simplify($string) {
+
+    if ($string===null) { return FALSE; }
+    
     $string = normalise($string);
     if ($string!==FALSE) {
         $parts = explode(" ", $string);
@@ -68,6 +76,9 @@ function simplify($string) {
 
 function similarity($string1, $string2, $type="Levenshtein", $crop=FALSE, $alphabeticise=FALSE) {
 
+    if ($string1===null || $string1===FALSE) { return 0; }
+    if ($string2===null || $string2===FALSE) { return 0; }
+    
     if ($string1==$string2) {
         return 100; 
     }

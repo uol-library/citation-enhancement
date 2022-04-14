@@ -37,7 +37,7 @@ Make a developer account on the Clarivate Portal https://developer.clarivate.com
 
 Host machine must be on 129.11.0.0 network because of restrictions on Scopus API 
 
-PHP - tested against versions 5.6.40 and 8.0.7 
+PHP - tested against versions 5.6.40, 8.0.7, 8.1.5 
 
 cURL support in PHP including support for https 
 
@@ -45,7 +45,7 @@ Project https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&ve
 
 ## 3. Latest releases
 
-v2.4.2
+v2.4.3
 
 ## 4. API references
 
