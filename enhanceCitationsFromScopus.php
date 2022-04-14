@@ -230,12 +230,15 @@ foreach ($citations as &$citation) {
     if (count($searchParameters)) { 
         
         // need to escape quote characters in TITLE - other fields don't matter for now 
-        // because the search terms are not wrapped in {} or "" 
+        // because their search terms are not wrapped in {} or "" 
         //TODO need to properly deal with special characters (",*,?) in *any* field?
-        // NB for now removing double-quotes altogether because of problems 
         if (isset($searchParameters["TITLE"])) { 
-            // $searchParameters["TITLE"] = str_replace('"', '\"', $searchParameters["TITLE"]); 
+            // for now removing double-quotes altogether because of problems
             $searchParameters["TITLE"] = str_replace('"', '', $searchParameters["TITLE"]);
+            // 20220414 found one case where a trailing single quote causes problems - 
+            // remove leading and trailing single quotes but (for now) leave in place elsewhere 
+            $searchParameters["TITLE"] = preg_replace('/^\s*\'/', '', $searchParameters["TITLE"]);
+            $searchParameters["TITLE"] = preg_replace('/\'\s*$/', '', $searchParameters["TITLE"]);
         }
        
         $citation["Scopus"] = Array(); // to populate

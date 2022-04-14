@@ -281,7 +281,7 @@ if (!$initialise) {
                                 
                                 $outputRecord["SCOPUS-SEARCH"] = isset($citation["WoS"]["search-active"]) ? $citation["WoS"]["search-active"] : NULL;
                                 
-                                $outputRecord["SCOPUS-SEARCH-DOI"] = (strpos($outputRecord["SCOPUS-SEARCH"], "DOI")===0) ? TRUE : FALSE;
+                                $outputRecord["SCOPUS-SEARCH-DOI"] = ($outputRecord["SCOPUS-SEARCH"] && strpos($outputRecord["SCOPUS-SEARCH"], "DOI")===0) ? TRUE : FALSE;
                                 
                                 
                                 $totalSimilarity = 0;
@@ -402,7 +402,7 @@ if (!$initialise) {
                                 
                                 $outputRecord["WOS-SEARCH"] = isset($citation["WoS"]["search-active"]) ? $citation["WoS"]["search-active"] : NULL;
                                 
-                                $outputRecord["WOS-SEARCH-DOI"] = (strpos($outputRecord["WOS-SEARCH"], "DO=")===0) ? TRUE : FALSE; 
+                                $outputRecord["WOS-SEARCH-DOI"] = ($outputRecord["WOS-SEARCH"] && strpos($outputRecord["WOS-SEARCH"], "DO=")===0) ? TRUE : FALSE; 
                                 
                                 
                                 $outputRecord["WOS-TITLE"] = $citation["WoS"]["first-match"]["metadata"]["title"];
