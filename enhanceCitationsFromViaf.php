@@ -202,10 +202,57 @@ foreach ($citations as &$citation) {
                     $primaryTitle = $titleScopus; 
                 }
 
-                
+            // third choice - data already parsed from WoS
+            } else if (isset($citation["WoS"]["result-count"]) && $citation["WoS"]["result-count"]
+                && isset($citation["WoS"]["first-match"]) && isset($citation["WoS"]["first-match"]["metadata"]["authors"]) && count($citation["WoS"]["first-match"]["metadata"]["authors"])
+                && isset($citation["WoS"]["first-match"]["metadata"]["title"])
+                ) {
+                    
+                    $searchDataSource = "WoS";
+                    
+                    $creatorsWoS = $citation["WoS"]["first-match"]["metadata"]["authors"];
+                    
+                    if ($creatorsWoS) {
+                        foreach ($creatorsWoS as $creatorWoS) {
+                            $creator = Array();
+                            if (isset($creatorWoS["display_name"]) && $creatorWoS["display_name"]) {
+                                $creator["collated"] = $creatorWoS["display_name"];
+                                if (isset($creatorWoS["wos_standard"]) && $creatorWoS["wos_standard"]) {
+                                    $creator["a"] = $creatorWoS["wos_standard"];
+                                } 
+                            } else if (isset($creatorWoS["full_name"]) && $creatorWoS["full_name"]) {
+                                $creator["collated"] = $creatorWoS["full_name"];
+                                if (isset($creatorWoS["wos_standard"]) && $creatorWoS["wos_standard"]) {
+                                    $creator["a"] = $creatorWoS["wos_standard"];
+                                }
+                            } else if (isset($creatorWoS["last_name"]) && $creatorWoS["last_name"] && isset($creatorWoS["first_name"]) && $creatorWoS["first_name"]) {
+                                $creator["collated"] = $creatorWoS["last_name"].", ".$creatorWoS["first_name"];
+                                if (isset($creatorWoS["wos_standard"]) && $creatorWoS["wos_standard"]) {
+                                    $creator["a"] = $creatorWoS["wos_standard"];
+                                }
+                            }
+                            
+                            if (count($creator)>0) {
+                                $creatorWoSSerialised = print_r($creator, TRUE);
+                                if (!in_array($creatorWoSSerialised, $creatorsSeen)) {
+                                    $creators[] = $creator;
+                                    $creatorsSeen[] = $creatorWoSSerialised;
+                                }
+                            }
+                        }
+                    }
+                    
+                    $titleWoS = Array("collated"=>$citation["WoS"]["first-match"]["metadata"]["title"]);
+                    $titleWoSSerialised = print_r($titleWoS, TRUE);
+                    if (isset($titleWoS["collated"]) && $titleWoS["collated"] && !in_array($titleWoSSerialised, $titlesSeen)) {
+                        $titles[] = $titleWoS;
+                        $titlesSeen[] = $titleWoSSerialised;
+                        $primaryTitle = $titleWoS;
+                    }
+                    
                 
         
-    // third choice - data from Leganto
+    // fourth choice - data from Leganto
         } else if (isset($citation["Leganto"]["secondary_type"]["value"]) && in_array($citation["Leganto"]["secondary_type"]["value"], Array("CR", "BK", "WS", "CONFERENCE", "E_BK", "E_CR", "OTHER"))
         && (
             ( isset($citation["Leganto"]["metadata"]["author"]) && $citation["Leganto"]["metadata"]["author"] ) 

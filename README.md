@@ -35,17 +35,19 @@ Make a developer account on the Clarivate Portal https://developer.clarivate.com
 
 ## 2. Software dependencies
 
-Host machine must be on 129.11.0.0 network because of restrictions on Scopus API 
+Essential: Host machine must be on 129.11.0.0 network because of restrictions on Scopus API 
 
-PHP - tested against versions 5.6.40, 8.0.7, 8.1.5 
+Essential: PHP - tested against versions 5.6.40, 8.0.7, 8.1.5 
 
-cURL support in PHP including support for https 
+Essential: cURL support in PHP including support for https with up-to-date cacert file  
 
-Project https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&version=GBrl-export&_a=contents 
+Essential: Project https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&version=GBrl-export&_a=contents
+
+Recommended: Bash shell (on Windows this is included in git-bash) for running batch-processing script batch.sh   
 
 ## 3. Latest releases
 
-v2.4.4
+v2.4.5
 
 ## 4. API references
 
@@ -90,6 +92,7 @@ e.g.
 >bash batch.sh -f Config/Modules/modcodes.txt 
 
 Writes output data to tab-delimited txt files in Data folder - summary.txt plus READING-LIST-CODE.txt for each reading list. 
+Also writes MODCODE.json file to Data folder with raw data, and intermediate files from each stage to the Data\tmp folder.  
 
 If you only need to run a certain stage for each module you can use the s option - a typical use would be to re-run the export without re-running all the data enhancements: 
 

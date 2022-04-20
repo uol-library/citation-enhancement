@@ -37,6 +37,9 @@
 #  enhanceCitationsFromVIAF.php
 #  simpleExport.php 
 #  
+#  Can optionally only run some of these e.g. 
+#  batch.sh -f MODCODES.txt -s get,alma
+#  only runs getCitationsByModule.php and enhanceCitationsFromAlma.php
 #  
 #  =======================================================================
 #  
