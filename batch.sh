@@ -154,8 +154,15 @@ do
 
    if [[ " ${stages[*]} " =~ " export " || -z "${s}" ]]; 
    then 
-      printf "Exporting digested data\n"
+      printf "Exporting shorter digested data\n"
       php simpleExport.php -a <Data/${modcode}.json
+      if [ $? -ne 0 ]; 
+      then 
+         printf "Script ended with error\n"
+         exit
+      fi 
+      printf "Exporting longer digested data\n"
+      php longExport.php -a <Data/${modcode}.json
       if [ $? -ne 0 ]; 
       then 
          printf "Script ended with error\n"
