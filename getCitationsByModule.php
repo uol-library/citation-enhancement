@@ -147,6 +147,8 @@ foreach ($modulesToInclude as $modcode) {
                     
                     $list_full_record = $list_endpoint->retrieveReadingList($course_id, $list_record["id"], "full");
                     
+                    $citationNumber = 1; // NB start at one not zero 
+                    
                     foreach ($list_full_record["citations"]["citation"] as $citation) {
                         
                         // $to_keep = Array("id"=>TRUE, "type"=>TRUE, "secondary_type"=>TRUE);
@@ -156,6 +158,8 @@ foreach ($modulesToInclude as $modcode) {
                         $newCitationLeganto["list_code"] = $list_code;
                         $newCitationLeganto["list_title"] = $list_title;
                         $newCitationLeganto["section"] = $citation["section_info"]["name"];
+                        $newCitationLeganto["citation"] = $citationNumber++;
+                        
                         // don't yet have section tags in any lists, but for when we do...
                         if (isset($citation["section_info"]["section_tags"]["section_tag"])) {
                             $newCitationLeganto["section_tags"] = Array();
