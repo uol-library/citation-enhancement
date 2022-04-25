@@ -491,9 +491,11 @@ foreach ($citations as &$citation) {
                             }
                             // normally, use the collated form of the author name to get maximum confidence for common names -
                             if (isset($creator["collated"]) && $creator["collated"] && $thisMainHeadingCollated) {
-                                $authorSimilarity = max($authorSimilarity, similarity($thisMainHeadingCollated, $creator["collated"], "Levenshtein", FALSE, TRUE));
+                                $authorSimilarity = max($authorSimilarity, similarity($thisMainHeadingCollated, $creator["collated"], "Levenshtein", FALSE));
+                                // for this one we'll do a straigh compare but we'll back it up below 
+                                // with a comparison cropping to initials and sorting words alphabetically  
                             } else if (isset($creator["a"]) && $creator["a"] && $thisMainHeadingA) {
-                                $authorSimilarity = max($authorSimilarity, similarity($thisMainHeadingA, $creator["a"], "Levenshtein", FALSE, TRUE));
+                                $authorSimilarity = max($authorSimilarity, similarity($thisMainHeadingA, $creator["a"], "Levenshtein", "initials", TRUE));
                             }
                         }
                         if ($lcMainHeading) {

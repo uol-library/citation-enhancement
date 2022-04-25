@@ -492,11 +492,14 @@ foreach ($citations as &$citation) {
                                     if (isset($creatorAlma["collated"]) && $creatorAlma["collated"]) {
                                         if ($collatedAuthorLong) {
                                             $foundSimilarity = TRUE;
-                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorLong, $creatorAlma["collated"], "Levenshtein", FALSE));
+                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorLong, $creatorAlma["collated"], "Levenshtein", FALSE)); 
+                                            // for author-long we'll do a straigh comparison 
+                                            // for author-short below we'll convert longer name to initials if the shorter name is just initials 
+                                            // and we'll rearrange words in name alphabetically 
                                         } 
                                         if ($collatedAuthorShort) {
                                             $foundSimilarity = TRUE;
-                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorAlma["collated"], "Levenshtein", FALSE));
+                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorAlma["collated"], "Levenshtein", "initials", TRUE));
                                         }
                                         // actually don't match on just surname - we do need some corroboration 
                                         /*
@@ -513,7 +516,7 @@ foreach ($citations as &$citation) {
                                         } 
                                         if ($collatedAuthorShort) {
                                             $foundSimilarity = TRUE;
-                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorAlma["a"], "Levenshtein", FALSE));
+                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorAlma["a"], "Levenshtein", "initials", TRUE));
                                         }
                                         // actually don't match on just surname - we do need some corroboration
                                         /*
@@ -538,7 +541,7 @@ foreach ($citations as &$citation) {
                                         } 
                                         if ($collatedAuthorShort) {
                                             $foundSimilarity = TRUE;
-                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorLeganto, "Levenshtein", FALSE));
+                                            $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorShort, $creatorLeganto, "Levenshtein", "initials", TRUE));
                                         }
                                         // actually don't match on just surname - we do need some corroboration
                                         /*

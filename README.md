@@ -47,7 +47,7 @@ Recommended: Bash shell (on Windows this is included in git-bash) for running ba
 
 ## 3. Latest releases
 
-v2.5.0
+v2.5.1
 
 ## 4. API references
 

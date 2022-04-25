@@ -554,7 +554,9 @@ foreach ($citations as &$citation) {
                                     }
                                     if ($collatedAuthorLong) {
                                         $foundSimilarity = TRUE;
+                                        // try both a straight comparison and a comparison cropping to initials and sorting words alphabetically
                                         $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorFull, $creatorAlma["a"], "Levenshtein", FALSE));
+                                        $thisSimilarity = max($thisSimilarity, similarity($collatedAuthorFull, $creatorAlma["a"], "Levenshtein", "initials", TRUE));
                                     }
                                 }
                             }

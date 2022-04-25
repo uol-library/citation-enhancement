@@ -22,6 +22,11 @@ function standardise($string) {
     
     if ($string===null) { return $string; }
     
+    // https://stackoverflow.com/questions/3635511/remove-diacritics-from-a-string
+    // removes diacritics from a string
+    $regexp = '/&([a-z]{1,2})(acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml|caron);/i';
+    $string = html_entity_decode(preg_replace($regexp, '$1', htmlentities($string)));
+    
     $dashes = Array("\xe2\x80\x93", "\xe2\x80\x94", "\xe2\x80\x95");
     $dblQuotes = Array("\xe2\x80\x9c", "\xe2\x80\x9d", "\xc2\xab}", "\xc2\xbb}");
     $quotes = Array("\xe2\x80\x98", "\xe2\x80\x99", "\xe2\x80\xb9", "\xe2\x80\xba");
@@ -85,19 +90,18 @@ function similarity($string1, $string2, $type="Levenshtein", $crop=FALSE, $alpha
 
     if ($crop && strlen($string1)!=strlen($string2)) {
         if (strlen($string1)>strlen($string2)) {
-            $string1 = cropto($string1, strlen($string2), $crop); // $crop may indicate the cropping method
+            $string1 = cropto($string1, $string2, $crop); // $crop may indicate the cropping method
         } else {
-            $string2 = cropto($string2, strlen($string1), $crop);
+            $string2 = cropto($string2, $string1, $crop);
         }
     }
     
     $string1 = normalise($string1);
     $string2 = normalise($string2);
+
     if (!$string1 || !$string2) { 
         return 0; 
     }
-    
-
     
     if ($alphabeticise) { 
         $stringArray = explode(" ", $string1); 
@@ -149,31 +153,104 @@ function similarity($string1, $string2, $type="Levenshtein", $crop=FALSE, $alpha
 }
 
 
-function cropto($string, $length, $type) { 
+function cropto($longer, $shorter, $type) { 
 
+    $length = strlen($shorter); 
+    
+    if ($type=="initials") {
+        // e.g. compare "Smith, John David" with "Smith, J.D." 
+        if (isSurnameInitials($shorter)) {
+            $converted = convertSurnameInitials($longer);
+            return $converted ? $converted : $longer; 
+        } else {
+            return $longer; 
+        }
+    }
+        
+    
     if ($type=="colon") {
-        $stringParts = explode(":", $string);
+        $stringParts = explode(":", $longer);
         $cropped = $stringParts[0];
-        
-        $originalLengthDiff = abs(strlen($string) - $length); 
+        $originalLengthDiff = abs(strlen($longer) - $length); 
         $croppedLengthDiff = abs(strlen($cropped) - $length);
-        
         if ($croppedLengthDiff<$originalLengthDiff) { 
             return $cropped; 
         } else { 
-            return $string;
+            return $longer;
         }
-        
     }
     
     // else 
     
     // can't just use substr because we only want to split at a space or punctuation 
-    $left = substr($string, 0, $length); 
-    $right = substr($string, $length);
+    $left = substr($longer, 0, $length); 
+    $right = substr($longer, $length);
     $right = preg_replace('/^([^\s\.,:;\!\?\-&]*).*$/', '$1', $right);
     return $left.$right; 
 }
+
+
+function isSurnameInitials($name) { 
+    // true for "Smith, J.D.", "J D Smith" etc 
+    // false for "Davids, John", "O'Connor, Bo" etc 
+    
+    $name = standardise($name); // varieties of apostrophe, dash, whitespace etc 
+    
+    if (preg_match('/^[A-Z][^\s,]+[,\s]+([A-Z][,\-\s\.]+)+$/', $name)) {
+        // Smith, J.D. 
+        return TRUE;
+    } else if (preg_match('/^[A-Z][^\s,]+[,\s]+([A-Z][,\-\s\.]+)*[A-Z]$/', $name)) {
+        // Smith, J or Smith, J.D
+        return TRUE;
+    } else if (preg_match('/^([A-Z][,\-\s\.]+)+[A-Z][^\s,]+$/', $name)) {
+        // J.D.Smith 
+        return TRUE;
+    }
+    
+    // else 
+    return FALSE; 
+}
+
+
+function convertSurnameInitials($name) {
+    // "Smith, John David" => "Smith, J D" 
+    // "John David Smith-Jones" => "J D Smith-Jones"
+    // unconvertable => FALSE 
+    
+    $name = standardise($name); // varieties of apostrophe, dash, whitespace etc
+    
+    $surname = FALSE; 
+    $forenames = FALSE; 
+    $order = FALSE; 
+    if (preg_match('/^([A-Z][^,]+),\s*(.+)$/', $name, $matches)) {
+        // Smith-Jones, John David 
+        $surname = $matches[1];
+        $forenames = $matches[2]; 
+        $order = "surname"; 
+    } else if (preg_match('/^(.+)\s+([A-Z][^,\s]+)$/', $name, $matches)) {
+        // John David Smith-Jones
+        $surname = $matches[2];
+        $forenames = $matches[1];
+        $order = "forenames"; 
+    }
+    if ($surname && $forenames) { 
+        $individualForenames = preg_split('/[\s\-\.,]+/', $forenames);
+        $individualForeInitials = Array(); 
+        foreach ($individualForenames as $individualForename) {
+            $individualForeInitials[] = preg_replace('/^([A-Z]).*$/', '$1', $individualForename);  
+        }
+        $foreInitials = implode(" ", $individualForeInitials);
+        if ($order=="surname") { 
+            return "$surname, $foreInitials"; 
+        } else { 
+            return "$foreInitials $surname";
+        }
+    }
+    
+    // else
+    return FALSE;
+}
+
 
 function getLongestMatchingSubstring($str1, $str2) {
     $len_1 = strlen($str1);
