@@ -447,21 +447,6 @@ foreach ($citations as &$citation) {
                     $foundMainHeading = FALSE; 
                     if ($viafCluster->mainHeadings) {
                         
-                        /* 
-                         * Main headings text  
-                        foreach ($viafCluster->mainHeadings->data as $viafHeadingObject) {
-                            //TODO is there a better way to identify the most authoritative form of the name?
-                            if (!$foundMainHeading) { $viafDataParsedItem["heading"] = $viafHeadingObject->text->__toString(); } 
-                            $foundMainHeading = TRUE;
-                            // normally, just use the collated form of the author name - 
-                            if (isset($creator["collated"]) && $creator["collated"]) { 
-                                $authorSimilarity = max($authorSimilarity, similarity($viafHeadingObject->text->__toString(), $creator["collated"], "Levenshtein", FALSE, TRUE));
-                            } else if (isset($creator["a"]) && $creator["a"]) {
-                                $authorSimilarity = max($authorSimilarity, similarity($viafHeadingObject->text->__toString(), $creator["a"], "Levenshtein", FALSE, TRUE));
-                            }
-                        }
-                         */
-                        
                         // Main headings structured 
                         $firstMainHeading = NULL; 
                         $lcMainHeading = NULL; 
@@ -489,12 +474,12 @@ foreach ($citations as &$citation) {
                                     }
                                 }
                             }
-                            // normally, use the collated form of the author name to get maximum confidence for common names -
                             if (isset($creator["collated"]) && $creator["collated"] && $thisMainHeadingCollated) {
                                 $authorSimilarity = max($authorSimilarity, similarity($thisMainHeadingCollated, $creator["collated"], "Levenshtein", FALSE));
-                                // for this one we'll do a straigh compare but we'll back it up below 
+                                // for this one we'll do a straight compare but we'll back it up below 
                                 // with a comparison cropping to initials and sorting words alphabetically  
-                            } else if (isset($creator["a"]) && $creator["a"] && $thisMainHeadingA) {
+                            } 
+                            if (isset($creator["a"]) && $creator["a"] && $thisMainHeadingA) {
                                 $authorSimilarity = max($authorSimilarity, similarity($thisMainHeadingA, $creator["a"], "Levenshtein", "initials", TRUE));
                             }
                         }

@@ -434,6 +434,7 @@ foreach ($citations as &$citation) {
                     }
                 }
             }
+            unset($author);
 
             // reprint addresses 
             forceArray($entry["static_data"]["fullrecord_metadata"]["reprint_addresses"]["address_name"]);
