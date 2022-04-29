@@ -6,8 +6,6 @@
 
     // assumes ../utils.php has already been run (to populate CONFIG) 
 
-	// require_once 'Constants.php';
-
 	class Alma {
 		/**
 		* The Alma URL
@@ -115,7 +113,7 @@
 		 * Sets the API Host
 		 * @return string
 		 */
-		protected function setAPIHost($apiHost=CONFIG["apiHost"]) {
+		protected function setAPIHost($apiHost=CONFIG["Alma"]["apiHost"]) {
 		    $this->apiHost = $apiHost;
 	 		return $this->apiHost;
 		}
@@ -133,7 +131,7 @@
 		 * Sets the API URL
 		 * @return string
 		 */
-		protected function setAPIURL($apiURL=CONFIG["apiURL"]) {
+		protected function setAPIURL($apiURL=CONFIG["Alma"]["apiURL"]) {
 			$this->apiUrl = $apiURL;
 	 		return $this->apiUrl;
 		}

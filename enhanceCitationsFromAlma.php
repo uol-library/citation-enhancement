@@ -68,7 +68,7 @@ require_once("utils.php");                  // helper functions
 
 require 'AlmaAPI/AlmaBibs.php';   // client for the Alma Bib API 
 
-$bib_endpoint = new LULAlmaBibs('bibs');                // we'll use this in any calls to the API 
+$bib_endpoint = new AlmaBibs('bibs');                // we'll use this in any calls to the API 
 // $bib_endpoint->setDebug(TRUE);                       // during testing 
 
 

@@ -93,8 +93,8 @@ if (!count($modulesToInclude)) {
 require 'AlmaAPI/AlmaCourses.php';
 // require 'AlmaAPI/LULAlmaCodeTables.php';
 require 'AlmaAPI/AlmaReadingLists.php';
-$course_endpoint = new LULAlmaCourses();
-$list_endpoint = new LULAlmaReadingLists();
+$course_endpoint = new AlmaCourses();
+$list_endpoint = new AlmaReadingLists();
 //$course_endpoint->setDebug(TRUE);        // during testing 
 //$list_endpoint->setDebug(TRUE);
 
