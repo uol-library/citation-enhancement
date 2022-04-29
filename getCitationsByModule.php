@@ -90,13 +90,9 @@ if (!count($modulesToInclude)) {
 
 
 // Alma Courses API 
-// NB this assumes a copy of this client is installed
-// in a sibling-folder to this project, so that the relative paths work
-// The client is in:
-// https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&version=GBrl-export&_a=contents
-require '../AlmaAPI/private/AlmaAPI/LULAlmaCourses.php';
-require '../AlmaAPI/private/AlmaAPI/LULAlmaCodeTables.php';
-require '../AlmaAPI/private/AlmaAPI/LULAlmaReadingLists.php';
+require 'AlmaAPI/AlmaCourses.php';
+// require 'AlmaAPI/LULAlmaCodeTables.php';
+require 'AlmaAPI/AlmaReadingLists.php';
 $course_endpoint = new LULAlmaCourses();
 $list_endpoint = new LULAlmaReadingLists();
 //$course_endpoint->setDebug(TRUE);        // during testing 

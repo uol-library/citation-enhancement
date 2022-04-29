@@ -663,7 +663,7 @@ print json_encode($citations, JSON_PRETTY_PRINT);
 
 function viafApiQuery($fields, $relation, $term) { 
     
-    global $config, $http_response_header; // latter needed to allow curl_get_file_contents to mimic file_get_contents side-effect
+    global $http_response_header; // latter needed to allow curl_get_file_contents to mimic file_get_contents side-effect
     
     $viafSearchURL = "http://viaf.org/viaf/search?query=".$fields."+".$relation."+%22".urlencode($term)."%22&maximumRecords=10&startRecord=1&sortKeys=holdingscount&httpAccept=text/xml";
     $viafSearchResponse = curl_get_file_contents($viafSearchURL);
@@ -681,7 +681,7 @@ function viafApiQuery($fields, $relation, $term) {
 
 function viafApiQuery2($searchStrategyAU, $searchTermAU, $searchStrategyTI, $searchTermTI) { 
 
-    global $config, $http_response_header; // latter needed to allow curl_get_file_contents to mimic file_get_contents side-effect
+    global $http_response_header; // latter needed to allow curl_get_file_contents to mimic file_get_contents side-effect
     
     $subQuery = $searchStrategyAU["search-fields"]."+".$searchStrategyAU["search-relation"]."+%22".urlencode(str_replace('"', '', $searchTermAU))."%22";
     if ($searchStrategyTI && $searchTermTI) {  

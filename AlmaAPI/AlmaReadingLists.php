@@ -10,10 +10,10 @@
 	 * 
 	 */
 
-	require_once 'LULAlma.php';
-	require_once 'LULAlmaCourses.php';
+	require_once 'Alma.php';
+	require_once 'AlmaCourses.php';
 	
-	class LULAlmaReadingLists extends LULAlmaCourses { // which in turn extends LULAlma
+	class AlmaReadingLists extends AlmaCourses { // which in turn extends Alma
 
 
 	    /**
@@ -26,7 +26,7 @@
 
 	    /**
 	     * Get all the reading lists for a given course 
-	     * Relies on previous call to LULAlmaCourses method to get course ID
+	     * Relies on previous call to AlmaCourses method to get course ID
 	     * 
 	     * @todo provide a new methd that accepts a course CODE rather than ID, searches for matching courses and returns matching reading lists  
 	     * @return array of reading list objects belonging to the provided course ID 
@@ -41,7 +41,7 @@
 
 	    /**
 	     * Get the requested reading list for a given course
-	     * Relies on previous call to LULAlmaCourses method to get course ID 
+	     * Relies on previous call to AlmaCourses method to get course ID 
 	     * and retrieveReadingLists to get list ID 
 	     *
 	     * @return reading list object

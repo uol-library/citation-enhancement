@@ -92,8 +92,8 @@ $inclusionThreshold = 20; // author-title similarity threshold - looser than the
 
 
 
-$outFormat  = isset($config["Export"]["Format"]) ? $config["Export"]["Format"] : "CSV";
-$outBOM     = isset($config["Export"]["BOM"]) ? json_decode('"'.$config["Export"]["BOM"].'"') : "";
+$outFormat  = isset(CONFIG["Export"]["Format"]) ? CONFIG["Export"]["Format"] : "CSV";
+$outBOM     = isset(CONFIG["Export"]["BOM"]) ? json_decode('"'.CONFIG["Export"]["BOM"].'"') : "";
 
 function outFilename($record) { return $record["LIST-CODE"]."_LONG"; };  
 $outFolder = "Data/"; 

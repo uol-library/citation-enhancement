@@ -10,9 +10,9 @@
 	 * 
 	 */
 
-	require_once 'LULAlma.php';
+	require_once 'Alma.php';
 
-	class LULAlmaCourses extends LULAlma {
+	class AlmaCourses extends Alma {
 
 
 		/**

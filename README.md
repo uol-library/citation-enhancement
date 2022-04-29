@@ -17,8 +17,6 @@ On a machine with permission to use the Scopus API (for University of Leeds user
 
 - In a folder, check out a copy of this project https://dev.azure.com/uol-support/Reading%20Lists/_git/Citation%20enhancement?path=%2F&version=GBlibjmh_dev&_a=contents  
 
-- In the same folder, alongside it, check out a copy of the Alma API client project https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&version=GBrl-export&_a=contents 
-
 - Obtain a developer api key for the Scopus API from https://dev.elsevier.com/api_docs.html 
 
 - In your local copy of this project, edit config.ini to contain your Scopus api key e.g. 
@@ -47,8 +45,6 @@ On a machine with permission to use the Scopus API (for University of Leeds user
 
 - Essential: cURL support in PHP including support for https with up-to-date cacert file  
 
-- Essential: Project https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&version=GBrl-export&_a=contents
-
 - Essential: Subscription to Scopus
 
 - Essential: Subscription to WoS Expanded API  
@@ -57,7 +53,7 @@ On a machine with permission to use the Scopus API (for University of Leeds user
 
 ## 3. Latest releases
 
-v2.6.2
+v3.1.1
 
 ## 4. APIs
 

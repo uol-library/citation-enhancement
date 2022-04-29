@@ -590,7 +590,7 @@ print json_encode($citations, JSON_PRETTY_PRINT);
  */
 function scopusApiQuery($URL, &$citationScopus, $type="default", $checkRateLimit=FALSE, $require=NULL) { 
      
-    global $scopusCache, $config, $http_response_header; // latter needed to allow curl_get_file_contents to mimic file_get_contents side-effect
+    global $scopusCache, $http_response_header; // latter needed to allow curl_get_file_contents to mimic file_get_contents side-effect
     
     $URL = preg_replace('/^http:\/\//', "https://", $URL); // a few references in the API use http
 
@@ -600,7 +600,7 @@ function scopusApiQuery($URL, &$citationScopus, $type="default", $checkRateLimit
     }
     // else 
     
-    $apiKey = $config["Scopus"]["apiKey"]; 
+    $apiKey = CONFIG["Scopus"]["apiKey"]; 
     $httpAccept = "application/json"; 
     $reqId = microtime(TRUE);
     

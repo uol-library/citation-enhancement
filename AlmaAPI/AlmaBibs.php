@@ -1,13 +1,13 @@
 <?php
 	// Interface to Alma using the Bib API
-	// This is a sub-class of LULAlma containing general methods and properties
+	// This is a sub-class of Alma containing general methods and properties
 	// related to querying and manipulating user-related data.
 	// You must sub-class this class for for actual interaction with Alma
 	// within your application
 
-	require_once 'LULAlma.php';
+	require_once 'Alma.php';
 
-	class LULAlmaBibs extends LULAlma {
+	class AlmaBibs extends Alma {
 
 
 		/**

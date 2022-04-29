@@ -121,9 +121,9 @@ if (isset($options['initialise']) || isset($options['i'])) {
 
 
 
-$outFormat  = isset($config["Export"]["Format"]) ? $config["Export"]["Format"] : "CSV"; 
-$outBOM     = isset($config["Export"]["BOM"]) ? json_decode('"'.$config["Export"]["BOM"].'"') : "";
-$outCountryCounts = isset($config["Export"]["CountryCounts"]) && $config["Export"]["CountryCounts"] ? TRUE : FALSE; 
+$outFormat  = isset(CONFIG["Export"]["Format"]) ? CONFIG["Export"]["Format"] : "CSV"; 
+$outBOM     = isset(CONFIG["Export"]["BOM"]) ? json_decode('"'.CONFIG["Export"]["BOM"].'"') : "";
+$outCountryCounts = isset(CONFIG["Export"]["CountryCounts"]) && CONFIG["Export"]["CountryCounts"] ? TRUE : FALSE; 
 
 function outFilename($record) { return $record["LIST-CODE"]; };  
 $fileSummary = "Summary";
@@ -294,7 +294,7 @@ if (!$initialise) {
                                                     $thisAuthorCountries[] = $nationalityCode;
                                                     $contemporaryAffiliation = TRUE;
                                                 } else {
-                                                    if ($config["General"]["Debug"]) {
+                                                    if (CONFIG["General"]["Debug"]) {
                                                         trigger_error("Can't derive nation code for \"".$authorAffiliation["country"]."\": you may need to add a mapping in Config/Countries/nameAlias.json", E_USER_NOTICE);
                                                     }
                                                 }
@@ -313,10 +313,10 @@ if (!$initialise) {
                                                         if (isset($iso2Map[$nationalityValue]) && $iso2Map[$nationalityValue]) {
                                                             if (preg_match('/^[A-Z]{2}$/', $iso2Map[$nationalityValue]) && !preg_match('/^(AA|Q[M-Z]|X[A-Z]|ZZ)$/', $iso2Map[$nationalityValue])) {
                                                                 $nationalityCode = $iso2Map[$nationalityValue];
-                                                            } else if ($config["General"]["Debug"]) {
+                                                            } else if (CONFIG["General"]["Debug"]) {
                                                                 trigger_error("User-assigned country code ".$iso2Map[$nationalityValue], E_USER_NOTICE);
                                                             }
-                                                        } else if ($config["General"]["Debug"]) {
+                                                        } else if (CONFIG["General"]["Debug"]) {
                                                             trigger_error("No 3-letter to 2-letter mapping for ".$nationalityValue, E_USER_NOTICE);
                                                         }
                                                     }
@@ -325,7 +325,7 @@ if (!$initialise) {
                                                         $nationalityValue = strtolower($authorAffiliation["address"]["country"]);
                                                         if (isset($namesToCodesMap[$nationalityValue])) {
                                                             $nationalityCode = $namesToCodesMap[$nationalityValue];
-                                                        } else if ($config["General"]["Debug"]) {
+                                                        } else if (CONFIG["General"]["Debug"]) {
                                                             trigger_error("No Name to 2-letter mapping for ".$nationalityValue, E_USER_NOTICE);
                                                         }
                                                     }
@@ -437,7 +437,7 @@ if (!$initialise) {
                                                     $thisAuthorCountries[] = $nationalityCode;
                                                     $outputRecord["WOS-AUTHOR-COUNTRIES-DISTINCT"][] = $nationalityCode;
                                                 } else {
-                                                    if (TRUE || $config["General"]["Debug"]) {
+                                                    if (TRUE || CONFIG["General"]["Debug"]) {
                                                         trigger_error("Can't derive nation code for \"".$address["country"]."\": you may need to add a mapping in Config/Countries/nameAlias.json", E_USER_NOTICE);
                                                     }
                                                 }
@@ -472,7 +472,7 @@ if (!$initialise) {
                                                     $outputRecord["WOS-FLOAT-COUNTRIES-DISTINCT"][] = $nationalityCode;
                                                 }
                                             } else {
-                                                if (TRUE || $config["General"]["Debug"]) {
+                                                if (TRUE || CONFIG["General"]["Debug"]) {
                                                     trigger_error("Can't derive nation code for \"".$address["address_spec"]["country"]."\": you may need to add a mapping in Config/Countries/nameAlias.json", E_USER_NOTICE);
                                                 }
                                             }
@@ -507,7 +507,7 @@ if (!$initialise) {
                                                 // $outputRecord["WOS-COUNTRY-CODES"][] = $nationalityCode;
                                                 // $outputRecord["WOS-COUNTRIES"][] = ( isset($namesMap[$nationalityCode]) && $namesMap[$nationalityCode] ) ? $namesMap[$nationalityCode] : $nationalityCode;
                                             } else {
-                                                if (TRUE || $config["General"]["Debug"]) {
+                                                if (TRUE || CONFIG["General"]["Debug"]) {
                                                     trigger_error("Can't derive nation code for \"$countryName\": you may need to add a mapping in Config/Countries/nameAlias.json", E_USER_NOTICE);
                                                 }
                                             }
@@ -612,17 +612,17 @@ if (!$initialise) {
                                                             } else { 
                                                                 $nationalityCode = $nationalityValue;
                                                             }
-                                                        } else if ($config["General"]["Debug"]) {
+                                                        } else if (CONFIG["General"]["Debug"]) {
                                                             trigger_error("User-assigned country code ".$nationalityValue, E_USER_NOTICE);
                                                         }
                                                     } else if (strlen($nationalityValue)==3) {
                                                         if (isset($iso2Map[$nationalityValue]) && $iso2Map[$nationalityValue]) {
                                                             if (preg_match('/^[A-Z]{2}$/', $iso2Map[$nationalityValue]) && !preg_match('/^(AA|Q[M-Z]|X[A-Z]|ZZ)$/', $iso2Map[$nationalityValue])) {
                                                                 $nationalityCode = $iso2Map[$nationalityValue];
-                                                            } else if ($config["General"]["Debug"]) {
+                                                            } else if (CONFIG["General"]["Debug"]) {
                                                                 trigger_error("User-assigned country code ".$iso2Map[$nationalityValue], E_USER_NOTICE);
                                                             }
-                                                        } else if ($config["General"]["Debug"]) {
+                                                        } else if (CONFIG["General"]["Debug"]) {
                                                             trigger_error("No 3- to 2-letter mapping for ".$nationalityValue, E_USER_NOTICE);
                                                         }
                                                     } else if (
@@ -641,21 +641,21 @@ if (!$initialise) {
                                                         $namesToCodesMap[strtolower($countryNameAlias[strtolower($nationalityValue)])]
                                                     ) { 
                                                         $nationalityCode = $namesToCodesMap[strtolower($countryNameAlias[strtolower($nationalityValue)])];
-                                                    } else if ($config["General"]["Debug"]) {
+                                                    } else if (CONFIG["General"]["Debug"]) {
                                                         trigger_error("Neither 2- nor 3-letter code nor recognised name ".$nationalityValue, E_USER_NOTICE);
                                                     }
                                                     if ($nationalityCode==NULL) {
                                                         if (isset($namesToCodesMap[strtolower($nationality["value"])])) {
                                                             // try a country name
                                                             $nationalityCode = $namesToCodesMap[strtolower($nationality["value"])];
-                                                        } else if ($config["General"]["Debug"]) {
+                                                        } else if (CONFIG["General"]["Debug"]) {
                                                             trigger_error("No Name to 2-letter mapping for ".$nationality["value"], E_USER_NOTICE);
                                                         }
                                                     }
                                                     if ($nationalityCode!==NULL) {
                                                         $thisAuthorCountries[] = $nationalityCode;
                                                     } else {
-                                                        if ($config["General"]["Debug"]) {
+                                                        if (CONFIG["General"]["Debug"]) {
                                                             trigger_error("Can't derive nation code for \"".$nationality["value"]."\": you may need to add a mapping in Config/Countries/nameAlias.json", E_USER_NOTICE);
                                                         }
                                                     }

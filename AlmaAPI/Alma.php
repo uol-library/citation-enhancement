@@ -4,9 +4,11 @@
 	// There is a sub-class for each Alma API. Each of those should be sub-classed for
 	// actual interaction with Alma
 
-	require_once 'LULConstants.php';
+    // assumes ../utils.php has already been run (to populate CONFIG) 
 
-	class LULAlma {
+	// require_once 'Constants.php';
+
+	class Alma {
 		/**
 		* The Alma URL
 		* @access private
@@ -73,12 +75,7 @@
 		* @var boolean
 		*/
 		var $debug;
-		/**
-		* The name of the log file
-		* @access private
-		* @var string
-		*/
-		var $logFile;
+
 		/**
 		* Error message if there's an error
 		* @access private
@@ -96,7 +93,7 @@
 			$this->setErrorMessages();
 
 	 		$this->apiKeyType	= $type;
-	 		$this->apiKey		= $this->getAPIKey($this->apiKeyType);
+	 		$this->apiKey		= CONFIG["Alma-Keys"][$this->apiKeyType];
 	 		$this->apiFormat	= $format;
 	 		$this->error		= '';
 	 		$this->debug		= false;
@@ -118,7 +115,7 @@
 		 * Sets the API Host
 		 * @return string
 		 */
-		protected function setAPIHost($apiHost=LUL_ALMA_API_HOST) {
+		protected function setAPIHost($apiHost=CONFIG["apiHost"]) {
 		    $this->apiHost = $apiHost;
 	 		return $this->apiHost;
 		}
@@ -136,7 +133,7 @@
 		 * Sets the API URL
 		 * @return string
 		 */
-		protected function setAPIURL($apiURL=LUL_ALMA_API_URL) {
+		protected function setAPIURL($apiURL=CONFIG["apiURL"]) {
 			$this->apiUrl = $apiURL;
 	 		return $this->apiUrl;
 		}
@@ -278,27 +275,6 @@
 			return $response;
 		}
 
-		/**
-	 	 * Gets the API key
-	 	 * @param string $type - the type of Alma API key
-	 	 * @return string
-	 	 */
-	 	protected function getAPIKey($type='users') { //TODO
-	 		$keys = array(
-	 			'users_online_registration'	=> 'l8xx5b80c2016fd54df3a0d3b8175a91bd22', #'l7xxa87b3f88ab5f4cdc9abbbfa79cf841d3',# OLD l7xxf72bbe4f58714b7a99d378434142f544
-	 			'users_emu_patrons'			=> 'l8xxf3b7082c9bc741139217d22afe30fb72', #'l7xxa87b3f88ab5f4cdc9abbbfa79cf841d3',# OLD l7xxf72bbe4f58714b7a99d378434142f544
-	 			'bibs'  					=> 'l8xxee997e638a044f73bd6469bc1ac63f9a',
-	 			'config'					=> 'l8xx43373182ce4842aab016123fcdaa1e4a',
-	 			'bibsupdate'				=> 'l8xx5e8ee1962dee419984c9f25ac1d5f8d6',
-	 			'primosearchreadinglists'	=> 'l8xxa8b1252af0e3431c82d9d03fcd2e45ca',
-	 		    'courses-sandbox'           => 'l8xx169b63e7251c486eb60e08baffad2736',  
-	 		    'courses'                   => 'l8xxcce029462b05452c8889963f3581d549', 
-	 		    'code-tables-sandbox'           => 'l8xxad18314330284ea99d2b3183405f01cb',
-	 		    'code-tables'                   => 'l8xx43373182ce4842aab016123fcdaa1e4a'
-	 		    
-	 		);
-	 		return $keys[$type];
-	 	}
 
 	 	/**
 	 	 * Outputs debug message if are debugging
@@ -322,35 +298,6 @@
 			return $debug;
 		}
 
-		/**
-		 * Sets the log file full path
-		 * @param string $log
-		 * @return string - the full path
-		 */
-		public function setLogFile($log) {
-			$this->logFile = LUL_ALMA_API_LOG_DIR."/$log";
-			return $this->logFile;
-		}
-
-		/**
-		 * Write line of data to the log file
-		 * Supplied data is prepended with a date stamp
-		 * @param array $data - items to be written on the line
-		 */
-		public function putLog($data) {
-			if (!empty($this->logFile) &&
-				is_array($data) &&
-				sizeof($data) > 0
-			) {
-				array_unshift($data,date('Y-m-d H:i:s'));
-            	file_put_contents(
-            		$this->logFile,
-            		implode(' | ',$data)."\n",
-            		FILE_APPEND
-            	);
-			}
-			return;
-		}
 
 	}
 ?>
