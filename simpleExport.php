@@ -152,8 +152,7 @@ if (!$initialise) {
 } 
 
 $outputRecords = Array(); 
-// $rowHeadings = Array("CIT-NUMBER", "CIT-TYPE", "CIT-TAGS", "CIT-TITLE", "CIT-CONTAINER", "CIT-AUTHOR", "DOI-MATCH", "SIMILARITY", "SOURCE", "SOURCE-AUTHORS", "SOURCE-COUNTRIES");
-$rowHeadings = Array("CIT-NUMBER", "CIT-TYPE", "CIT-TAGS", "CIT-TITLE", "CIT-CONTAINER", "CIT-AUTHOR", "SOURCE", "SOURCE-AUTHORS", "SOURCE-COUNTRIES");
+$rowHeadings = Array("CIT-NUMBER", "CIT-TYPE", "CIT-TAGS", "CIT-TITLE", "CIT-CONTAINER", "CIT-AUTHOR", "DOI-MATCH", "SIMILARITY", "SOURCE", "SOURCE-AUTHORS", "SOURCE-COUNTRIES");
 
 if (!$initialise) { 
 
@@ -626,8 +625,24 @@ if (!$initialise) {
                                                         } else if ($config["General"]["Debug"]) {
                                                             trigger_error("No 3- to 2-letter mapping for ".$nationalityValue, E_USER_NOTICE);
                                                         }
+                                                    } else if (
+                                                        isset($namesToCodesMap[strtolower($nationalityValue)])
+                                                        &&
+                                                        $namesToCodesMap[strtolower($nationalityValue)]
+                                                    ) {
+                                                        $nationalityCode = $namesToCodesMap[strtolower($nationalityValue)]; 
+                                                    } else if (
+                                                        isset($countryNameAlias[strtolower($nationalityValue)])
+                                                        &&
+                                                        $countryNameAlias[strtolower($nationalityValue)]
+                                                        &&
+                                                        isset($namesToCodesMap[strtolower($countryNameAlias[strtolower($nationalityValue)])])
+                                                        &&
+                                                        $namesToCodesMap[strtolower($countryNameAlias[strtolower($nationalityValue)])]
+                                                    ) { 
+                                                        $nationalityCode = $namesToCodesMap[strtolower($countryNameAlias[strtolower($nationalityValue)])];
                                                     } else if ($config["General"]["Debug"]) {
-                                                        trigger_error("Neither 2- nor 3-letter code ".$nationalityValue, E_USER_NOTICE);
+                                                        trigger_error("Neither 2- nor 3-letter code nor recognised name ".$nationalityValue, E_USER_NOTICE);
                                                     }
                                                     if ($nationalityCode==NULL) {
                                                         if (isset($namesToCodesMap[strtolower($nationality["value"])])) {

@@ -159,7 +159,7 @@ function cropto($longer, $shorter, $type) {
     
     if ($type=="initials") {
         // e.g. compare "Smith, John David" with "Smith, J.D." 
-        if (isSurnameInitials($shorter)) {
+        if (isSurnameInitials($shorter) && !isSurnameInitials($longer)) {
             $converted = convertSurnameInitials($longer);
             return $converted ? $converted : $longer; 
         } else {
@@ -202,7 +202,7 @@ function isSurnameInitials($name) {
     } else if (preg_match('/^[A-Z][^\s,]+[,\s]+([A-Z][,\-\s\.]+)*[A-Z]$/', $name)) {
         // Smith, J or Smith, J.D
         return TRUE;
-    } else if (preg_match('/^([A-Z][,\-\s\.]+)+[A-Z][^\s,]+$/', $name)) {
+    } else if (preg_match('/^([A-Z][,\-\s\.]+)+[A-Z][^\.\s,]+$/', $name)) {
         // J.D.Smith 
         return TRUE;
     }
@@ -227,7 +227,7 @@ function convertSurnameInitials($name) {
         $surname = $matches[1];
         $forenames = $matches[2]; 
         $order = "surname"; 
-    } else if (preg_match('/^(.+)\s+([A-Z][^,\s]+)$/', $name, $matches)) {
+    } else if (preg_match('/^(.+)\s+([A-Z][^\.,\s]+)$/', $name, $matches)) {
         // John David Smith-Jones
         $surname = $matches[2];
         $forenames = $matches[1];

@@ -396,6 +396,7 @@ foreach ($citations as $citation) {
                                     if (isset($address["address_spec"])) { 
 										if (!isset($seenAddresses[$address["address_spec"]["addr_no"]]) || !$seenAddresses[$address["address_spec"]["addr_no"]]) { 
 											$outputRecord["SOURCE-LOCATION-TYPE"] = "Unassigned address";
+											$outputRecord["SOURCE-AUTHORS"] = ""; 
 											$outputRecord["SIMILARITY"] = $maxSimilarity; // we have no choice but to use this 
 											if (isset($address["address_spec"]["full_address"])) {
 												$outputRecord["SOURCE-LOCATION"] = $address["address_spec"]["full_address"];
@@ -412,6 +413,11 @@ foreach ($citations as $citation) {
                                 foreach ($citation["WoS"]["first-match"]["metadata"]["reprint_addresses"] as $address) {
                                     
                                     $outputRecord["SOURCE-LOCATION-TYPE"] = "Reprint address";
+                                    if (isset($address["names"]) && isset($address["names"]["name"]) && isset($address["names"]["name"]["display_name"])) {
+                                        $outputRecord["SOURCE-AUTHORS"] = $address["names"]["name"]["display_name"];
+                                    } else {
+                                        $outputRecord["SOURCE-AUTHORS"] = "";
+                                    }
                                     $outputRecord["SIMILARITY"] = $maxSimilarity; // we have no choice but to use this
                                     if (isset($address["address_spec"]["full_address"])) {
                                         $outputRecord["SOURCE-LOCATION"] = $address["address_spec"]["full_address"];
@@ -427,6 +433,11 @@ foreach ($citations as $citation) {
                             if (isset($citation["WoS"]["first-match"]["metadata"]["publisher"]) && $citation["WoS"]["first-match"]["metadata"]["publisher"]) {
                                     
                                 $outputRecord["SOURCE-LOCATION-TYPE"] = "Publisher address";
+                                if (isset($citation["WoS"]["first-match"]["metadata"]["publisher"]["names"]) && isset($citation["WoS"]["first-match"]["metadata"]["publisher"]["names"]["name"]) && isset($citation["WoS"]["first-match"]["metadata"]["publisher"]["names"]["name"]["display_name"])) {
+                                    $outputRecord["SOURCE-AUTHORS"] = $citation["WoS"]["first-match"]["metadata"]["publisher"]["names"]["name"]["display_name"];
+                                } else {
+                                    $outputRecord["SOURCE-AUTHORS"] = "";
+                                }
                                 $outputRecord["SIMILARITY"] = $maxSimilarity; // we have no choice but to use this
                                 if (isset($citation["WoS"]["first-match"]["metadata"]["publisher"]["address_spec"]["full_address"])) {
                                     $outputRecord["SOURCE-LOCATION"] = $citation["WoS"]["first-match"]["metadata"]["publisher"]["address_spec"]["full_address"];
