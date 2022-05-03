@@ -434,21 +434,23 @@ foreach ($citations as &$citation) {
                         // because extra affiliation retrieves may cause us problems with rate-limit    
                         if (isset($citationScopusAuthor["author-url"]) && $citationScopusAuthor["author-url"]) {
                             $authorData = scopusApiQuery($citationScopusAuthor["author-url"]."?", $citation["Scopus"], "author-retrieval", TRUE, "author-retrieval-response");
-                            $citationScopusAuthor["affiliation-current"] = Array(); 
-                            foreach($authorData["author-retrieval-response"] as $authorEntry) { 
-                                if (isset($authorEntry["author-profile"])
-                                    && isset($authorEntry["author-profile"]["affiliation-current"])
-                                    && isset($authorEntry["author-profile"]["affiliation-current"]["affiliation"])
-                                ) {
-                                    $authorProfileAffiliations = $authorEntry["author-profile"]["affiliation-current"]["affiliation"]; // for convenience
-                                    // affiliation may be single or a list(?) - for simplicity, *always* turn it into a list
-                                    // - if associative array, wrap in a numeric array
-                                    if (count(array_filter(array_keys($authorProfileAffiliations), 'is_string'))>0) { $authorProfileAffiliations=Array($authorProfileAffiliations); }
-                                    foreach ($authorProfileAffiliations as $authorProfileAffiliation) {
-                                        $citationScopusAuthorAffiliationProfile = array_filter(array_intersect_key($authorProfileAffiliation, Array("@affiliation-id"=>TRUE)));
-                                        $citationScopusAuthorAffiliationProfile = array_merge($citationScopusAuthorAffiliationProfile, array_filter(array_intersect_key($authorProfileAffiliation["ip-doc"], Array("sort-name"=>TRUE, "address"=>TRUE))));
-                                        $citationScopusAuthor["affiliation-current"][] = $citationScopusAuthorAffiliationProfile;
-                                    }
+                            if ($authorData) { 
+                                $citationScopusAuthor["affiliation-current"] = Array();
+                                foreach($authorData["author-retrieval-response"] as $authorEntry) {
+                                    if (isset($authorEntry["author-profile"])
+                                        && isset($authorEntry["author-profile"]["affiliation-current"])
+                                        && isset($authorEntry["author-profile"]["affiliation-current"]["affiliation"])
+                                        ) {
+                                            $authorProfileAffiliations = $authorEntry["author-profile"]["affiliation-current"]["affiliation"]; // for convenience
+                                            // affiliation may be single or a list(?) - for simplicity, *always* turn it into a list
+                                            // - if associative array, wrap in a numeric array
+                                            if (count(array_filter(array_keys($authorProfileAffiliations), 'is_string'))>0) { $authorProfileAffiliations=Array($authorProfileAffiliations); }
+                                            foreach ($authorProfileAffiliations as $authorProfileAffiliation) {
+                                                $citationScopusAuthorAffiliationProfile = array_filter(array_intersect_key($authorProfileAffiliation, Array("@affiliation-id"=>TRUE)));
+                                                $citationScopusAuthorAffiliationProfile = array_merge($citationScopusAuthorAffiliationProfile, array_filter(array_intersect_key($authorProfileAffiliation["ip-doc"], Array("sort-name"=>TRUE, "address"=>TRUE))));
+                                                $citationScopusAuthor["affiliation-current"][] = $citationScopusAuthorAffiliationProfile;
+                                            }
+                                        }
                                 }
                             }
                         }
@@ -606,7 +608,7 @@ function scopusApiQuery($URL, &$citationScopus, $type="default", $checkRateLimit
     
     $apiURL = $URL."&httpAccept=".urlencode($httpAccept)."&reqId=".urlencode($reqId)."&apiKey=".urlencode($apiKey); 
    
-    usleep(100000); // so as not to hammer the API 
+    usleep(500000); // so as not to hammer the API 
     
     $scopusResponse = curl_get_file_contents($apiURL);
     
@@ -618,7 +620,7 @@ function scopusApiQuery($URL, &$citationScopus, $type="default", $checkRateLimit
             $citationScopus["rate-limit"][$type] = Array();
         }
         foreach ($http_response_header as $header) {
-            if (preg_match('/^X-RateLimit-(\w+):\s*(\d+)/', $header, $matches)) {
+            if (preg_match('/^X-RateLimit-(\w+):\s*(\d+)/i', $header, $matches)) {
                 $citationScopus["rate-limit"][$type][$matches[1]] = $matches[2]; // limit, remaining, reset
             }
         }
@@ -665,7 +667,22 @@ function scopusApiQuery($URL, &$citationScopus, $type="default", $checkRateLimit
         $scopusCache[$URL] = FALSE;
         return FALSE;
     }
-    
+    if (isset($scopusData["error-response"])) {
+        if (!isset($citationScopus["errors"])) {
+            $citationScopus["errors"] = Array();
+        }
+        if (!isset($citationScopus["errors"][$type])) {
+            $citationScopus["errors"][$type] = Array();
+        }
+        $serviceError = $scopusData["error-response"];
+        $errorMessage = (isset($serviceError["error-code"])) ? $serviceError["error-code"] : "Unknown error code";
+        $errorMessage .= " (";
+        $errorMessage = (isset($serviceError["error-message"])) ? $serviceError["error-message"] : "Unknown error text";
+        $errorMessage .= ")";
+        $citationScopus["errors"][$type][] = Array("link"=>$URL, "error"=>$errorMessage);
+        $scopusCache[$URL] = FALSE;
+        return FALSE;
+    }
     if ($require!==NULL) { 
         if (!isset($scopusData[$require])) { 
             if (!isset($citationScopus["errors"])) {
