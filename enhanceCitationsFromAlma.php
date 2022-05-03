@@ -66,13 +66,9 @@ error_reporting(E_ALL);                     // we want to know about all problem
 require_once("utils.php");                  // helper functions 
 
 
-require '../AlmaAPI/private/AlmaAPI/LULAlmaBibs.php';   // client for the Alma Bib API 
-                                                        // NB this assiumes a copy of this client is installed 
-                                                        // in a sibling-folder to this project, so that the relative paths work
-                                                        // The client is in: 
-                                                        // https://dev.azure.com/uol-support/Library%20API/_git/AlmaAPI?path=%2F&version=GBrl-export&_a=contents
+require 'AlmaAPI/AlmaBibs.php';   // client for the Alma Bib API 
 
-$bib_endpoint = new LULAlmaBibs('bibs');                // we'll use this in any calls to the API 
+$bib_endpoint = new AlmaBibs('bibs');                // we'll use this in any calls to the API 
 // $bib_endpoint->setDebug(TRUE);                       // during testing 
 
 

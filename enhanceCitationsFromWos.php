@@ -645,7 +645,7 @@ function wosQuote($parameter, $keepParentheses=FALSE) {
  */
 function wosApiQuery($usrQuery, &$citationWos, $type="default", $checkRateLimit=FALSE, $require=NULL) { 
      
-    global $wosCache, $config; 
+    global $wosCache; 
     
     $URL = "https://wos-api.clarivate.com/api/wos/?databaseId=WOK&count=10&firstRecord=1&usrQuery=".urlencode($usrQuery); 
     
@@ -663,7 +663,7 @@ function wosApiQuery($usrQuery, &$citationWos, $type="default", $checkRateLimit=
     curl_setopt($c, CURLOPT_URL, $URL);
     curl_setopt($c, CURLOPT_HTTPHEADER, array(
         "accept: application/json",
-        "X-ApiKey: ".$config["WoS"]["apiKey"]
+        "X-ApiKey: ".CONFIG["WoS"]["apiKey"]
     )); 
         
     $response = curl_exec($c);

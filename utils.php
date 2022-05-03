@@ -12,9 +12,9 @@
 
 
 
-$config = parse_ini_file("config.ini", true);       // from now on, keep as much config in this ini file as possible - 
-                                                    // all scripts include utils.php so all will have access to 
-                                                    // config through $config 
+define('CONFIG', parse_ini_file("config.ini", true));       // from now on, keep as much config in this ini file as possible - 
+                                                            // all scripts include utils.php so all will have access to 
+                                                            // config through CONFIG
 
 
 
