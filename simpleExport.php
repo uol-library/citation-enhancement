@@ -155,6 +155,8 @@ $outputRecords = Array();
 $rowHeadings = Array("CIT-NUMBER", "CIT-TYPE", "CIT-TAGS", "CIT-TITLE", "CIT-CONTAINER", "CIT-AUTHOR", "DOI-MATCH", "SIMILARITY", "SOURCE", "SOURCE-AUTHORS", "SOURCE-COUNTRIES");
 
 if (!$initialise) { 
+    
+    $unrecognisedCountries = Array(); 
 
     foreach ($citations as $citation) {
         
@@ -294,6 +296,10 @@ if (!$initialise) {
                                                     $thisAuthorCountries[] = $nationalityCode;
                                                     $contemporaryAffiliation = TRUE;
                                                 } else {
+                                                    if (!isset($unrecognisedCountries[$nationality["value"]])) {
+                                                        $unrecognisedCountries[$nationality["value"]] = 0;
+                                                    }
+                                                    $unrecognisedCountries[$nationality["value"]]++;
                                                     if (CONFIG["General"]["Debug"]) {
                                                         trigger_error("Can't derive nation code for \"".$authorAffiliation["country"]."\": you may need to add a mapping in Config/Countries/nameAlias.json", E_USER_NOTICE);
                                                     }
@@ -332,6 +338,11 @@ if (!$initialise) {
                                                     if ($nationalityCode!==NULL) {
                                                         $thisAuthorCountries[] = $nationalityCode;
                                                     } else {
+                                                        if (!isset($unrecognisedCountries[$nationality["value"]])) {
+                                                            $unrecognisedCountries[$nationality["value"]] = 0;
+                                                        }
+                                                        $unrecognisedCountries[$nationality["value"]]++;
+                                                        
                                                         // trigger_error("Can't derive nation code for ".$authorAffiliation["address"]["@country"].":".$authorAffiliation["address"]["country"], E_USER_NOTICE);
                                                     }
                                                 }
@@ -437,6 +448,11 @@ if (!$initialise) {
                                                     $thisAuthorCountries[] = $nationalityCode;
                                                     $outputRecord["WOS-AUTHOR-COUNTRIES-DISTINCT"][] = $nationalityCode;
                                                 } else {
+                                                    if (!isset($unrecognisedCountries[$nationality["value"]])) {
+                                                        $unrecognisedCountries[$nationality["value"]] = 0;
+                                                    }
+                                                    $unrecognisedCountries[$nationality["value"]]++;
+                                                    
                                                     if (TRUE || CONFIG["General"]["Debug"]) {
                                                         trigger_error("Can't derive nation code for \"".$address["country"]."\": you may need to add a mapping in Config/Countries/nameAlias.json", E_USER_NOTICE);
                                                     }
@@ -507,6 +523,12 @@ if (!$initialise) {
                                                 // $outputRecord["WOS-COUNTRY-CODES"][] = $nationalityCode;
                                                 // $outputRecord["WOS-COUNTRIES"][] = ( isset($namesMap[$nationalityCode]) && $namesMap[$nationalityCode] ) ? $namesMap[$nationalityCode] : $nationalityCode;
                                             } else {
+                                                
+                                                if (!isset($unrecognisedCountries[$nationality["value"]])) {
+                                                    $unrecognisedCountries[$nationality["value"]] = 0;
+                                                }
+                                                $unrecognisedCountries[$nationality["value"]]++;
+                                                
                                                 if (TRUE || CONFIG["General"]["Debug"]) {
                                                     trigger_error("Can't derive nation code for \"$countryName\": you may need to add a mapping in Config/Countries/nameAlias.json", E_USER_NOTICE);
                                                 }
@@ -641,6 +663,14 @@ if (!$initialise) {
                                                         $namesToCodesMap[strtolower($countryNameAlias[strtolower($nationalityValue)])]
                                                     ) { 
                                                         $nationalityCode = $namesToCodesMap[strtolower($countryNameAlias[strtolower($nationalityValue)])];
+                                                    } else if (
+                                                        preg_match('/\[(.+)\]\s*$/', $nationalityValue, $countryBracketMatches)
+                                                        &&
+                                                        isset($namesToCodesMap[strtolower($countryBracketMatches[1])])
+                                                        &&
+                                                        $namesToCodesMap[strtolower($countryBracketMatches[1])]
+                                                    ) {
+                                                        $nationalityCode = $namesToCodesMap[strtolower($countryBracketMatches[1])];
                                                     } else if (CONFIG["General"]["Debug"]) {
                                                         trigger_error("Neither 2- nor 3-letter code nor recognised name ".$nationalityValue, E_USER_NOTICE);
                                                     }
@@ -655,6 +685,11 @@ if (!$initialise) {
                                                     if ($nationalityCode!==NULL) {
                                                         $thisAuthorCountries[] = $nationalityCode;
                                                     } else {
+                                                        if (!isset($unrecognisedCountries[$nationality["value"]])) {
+                                                            $unrecognisedCountries[$nationality["value"]] = 0;
+                                                        }
+                                                        $unrecognisedCountries[$nationality["value"]]++;
+                                                        
                                                         if (CONFIG["General"]["Debug"]) {
                                                             trigger_error("Can't derive nation code for \"".$nationality["value"]."\": you may need to add a mapping in Config/Countries/nameAlias.json", E_USER_NOTICE);
                                                         }
@@ -755,6 +790,12 @@ if (!$initialise) {
         }
         
     }
+    
+    if (CONFIG["General"]["Debug"]) {
+        arsort($unrecognisedCountries);  
+        print_r($unrecognisedCountries); 
+    }
+    
     
     
 
