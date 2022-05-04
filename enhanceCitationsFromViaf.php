@@ -450,6 +450,7 @@ foreach ($citations as &$citation) {
                         // Main headings structured 
                         $firstMainHeading = NULL; 
                         $lcMainHeading = NULL; 
+                        $allHeadings = Array(); 
                         foreach ($viafCluster->mainHeadings->mainHeadingEl as $viafHeadingObject) {
                             $lcSource = FALSE; // unless we find differently 
                             $thisMainHeadingA = FALSE; 
@@ -462,7 +463,7 @@ foreach ($citations as &$citation) {
                             foreach ($viafHeadingObject->datafield->subfield as $subfield) {
                                 $acceptedSubfields = Array("a","b","d","q");
                                 if (in_array($subfield["code"], $acceptedSubfields)) {
-                                    $thisMainHeadingCollated .= trim($subfield->__toString()); 
+                                    $thisMainHeadingCollated .= trim($subfield->__toString())." "; 
                                 }
                                 if ($subfield["code"]=="a") {
                                     $thisMainHeadingA = trim($subfield->__toString()); 
@@ -474,6 +475,12 @@ foreach ($citations as &$citation) {
                                     }
                                 }
                             }
+                            $thisMainHeadingCollated = preg_replace('/^\s+/', '', $thisMainHeadingCollated); 
+                            $thisMainHeadingCollated = preg_replace('/\s+$/', '', $thisMainHeadingCollated);
+                            $thisMainHeadingCollated = preg_replace('/\s+/', ' ', $thisMainHeadingCollated);
+                            
+                            $allHeadings[] = $thisMainHeadingCollated; 
+                            
                             if (isset($creator["collated"]) && $creator["collated"] && $thisMainHeadingCollated) {
                                 $authorSimilarity = max($authorSimilarity, similarity($thisMainHeadingCollated, $creator["collated"], "Levenshtein", FALSE));
                                 // for this one we'll do a straight compare but we'll back it up below 
@@ -492,6 +499,7 @@ foreach ($citations as &$citation) {
                             $foundMainHeading = TRUE;
                             $viafDataParsedItem["heading"] = $firstMainHeading; 
                         }
+                        $viafDataParsedItem["headings-all"] = $allHeadings; 
                         
                     }
                     // we'll add the author similarity a little lower, so it appears close to the title similarity in the resulting object  
@@ -515,6 +523,7 @@ foreach ($citations as &$citation) {
                     
                     // placeholder for title similarity and add the author similarity we fetched earlier 
                     $viafDataParsedItem["similarity-title"] = FALSE; // will populate below
+                    $viafDataParsedItem["best-matching-title"] = FALSE; // will populate below
                     if ($foundMainHeading) { $viafDataParsedItem["similarity-author"] = $authorSimilarity; } 
                     
                     $viafTitles = $viafCluster->titles;
@@ -607,6 +616,7 @@ foreach ($citations as &$citation) {
                                         if ($thisSimilarity>0 || $citationViaf["records"]==1) { // set a higher threshold? 
                                                                                                 // and always keep the data if there's only one match 
                                             $viafBestSimilarity = $thisSimilarity;
+                                            $viafDataParsedItem["best-matching-title"] = $viafTitle; 
                                             $viafDataParsedItem["similarity-title"] = $thisSimilarity;
                                             $viafDataParsed = $viafDataParsedItem;
                                         }
@@ -689,6 +699,8 @@ function viafApiQuery2($searchStrategyAU, $searchTermAU, $searchStrategyTI, $sea
     }
     
     $viafSearchURL = "http://viaf.org/viaf/search?query=".$subQuery."&maximumRecords=10&startRecord=1&sortKeys=holdingscount&httpAccept=text/xml";
+    
+    usleep(50000); // to avoid hitting API too hard 
     
     $viafSearchResponse = curl_get_file_contents($viafSearchURL);
     

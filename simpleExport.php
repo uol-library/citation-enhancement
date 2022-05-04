@@ -152,7 +152,7 @@ if (!$initialise) {
 } 
 
 $outputRecords = Array(); 
-$rowHeadings = Array("CIT-NUMBER", "CIT-TYPE", "CIT-TAGS", "CIT-TITLE", "CIT-CONTAINER", "CIT-AUTHOR", "DOI-MATCH", "SIMILARITY", "SOURCE", "SOURCE-AUTHORS", "SOURCE-COUNTRIES");
+$rowHeadings = Array("CIT-NUMBER", "CIT-TYPE", "CIT-TAGS", "CIT-TITLE", "CIT-CONTAINER", "CIT-AUTHOR", "DOI-MATCH", "SIMILARITY", "SOURCE", "SOURCE-TITLE", "SOURCE-AUTHORS", "SOURCE-COUNTRIES");
 
 if (!$initialise) { 
     
@@ -265,6 +265,11 @@ if (!$initialise) {
                                 $outputRecord["SCOPUS-SEARCH"] = isset($citation["Scopus"]["search-active"]) ? $citation["Scopus"]["search-active"] : NULL;
                                 
                                 $outputRecord["SCOPUS-SEARCH-DOI"] = ($outputRecord["SCOPUS-SEARCH"] && strpos($outputRecord["SCOPUS-SEARCH"], "DOI")===0) ? TRUE : FALSE;
+                                
+                                
+                                $outputRecord["SCOPUS-TITLE"] = isset($citation["Scopus"]["first-match"]["summary"]["dc:title"]) ? $citation["Scopus"]["first-match"]["summary"]["dc:title"] : "";
+                                $outputRecord["SCOPUS-CONTAINER"] = isset($citation["Scopus"]["first-match"]["summary"]["prism:publicationName"]) ? $citation["Scopus"]["first-match"]["summary"]["prism:publicationName"] : "";
+                                
                                 
                                 $totalSimilarity = 0;
                                 $countSimilarity = 0;
@@ -396,7 +401,10 @@ if (!$initialise) {
                                 $outputRecord["WOS-SEARCH-DOI"] = ($outputRecord["WOS-SEARCH"] && strpos($outputRecord["WOS-SEARCH"], "DO=")===0) ? TRUE : FALSE; 
                                 
                                 
-                                $outputRecord["WOS-TITLE"] = $citation["WoS"]["first-match"]["metadata"]["title"];
+                                $outputRecord["WOS-TITLE"] = isset($citation["WoS"]["first-match"]["metadata"]["title"]) ? $citation["WoS"]["first-match"]["metadata"]["title"] : "";
+                                $outputRecord["WOS-CONTAINER"] = isset($citation["WoS"]["first-match"]["metadata"]["source"]) ? $citation["WoS"]["first-match"]["metadata"]["source"] : "";
+                                
+                                
                                 if (isset($citation["WoS"]["first-match"]["metadata"]["identifiers"]) && isset($citation["WoS"]["first-match"]["metadata"]["identifiers"]["doi"]) && count($citation["WoS"]["first-match"]["metadata"]["identifiers"]["doi"])) {
                                     $outputRecord["WOS-DOI"] = $citation["WoS"]["first-match"]["metadata"]["identifiers"]["doi"][0];
                                 } else if (isset($citation["WoS"]["first-match"]["metadata"]["identifiers"]) && isset($citation["WoS"]["first-match"]["metadata"]["identifiers"]["xref_doi"]) && count($citation["WoS"]["first-match"]["metadata"]["identifiers"]["xref_doi"])) {
@@ -614,6 +622,10 @@ if (!$initialise) {
                                                                                     // because each author search is independent - some may be "right" and some "wrong" 
 
                                         
+                                        $outputRecord["VIAF-TITLE"] = isset($viafCitation["best-match"]["best-matching-title"]) ? $viafCitation["best-match"]["best-matching-title"] : "";
+                                        $outputRecord["VIAF-CONTAINER"] = ""; // always - we have no possible value for this 
+                                        
+                                        
                                         $outputRecord["VIAF-AUTHORS"][] = $viafCitation["best-match"]["heading"];
                                         $thisAuthorCountries = Array();
                                         
@@ -753,9 +765,10 @@ if (!$initialise) {
                                         if (!isset($outputRecord["SOURCE"])) { 
                                             $outputRecord["SOURCE"] = $sourcePreference;
                                             $outputRecord["DOI-MATCH"] = ( isset($outputRecord["$sourcePreference-SEARCH-DOI"]) && $outputRecord["$sourcePreference-SEARCH-DOI"]) ? "Y" : "N";
-                                            $outputRecord["SIMILARITY"] = $outputRecord["$sourcePreference-SIMILARITY"];
+                                            $outputRecord["SIMILARITY"] = isset($outputRecord["$sourcePreference-SIMILARITY"]) ? $outputRecord["$sourcePreference-SIMILARITY"] : "";
                                             $outputRecord["SOURCE-AUTHORS"] = $outputRecord["$sourcePreference-AUTHORS"];
                                             $outputRecord["SOURCE-TITLE"] = isset($outputRecord["$sourcePreference-TITLE"]) ? $outputRecord["$sourcePreference-TITLE"] : "";
+                                            $outputRecord["SOURCE-CONTAINER"] = isset($outputRecord["$sourcePreference-CONTAINER"]) ? $outputRecord["$sourcePreference-CONTAINER"] : "";
                                         }
                                         
                                         
@@ -769,7 +782,8 @@ if (!$initialise) {
                                             $outputRecord["SIMILARITY"] = $outputRecord["$sourcePreference-SIMILARITY"];
                                             $outputRecord["SOURCE-AUTHORS"] = $outputRecord["$sourcePreference-AUTHORS"];
                                             $outputRecord["SOURCE-TITLE"] = isset($outputRecord["$sourcePreference-TITLE"]) ? $outputRecord["$sourcePreference-TITLE"] : "";
-                                                    
+                                            $outputRecord["SOURCE-CONTAINER"] = isset($outputRecord["$sourcePreference-CONTAINER"]) ? $outputRecord["$sourcePreference-CONTAINER"] : "";
+                                            
                                             $outputRecord["SOURCE-COUNTRY-CODES"] = $outputRecord["$sourcePreference-COUNTRY-CODES"];
                                             $outputRecord["SOURCE-COUNTRIES"] = $outputRecord["$sourcePreference-COUNTRIES"];
                                             break; // don't check any more sources

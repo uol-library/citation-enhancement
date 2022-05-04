@@ -116,6 +116,8 @@ foreach ($modulesToInclude as $modcode) {
     
     $newCitationCourse = Array("modcode"=>$modcode); 
     
+    usleep(200000); // to avoid hitting API too hard
+    
     $course_records = $course_endpoint->searchCourses($modcode, "searchable_ids", 100, 0, "false");
     
     if (!isset($course_records["course"])) { 
@@ -127,6 +129,9 @@ foreach ($modulesToInclude as $modcode) {
             
             $course_code = $course_record["code"];
             $course_id = $course_record["id"];
+            
+            usleep(200000); // to avoid hitting API too hard
+            
             $list_records = $list_endpoint->retrieveReadingLists($course_id);
             
             $newCitationCourse["course_code"] = $course_code; 

@@ -87,7 +87,7 @@ error_reporting(E_ALL);                     // we want to know about all problem
 require_once("utils.php"); 
 
 
-$inclusionThreshold = 20; // author-title similarity threshold - looser than the simple export, to include more possibles  
+$inclusionThreshold = 60; // author-title similarity threshold - looser than the 80% required in simple export  
 
 
 
@@ -118,7 +118,7 @@ $iso2Alias = json_decode(file_get_contents("Config/CountryCodes/iso2Alias.json")
 $citations = json_decode(file_get_contents("php://stdin"), TRUE);
 
 $outputRecords = Array(); 
-$rowHeadings = Array("CIT-NUMBER", "CIT-TYPE", "CIT-TAGS", "CIT-TITLE", "CIT-CONTAINER", "CIT-AUTHOR", "DOI-MATCH", "SIMILARITY", "SOURCE", "SOURCE-AUTHORS", "SOURCE-LOCATION-TYPE", "SOURCE-LOCATION");
+$rowHeadings = Array("CIT-NUMBER", "CIT-TYPE", "CIT-TAGS", "CIT-TITLES", "CIT-CONTAINER", "CIT-AUTHORS", "DOI-MATCH", "SIMILARITY", "SOURCE", "SOURCE-TYPE", "SOURCE-TITLES", "SOURCE-CONTAINER", "SOURCE-AUTHORS", "SOURCE-LOCATION-TYPE", "SOURCE-LOCATION");
 
 foreach ($citations as $citation) {
     
@@ -139,32 +139,73 @@ foreach ($citations as $citation) {
             // and which are not notes
             
             $outputRecordBase = Array();    // base information used by all lines
-			
+            
             $outputRecordBase["MOD-CODE"] = $citation["Course"]["modcode"];
             $outputRecordBase["LIST-CODE"] = $citation["Leganto"]["list_code"];
             $outputRecordBase["LIST-TITLE"] = $citation["Leganto"]["list_title"];
-			
+            
             $outputRecordBase["CIT-NUMBER"] = isset($citation["Leganto"]["citation"]) ? $citation["Leganto"]["citation"] : "";
-			
-			if (isset($citation["Leganto"]["metadata"]["title"])) {
-                $outputRecordBase["CIT-TITLE"] = $citation["Leganto"]["metadata"]["title"];
-            } else if (isset($citation["Leganto"]["metadata"]["journal_title"])) {
-                $outputRecordBase["CIT-TITLE"] = $citation["Leganto"]["metadata"]["journal_title"];
+
+            
+            $outputRecordBase["CIT-TITLES"] = Array();
+            $outputRecordBase["CIT-AUTHORS"] = Array();
+            
+            $foundTitle = FALSE; 
+            if (isset($citation["Leganto"]["metadata"]["title"])) {
+                $foundTitle = $citation["Leganto"]["metadata"]["title"];
+                if (!in_array($foundTitle, $outputRecordBase["CIT-TITLES"])) { 
+                    $outputRecordBase["CIT-TITLES"][] = $foundTitle;
+                }
+            } 
+            if (isset($citation["Leganto"]["metadata"]["journal_title"])) {
+                $foundTitle = $citation["Leganto"]["metadata"]["journal_title"];
+                if (!in_array($foundTitle, $outputRecordBase["CIT-TITLES"])) {
+                    $outputRecordBase["CIT-TITLES"][] = $foundTitle;
+                }
             }
+            
             if (isset($citation["Leganto"]["metadata"]["article_title"])) {
-                if (isset($outputRecordBase["CIT-TITLE"])) {
-                    $outputRecordBase["CIT-CONTAINER"] = $outputRecordBase["CIT-TITLE"];
+                if ($foundTitle) {
+                    $outputRecordBase["CIT-CONTAINER"] = $foundTitle;
                 }
-                $outputRecordBase["CIT-TITLE"] = $citation["Leganto"]["metadata"]["article_title"];
-            } else if (isset($citation["Leganto"]["metadata"]["chapter_title"])) {
-                if (isset($outputRecordBase["CIT-TITLE"])) {
-                    $outputRecordBase["CIT-CONTAINER"] = $outputRecordBase["CIT-TITLE"];
+                if (!in_array($citation["Leganto"]["metadata"]["article_title"], $outputRecordBase["CIT-TITLES"])) {
+                    $outputRecordBase["CIT-TITLES"][] = $citation["Leganto"]["metadata"]["article_title"];
                 }
-                $outputRecordBase["CIT-TITLE"] = $citation["Leganto"]["metadata"]["chapter_title"];
+            } 
+            if (isset($citation["Leganto"]["metadata"]["chapter_title"])) {
+                if ($foundTitle) {
+                    $outputRecordBase["CIT-CONTAINER"] = $foundTitle;
+                }
+                if (!in_array($citation["Leganto"]["metadata"]["chapter_title"], $outputRecordBase["CIT-TITLES"])) {
+                    $outputRecordBase["CIT-TITLES"][] = $citation["Leganto"]["metadata"]["chapter_title"];
+                }
             }
             if (isset($citation["Leganto"]["metadata"]["author"])) {
-                $outputRecordBase["CIT-AUTHOR"] = $citation["Leganto"]["metadata"]["author"];
+                if (!in_array($citation["Leganto"]["metadata"]["author"], $outputRecordBase["CIT-AUTHORS"])) {
+                    $outputRecordBase["CIT-AUTHORS"][] = $citation["Leganto"]["metadata"]["author"];
+                }
             }
+            if (isset($citation["Leganto"]["metadata"]["chapter_author"])) {
+                if (!in_array($citation["Leganto"]["metadata"]["chapter_author"], $outputRecordBase["CIT-AUTHORS"])) {
+                    $outputRecordBase["CIT-AUTHORS"][] = $citation["Leganto"]["metadata"]["chapter_author"];
+                }
+            }
+            
+            if (isset($citation["Alma"]["titles"])) {  
+                foreach ($citation["Alma"]["titles"] as $almaTitle) {  
+                    if (!in_array($almaTitle["collated"], $outputRecordBase["CIT-TITLES"])) {
+                        $outputRecordBase["CIT-TITLES"][] = $almaTitle["collated"];
+                    }
+                }
+            }
+            if (isset($citation["Alma"]["creators"])) {
+                foreach ($citation["Alma"]["creators"] as $almaCreator) {
+                    if (!in_array($almaCreator["collated"], $outputRecordBase["CIT-AUTHORS"])) {
+                        $outputRecordBase["CIT-AUTHORS"][] = $almaCreator["collated"];
+                    }
+                }
+            }
+            
             if (isset($citation["Leganto"]["secondary_type"])) {
                 $outputRecordBase["CIT-TYPE"] = $citation["Leganto"]["secondary_type"]["desc"];
             }
@@ -227,11 +268,11 @@ foreach ($citations as $citation) {
                     
                     $generatedHeadEntry = FALSE;
                     
-                    $maxCitationSimilarities = Array(); // kludge - we need to stash the citation-level 
-                                                        // maximum similarities, because at the point atwhich we assemble each 
-                                                        // row we don't yet know the maximum 
-                                                        // probably a better way to do this 
-                    $maxCitationSimilaritiesIndex = 0; 
+                    $maxCitationSimilarities = Array(); // kludge - we need to stash the citation-level
+                    // maximum similarities, because at the point atwhich we assemble each
+                    // row we don't yet know the maximum
+                    // probably a better way to do this
+                    $maxCitationSimilaritiesIndex = 0;
                     
                     if (isset($citation["Scopus"])) {
                         
@@ -243,8 +284,8 @@ foreach ($citations as $citation) {
                         
                         if (isset($citation["Scopus"]["first-match"]) && isset($citation["Scopus"]["first-match"]["authors"])) {
                             
-                            $maxCitationSimilaritiesIndex++; // make a new one 
-                            $maxCitationSimilarities[$maxCitationSimilaritiesIndex] = FALSE; 
+                            $maxCitationSimilaritiesIndex++; // make a new one
+                            $maxCitationSimilarities[$maxCitationSimilaritiesIndex] = FALSE;
                             $outputRecordScopus["SIMILARITY-MAX-INDEX"] = $maxCitationSimilaritiesIndex;
                             
                             foreach ($citation["Scopus"]["first-match"]["authors"] as $author) {
@@ -254,17 +295,36 @@ foreach ($citations as $citation) {
                                 $outputRecordScopus["SOURCE"] = "SCOPUS";
                                 if (isset($author["similarity-title"]) && isset($author["similarity-author"])) {
                                     $outputRecordScopus["SIMILARITY"] = floor($author["similarity-title"]*$author["similarity-author"]/100);
-                                    if ($maxCitationSimilarities[$maxCitationSimilaritiesIndex]===FALSE || $outputRecordScopus["SIMILARITY"]>$maxCitationSimilarities[$maxCitationSimilaritiesIndex]) { 
+                                    if ($maxCitationSimilarities[$maxCitationSimilaritiesIndex]===FALSE || $outputRecordScopus["SIMILARITY"]>$maxCitationSimilarities[$maxCitationSimilaritiesIndex]) {
                                         $maxCitationSimilarities[$maxCitationSimilaritiesIndex] = $outputRecordScopus["SIMILARITY"];
                                     }
                                     
                                     
                                 }
+                                $outputRecordScopus["SOURCE-TYPE"] = isset($citation["Scopus"]["first-match"]["summary"]["subtype"]) ? $citation["Scopus"]["first-match"]["summary"]["subtype"] : "";
+                                $outputRecordScopus["SOURCE-TITLES"] = isset($citation["Scopus"]["first-match"]["summary"]["dc:title"]) ? $citation["Scopus"]["first-match"]["summary"]["dc:title"] : "";
+                                $outputRecordScopus["SOURCE-CONTAINER"] = isset($citation["Scopus"]["first-match"]["summary"]["prism:publicationName"]) ? $citation["Scopus"]["first-match"]["summary"]["prism:publicationName"] : "";
+                                
+                                $outputRecordScopus["SOURCE-AUTHORS"] = Array();
+                                
                                 $outputRecordScopus["SCOPUS-SEARCH"] = isset($citation["Scopus"]["search-active"]) ? $citation["Scopus"]["search-active"] : NULL;
                                 $outputRecordScopus["DOI-MATCH"] = ($outputRecordScopus["SCOPUS-SEARCH"] && strpos($outputRecordScopus["SCOPUS-SEARCH"], "DOI")===0) ? "Y" : "N";
-                                $outputRecordScopus["SOURCE-AUTHORS"] = $author["ce:indexed-name"];
+                                if (isset($author["ce:indexed-name"]) && !in_array($author["ce:indexed-name"], $outputRecordScopus["SOURCE-AUTHORS"])) { 
+                                    $outputRecordScopus["SOURCE-AUTHORS"][] = $author["ce:indexed-name"];
+                                }
+                                if (isset($author["ce:indexed-name"]) && !in_array($author["ce:indexed-name"], $outputRecordScopus["SOURCE-AUTHORS"])) {
+                                    $outputRecordScopus["SOURCE-AUTHORS"][] = $author["ce:indexed-name"];
+                                }
+                                if (isset($author["ce:surname"])) { 
+                                    if (isset($author["ce:given-name"]) && !in_array($author["ce:surname"].", ".$author["ce:given-name"], $outputRecordScopus["SOURCE-AUTHORS"])) {
+                                        $outputRecordScopus["SOURCE-AUTHORS"][] = $author["ce:surname"].", ".$author["ce:given-name"];
+                                    }
+                                    if (isset($author["ce:initials"]) && !in_array($author["ce:surname"].", ".$author["ce:initials"], $outputRecordScopus["SOURCE-AUTHORS"])) {
+                                        $outputRecordScopus["SOURCE-AUTHORS"][] = $author["ce:surname"].", ".$author["ce:initials"];
+                                    }
+                                }
                                 
-                                $outputRecord = $outputRecordScopus; // start a new one from the base + scopus author info  
+                                $outputRecord = $outputRecordScopus; // start a new one from the base + scopus author info
                                 
                                 if (isset($author["affiliation"]) && is_array($author["affiliation"])) {
                                     foreach ($author["affiliation"] as $authorAffiliation) {
@@ -283,7 +343,7 @@ foreach ($citations as $citation) {
                                             $outputRecord["SOURCE-LOCATION"][] = $authorAffiliation["country"];
                                         }
                                         $outputRecords[] = $outputRecord;
-                                        $outputRecord = $outputRecordScopus; // start a new one from the base + scopus author info  
+                                        $outputRecord = $outputRecordScopus; // start a new one from the base + scopus author info
                                     }
                                 }
                                 // current affiliation
@@ -332,7 +392,7 @@ foreach ($citations as $citation) {
                         $maxSimilarity = FALSE;
                         $minSimilarity = FALSE;
                         
-                        $seenAddresses = Array(); 
+                        $seenAddresses = Array();
                         
                         if (isset($citation["WoS"]["first-match"]) && isset($citation["WoS"]["first-match"]["metadata"]) && isset($citation["WoS"]["first-match"]["metadata"]["authors"])) {
                             
@@ -347,6 +407,7 @@ foreach ($citations as $citation) {
                                 $generatedHeadEntry = TRUE;
                                 
                                 $outputRecordWoS["SOURCE"] = "WOS";
+                                $outputRecordWoS["SOURCE-AUTHORS"] = Array();
                                 
                                 if (isset($author["similarity-title"]) && isset($author["similarity-author"])) {
                                     $outputRecordWoS["SIMILARITY"] = floor($author["similarity-title"]*$author["similarity-author"]/100);
@@ -363,19 +424,30 @@ foreach ($citations as $citation) {
                                 $outputRecordWoS["WOS-SEARCH"] = isset($citation["WoS"]["search-active"]) ? $citation["WoS"]["search-active"] : NULL;
                                 $outputRecordWoS["DOI-MATCH"] = ($outputRecordWoS["WOS-SEARCH"] && strpos($outputRecordWoS["WOS-SEARCH"], "DO=")===0) ? "Y" : "N";
                                 
-                                $outputRecordWoS["SOURCE-AUTHORS"] = $author["display_name"];
+                                if (isset($author["display_name"]) && !in_array($author["display_name"], $outputRecordWoS["SOURCE-AUTHORS"])) {
+                                    $outputRecordWoS["SOURCE-AUTHORS"][] = $author["display_name"];
+                                }
+                                if (isset($author["wos_standard"]) && !in_array($author["wos_standard"], $outputRecordWoS["SOURCE-AUTHORS"])) {
+                                    $outputRecordWoS["SOURCE-AUTHORS"][] = $author["wos_standard"];
+                                }
+                                if (isset($author["full_name"]) && !in_array($author["full_name"], $outputRecordWoS["SOURCE-AUTHORS"])) {
+                                    $outputRecordWoS["SOURCE-AUTHORS"][] = $author["full_name"];
+                                }
+                                
+                                $outputRecordWoS["SOURCE-TYPE"] = isset($citation["WoS"]["first-match"]["metadata"]["doctype"]) ? $citation["WoS"]["first-match"]["metadata"]["doctype"] : "";
+                                $outputRecordWoS["SOURCE-TITLES"] = isset($citation["WoS"]["first-match"]["metadata"]["title"]) ? $citation["WoS"]["first-match"]["metadata"]["title"] : "";
+                                $outputRecordWoS["SOURCE-CONTAINER"] = isset($citation["WoS"]["first-match"]["metadata"]["source"]) ? $citation["WoS"]["first-match"]["metadata"]["source"] : "";
                                 
                                 if (isset($author["addr_no"]) && $author["addr_no"]) {
                                     $seenAddresses[$author["addr_no"]] = TRUE;
                                 }
                                 
-                                $outputRecord = $outputRecordWoS; // start a new one from the base + WoS author info 
+                                $outputRecord = $outputRecordWoS; // start a new one from the base + WoS author info
                                 
                                 if (isset($author["addresses"]) && $author["addresses"]) {
                                     foreach ($author["addresses"] as $address) {
                                         $outputRecord["SOURCE-LOCATION-TYPE"] = "Author address";
-                                        $outputRecord["SOURCE-AUTHORS"] = $author["display_name"];
-                                        $outputRecord["SIMILARITY"] = $thisSimilarity; // kludge 
+                                        $outputRecord["SIMILARITY"] = $thisSimilarity; // kludge
                                         if (isset($address["full_address"])) {
                                             $outputRecord["SOURCE-LOCATION"] = $address["full_address"];
                                         }
@@ -387,23 +459,23 @@ foreach ($citations as $citation) {
                             
                             if ($countSimilarity) {
                                 $avgSimilarity = floor($totalSimilarity/$countSimilarity);
-                                // also have $minSimilarity and $maxSimilarity 
+                                // also have $minSimilarity and $maxSimilarity
                             }
                             
                             // floating addresses
                             if (isset($citation["WoS"]["first-match"]["metadata"]["addresses"]) && $citation["WoS"]["first-match"]["metadata"]["addresses"]) {
                                 foreach ($citation["WoS"]["first-match"]["metadata"]["addresses"] as $address) {
-                                    if (isset($address["address_spec"])) { 
-										if (!isset($seenAddresses[$address["address_spec"]["addr_no"]]) || !$seenAddresses[$address["address_spec"]["addr_no"]]) { 
-											$outputRecord["SOURCE-LOCATION-TYPE"] = "Unassigned address";
-											$outputRecord["SOURCE-AUTHORS"] = ""; 
-											$outputRecord["SIMILARITY"] = $maxSimilarity; // we have no choice but to use this 
-											if (isset($address["address_spec"]["full_address"])) {
-												$outputRecord["SOURCE-LOCATION"] = $address["address_spec"]["full_address"];
-											}
-											$outputRecords[] = $outputRecord;
-											$outputRecord = $outputRecordWoS; // start a new one from the base + WoS author info
-										}
+                                    if (isset($address["address_spec"])) {
+                                        if (!isset($seenAddresses[$address["address_spec"]["addr_no"]]) || !$seenAddresses[$address["address_spec"]["addr_no"]]) {
+                                            $outputRecord["SOURCE-LOCATION-TYPE"] = "Unassigned address";
+                                            $outputRecord["SOURCE-AUTHORS"] = "";
+                                            $outputRecord["SIMILARITY"] = $maxSimilarity; // we have no choice but to use this
+                                            if (isset($address["address_spec"]["full_address"])) {
+                                                $outputRecord["SOURCE-LOCATION"] = $address["address_spec"]["full_address"];
+                                            }
+                                            $outputRecords[] = $outputRecord;
+                                            $outputRecord = $outputRecordWoS; // start a new one from the base + WoS author info
+                                        }
                                     }
                                     
                                 }
@@ -414,7 +486,7 @@ foreach ($citations as $citation) {
                                     
                                     $outputRecord["SOURCE-LOCATION-TYPE"] = "Reprint address";
                                     if (isset($address["names"]) && isset($address["names"]["name"]) && isset($address["names"]["name"]["display_name"])) {
-                                        $outputRecord["SOURCE-AUTHORS"] = $address["names"]["name"]["display_name"];
+                                        $outputRecord["SOURCE-AUTHORS"] = $address["names"]["name"]["display_name"]; // for reprint addresses we won't bother listing everything 
                                     } else {
                                         $outputRecord["SOURCE-AUTHORS"] = "";
                                     }
@@ -428,24 +500,26 @@ foreach ($citations as $citation) {
                                     
                                 }
                             }
-
+                            
                             // publisher addresses
                             if (isset($citation["WoS"]["first-match"]["metadata"]["publisher"]) && $citation["WoS"]["first-match"]["metadata"]["publisher"]) {
-                                    
+                                
                                 $outputRecord["SOURCE-LOCATION-TYPE"] = "Publisher address";
-                                if (isset($citation["WoS"]["first-match"]["metadata"]["publisher"]["names"]) && isset($citation["WoS"]["first-match"]["metadata"]["publisher"]["names"]["name"]) && isset($citation["WoS"]["first-match"]["metadata"]["publisher"]["names"]["name"]["display_name"])) {
-                                    $outputRecord["SOURCE-AUTHORS"] = $citation["WoS"]["first-match"]["metadata"]["publisher"]["names"]["name"]["display_name"];
-                                } else {
-                                    $outputRecord["SOURCE-AUTHORS"] = "";
-                                }
+                                $outputRecord["SOURCE-AUTHORS"] = "";
                                 $outputRecord["SIMILARITY"] = $maxSimilarity; // we have no choice but to use this
+                                if (isset($citation["WoS"]["first-match"]["metadata"]["publisher"]["names"]) && isset($citation["WoS"]["first-match"]["metadata"]["publisher"]["names"]["name"]) && isset($citation["WoS"]["first-match"]["metadata"]["publisher"]["names"]["name"]["display_name"])) {
+                                    $outputRecord["SOURCE-LOCATION"] = $citation["WoS"]["first-match"]["metadata"]["publisher"]["names"]["name"]["display_name"];
+                                } else {
+                                    $outputRecord["SOURCE-LOCATION"] = "";
+                                }
                                 if (isset($citation["WoS"]["first-match"]["metadata"]["publisher"]["address_spec"]["full_address"])) {
-                                    $outputRecord["SOURCE-LOCATION"] = $citation["WoS"]["first-match"]["metadata"]["publisher"]["address_spec"]["full_address"];
+                                    if ($outputRecord["SOURCE-LOCATION"]) { $outputRecord["SOURCE-LOCATION"] = $outputRecord["SOURCE-LOCATION"].", "; } 
+                                    $outputRecord["SOURCE-LOCATION"] = $outputRecord["SOURCE-LOCATION"].$citation["WoS"]["first-match"]["metadata"]["publisher"]["address_spec"]["full_address"];
                                 }
                                 $outputRecords[] = $outputRecord;
                                 $outputRecord = $outputRecordWoS; // start a new one from the base + WoS author info
                                 
-                                    
+                                
                                 
                             }
                             
@@ -465,10 +539,10 @@ foreach ($citations as $citation) {
                             exit;
                         }
                         
-
+                        
                         
                         foreach ($citation["VIAF"] as $viafCitation) {
-
+                            
                             
                             if (isset($viafCitation["best-match"])) {
                                 
@@ -477,9 +551,14 @@ foreach ($citations as $citation) {
                                 $generatedHeadEntry = TRUE;
                                 
                                 $outputRecordViaf["SOURCE"] = "VIAF";
-                                $outputRecordViaf["DOI-MATCH"] = "N"; // never searching VIAF by DOI 
+                                $outputRecordViaf["DOI-MATCH"] = "N"; // never searching VIAF by DOI
                                 $outputRecordViaf["SIMILARITY"] = floor($viafCitation["best-match"]["similarity-title"]*$viafCitation["best-match"]["similarity-author"]/100);
-                                $outputRecordViaf["SOURCE-AUTHORS"] = $viafCitation["best-match"]["heading"];
+                                $outputRecordViaf["SOURCE-AUTHORS"] = array_unique($viafCitation["best-match"]["headings-all"]); // all forms of the author's name, not just one selected one
+                                
+                                $outputRecordViaf["SOURCE-TYPE"] = ""; // always - we have no possible value for this
+                                $outputRecordViaf["SOURCE-TITLES"] = isset($viafCitation["best-match"]["best-matching-title"]) ? $viafCitation["best-match"]["best-matching-title"] : "";
+                                $outputRecordViaf["SOURCE-CONTAINER"] = ""; // always - we have no possible value for this
+                                
                                 
                                 $outputRecord = $outputRecordViaf; // start a new one from the base + VIAF author info
                                 
@@ -566,7 +645,7 @@ foreach ($outputRecords as $outputRecord) {
                     $outputFieldParts[] = $fieldPart;
                 }
             }
-            $outputField = implode(",", $outputFieldParts);
+            $outputField = implode("|", $outputFieldParts);
         } else {
             $outputField = $outputRecord[$rowHeading];
         }

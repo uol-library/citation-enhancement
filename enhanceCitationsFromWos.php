@@ -345,7 +345,11 @@ foreach ($citations as &$citation) {
         if (!$wosSearchData) { continue; } // move on to next citation 
             
         
-        $citation["WoS"]["result-count"] = intval($wosSearchData["QueryResult"]["RecordsFound"]);
+        if (isset($wosSearchData["QueryResult"]) && isset($wosSearchData["QueryResult"]["RecordsFound"])) { 
+            $citation["WoS"]["result-count"] = intval($wosSearchData["QueryResult"]["RecordsFound"]);
+        } else { 
+            $citation["WoS"]["result-count"] = FALSE; 
+        }
         
         if ($citation["WoS"]["result-count"]) {
             

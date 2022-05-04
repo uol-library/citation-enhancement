@@ -84,6 +84,9 @@ foreach ($citations as &$citation) {
         if (isset($citation["Leganto"]["metadata"]["mms_id"]) && $citation["Leganto"]["metadata"]["mms_id"]) {
             
             $citation["Alma"] = Array(); // will populate
+            
+            usleep(100000); // to avoid hitting API too hard
+            
             $bib_record = $bib_endpoint->retrieveBib($citation["Leganto"]["metadata"]["mms_id"]);
             // print_r($bib_record);
             
