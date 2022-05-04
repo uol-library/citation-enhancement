@@ -1,5 +1,11 @@
 #!/usr/bin/bash
 #  
+#
+#  DEPRECATED
+#
+#  Use batch.php instead (with same options - m,f,s)  
+#
+#
 #  =======================================================================
 #  
 #  Script to process multiple modules and reading lists using the 

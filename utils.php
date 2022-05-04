@@ -290,8 +290,7 @@ function curl_get_file_contents($URL) {
     
     curl_close($c);
     
-    if ($body) return $body;
-    else return FALSE;
+    return $body ? $body : FALSE; 
     
 }
 
