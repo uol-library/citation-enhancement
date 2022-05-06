@@ -62,7 +62,7 @@ On a machine with permission to use the Scopus API (for University of Leeds user
 
 ## 3. Latest releases
 
-v3.2.2
+v3.2.3
 
 ## 4. APIs
 

@@ -741,9 +741,11 @@ if (!$initialise) {
                         $outputRecord["CSI"] = NULL;
                         
                         // filter and combine VIAF, Scopus and WoS data
-                        if (in_array($citation["Leganto"]["secondary_type"]["desc"], Array("CR", "E_CR", "JR"))) {    // article-ish
+                        if (in_array($citation["Leganto"]["secondary_type"]["value"], Array("CR", "E_CR", "JR"))) {    // article-ish
+                            $outputRecord["JOURNAL-ARTICLE"] = TRUE; 
                             $sourcePreferences = Array("SCOPUS", "WOS", "VIAF");
                         } else {
+                            $outputRecord["JOURNAL-ARTICLE"] = FALSE;
                             $sourcePreferences = Array("VIAF", "SCOPUS", "WOS");
                         }
                         foreach ($sourcePreferences as $sourcePreference) {
@@ -872,7 +874,7 @@ if (!$initialise) {
 $lastFilename = FALSE;  // once we hit the first record we'll set this 
 $out = NULL;            // will be a CSV file handle 
 $summary = NULL;        // will be an arry of list-level metadata  
-$summaryHeadings = Array("FILE", "MOD-CODE", "LIST-CODE", "LIST-TITLE", "CITATIONS-NON-NOTE", "CITATIONS-WITH-COUNTRY", "AUTHORS-WITH-COUNTRY", "COUNTRY-COUNT", "COUNTRIES"); 
+$summaryHeadings = Array("FILE", "MOD-CODE", "LIST-CODE", "LIST-TITLE", "CITATIONS-NON-NOTE", "JOURNAL-ARTICLES", "SOURCE-SCOPUS", "SOURCE-WOS", "SOURCE-VIAF", "CITATIONS-WITH-COUNTRY", "AUTHORS-WITH-COUNTRY", "COUNTRY-COUNT", "COUNTRIES"); 
 $outSummary = NULL; 
 
 
@@ -946,6 +948,13 @@ if (!$initialise) {
             // other summary initialisation
             $summary["FILE"] = $thisFilename;
             $summary["CITATIONS-NON-NOTE"] = 0;     // fill in later 
+
+            $summary["JOURNAL-ARTICLES"] = 0;     // fill in later
+            $summary["SOURCE-SCOPUS"] = 0;     // fill in later
+            $summary["SOURCE-WOS"] = 0;     // fill in later
+            $summary["SOURCE-VIAF"] = 0;     // fill in later
+            
+            
             $summary["CITATIONS-WITH-COUNTRY"] = 0; // fill in later 
             $summary["AUTHORS-WITH-COUNTRY"] = 0;   // fill in later 
             $summary["COUNTRY-COUNT"] = count($countryCodeCounts[$thisFilename]);
@@ -957,7 +966,17 @@ if (!$initialise) {
         }
         
         // now output each row and do various summary counts we can only do by processing each row 
+        
         $summary["CITATIONS-NON-NOTE"]++;
+        
+        if ($outputRecord["JOURNAL-ARTICLE"]) { 
+            $summary["JOURNAL-ARTICLES"]++; 
+        }
+        
+        if ($outputRecord["SOURCE"]) { 
+            $summary["SOURCE-".$outputRecord["SOURCE"]]++;
+        }
+
         if ($outputRecord["SOURCE-COUNTRIES"] && count($outputRecord["SOURCE-COUNTRIES"])) { 
             $summary["CITATIONS-WITH-COUNTRY"]++; 
             // count authors for whom we have some country data 
