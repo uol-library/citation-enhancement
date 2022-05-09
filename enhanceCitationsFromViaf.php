@@ -606,11 +606,13 @@ foreach ($citations as &$citation) {
                                         // try two different comparisons - without and with truncation of longer title at colon 
                                         $thisSimilarity = similarity($viafTitle, $citationTitle["collated"], "Levenshtein");
                                         $thisSimilarity = max($thisSimilarity, similarity($viafTitle, $citationTitle["collated"], "Levenshtein", "colon"));
+                                        $thisSimilarity = max($thisSimilarity, similarity($viafTitle, $citationTitle["collated"], "Levenshtein", "post-colon"));
                                     }
                                     if (isset($citationTitle["a"])) {
                                         // now compare the shorter ($a) source title with the full VIAF title 
                                         $thisSimilarity = max($thisSimilarity, similarity($viafTitle, $citationTitle["a"], "Levenshtein"));
                                         $thisSimilarity = max($thisSimilarity, similarity($viafTitle, $citationTitle["a"], "Levenshtein", "colon"));
+                                        $thisSimilarity = max($thisSimilarity, similarity($viafTitle, $citationTitle["a"], "Levenshtein", "post-colon"));
                                     }
                                     if ($viafBestSimilarity===FALSE || $thisSimilarity>$viafBestSimilarity) {
                                         if ($thisSimilarity>0 || $citationViaf["records"]==1) { // set a higher threshold? 

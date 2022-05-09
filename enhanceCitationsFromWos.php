@@ -472,6 +472,7 @@ foreach ($citations as &$citation) {
                     $foundTitleSimilarity = TRUE;
                     $titleSimilarity = max($titleSimilarity, similarity($citation["WoS"]["first-match"]["metadata"]["title"], $searchParameters["TITLE"], "Levenshtein", FALSE));
                     $titleSimilarity = max($titleSimilarity, similarity($citation["WoS"]["first-match"]["metadata"]["title"], $searchParameters["TITLE"], "Levenshtein", "colon"));
+                    $titleSimilarity = max($titleSimilarity, similarity($citation["WoS"]["first-match"]["metadata"]["title"], $searchParameters["TITLE"], "Levenshtein", "post-colon"));
                 }
                 // now try comparing with all the Alma titles
                 if (isset($extraParameters["ALMA-TITLES"])) {
@@ -480,10 +481,12 @@ foreach ($citations as &$citation) {
                         if (isset($titleAlma["collated"])) {
                             $titleSimilarity = max($titleSimilarity, similarity($citation["WoS"]["first-match"]["metadata"]["title"], $titleAlma["collated"], "Levenshtein", FALSE));
                             $titleSimilarity = max($titleSimilarity, similarity($citation["WoS"]["first-match"]["metadata"]["title"], $titleAlma["collated"], "Levenshtein", "colon"));
+                            $titleSimilarity = max($titleSimilarity, similarity($citation["WoS"]["first-match"]["metadata"]["title"], $titleAlma["collated"], "Levenshtein", "post-colon"));
                         }
                         if (isset($titleAlma["a"])) {
                             $titleSimilarity = max($titleSimilarity, similarity($citation["WoS"]["first-match"]["metadata"]["title"], $titleAlma["a"], "Levenshtein", FALSE));
                             $titleSimilarity = max($titleSimilarity, similarity($citation["WoS"]["first-match"]["metadata"]["title"], $titleAlma["a"], "Levenshtein", "colon"));
+                            $titleSimilarity = max($titleSimilarity, similarity($citation["WoS"]["first-match"]["metadata"]["title"], $titleAlma["a"], "Levenshtein", "post-colon"));
                         }
                     }
                 }
@@ -492,6 +495,7 @@ foreach ($citations as &$citation) {
                     if (isset($titleAlma["collated"])) {
                         $titleSimilarity = max($titleSimilarity, similarity($citation["WoS"]["first-match"]["metadata"]["title"], $extraParameters["LEGANTO-TITLE"], "Levenshtein", FALSE));
                         $titleSimilarity = max($titleSimilarity, similarity($citation["WoS"]["first-match"]["metadata"]["title"], $extraParameters["LEGANTO-TITLE"], "Levenshtein", "colon"));
+                        $titleSimilarity = max($titleSimilarity, similarity($citation["WoS"]["first-match"]["metadata"]["title"], $extraParameters["LEGANTO-TITLE"], "Levenshtein", "post-colon"));
                     }
                 }
             }
