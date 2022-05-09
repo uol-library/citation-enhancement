@@ -350,4 +350,15 @@ function csi($authorAffiliations, $worldBankRank) {
 }
 
 
+function scopusDocType($code) { 
+    $scopusDocTypes = Array("ar" => "Article", "ab" => "Abstract Report", "bk" => "Book", "bz" => "Business Article", "ch" => "Book Chapter", "cp" => "Conference Paper", "cr" => "Conference Review", "ed" => "Editorial", "er" => "Erratum", "le" => "Letter", "no" => "Note", "pr" => "Press Release", "re" => "Review", "sh" => "Short Survey");
+    $code = strtolower($code); // just in case 
+    if (isset($scopusDocTypes[$code])) {
+        return $scopusDocTypes[$code]; 
+    } else {
+        return $code; 
+    }
+}
+
+
 ?>

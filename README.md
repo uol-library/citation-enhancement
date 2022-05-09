@@ -24,7 +24,7 @@ On a machine with permission to use the Scopus API (for University of Leeds user
 
 - Obtain a developer api key for the Scopus API from https://dev.elsevier.com/api_docs.html 
 
-- Make a developer account on the Clarivate Portal https://developer.clarivate.com/ create your own Application and subscribe it to the WoS Enhanced API, and get the key for that 
+- Make a developer account on the Clarivate Portal https://developer.clarivate.com/ create your own Application and subscribe it to the WoS API Expanded, and get the key for that 
 
 - In your local copy of the project, copy the template file config.template.ini to become your configuration file config.ini 
 
@@ -62,7 +62,7 @@ On a machine with permission to use the Scopus API (for University of Leeds user
 
 ## 3. Latest releases
 
-v3.2.3
+v3.2.4
 
 ## 4. APIs
 

@@ -301,7 +301,7 @@ foreach ($citations as $citation) {
                                     
                                     
                                 }
-                                $outputRecordScopus["SOURCE-TYPE"] = isset($citation["Scopus"]["first-match"]["summary"]["subtype"]) ? $citation["Scopus"]["first-match"]["summary"]["subtype"] : "";
+                                $outputRecordScopus["SOURCE-TYPE"] = isset($citation["Scopus"]["first-match"]["summary"]["subtype"]) ? scopusDocType($citation["Scopus"]["first-match"]["summary"]["subtype"]) : "";
                                 $outputRecordScopus["SOURCE-TITLES"] = isset($citation["Scopus"]["first-match"]["summary"]["dc:title"]) ? $citation["Scopus"]["first-match"]["summary"]["dc:title"] : "";
                                 $outputRecordScopus["SOURCE-CONTAINER"] = isset($citation["Scopus"]["first-match"]["summary"]["prism:publicationName"]) ? $citation["Scopus"]["first-match"]["summary"]["prism:publicationName"] : "";
                                 
