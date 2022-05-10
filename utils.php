@@ -181,11 +181,15 @@ function cropto($longer, $shorter, $type) {
     }
     if ($type=="post-colon") {
         $stringParts = explode(":", $longer, 2);
-        $cropped = $stringParts[1];
-        $originalLengthDiff = abs(strlen($longer) - $length);
-        $croppedLengthDiff = abs(strlen($cropped) - $length);
-        if ($croppedLengthDiff<$originalLengthDiff) {
-            return $cropped;
+        if (isset($stringParts[1])) {
+            $cropped = $stringParts[1];
+            $originalLengthDiff = abs(strlen($longer) - $length);
+            $croppedLengthDiff = abs(strlen($cropped) - $length);
+            if ($croppedLengthDiff<$originalLengthDiff) {
+                return $cropped;
+            } else {
+                return $longer;
+            }
         } else {
             return $longer;
         }
