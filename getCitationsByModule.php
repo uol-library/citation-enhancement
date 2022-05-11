@@ -85,7 +85,6 @@ if ($modcodes) {
 }
 if (!count($modulesToInclude)) {
     trigger_error("Error: Must specify module codes in -m or --modcode option", E_USER_ERROR);
-    exit;
 }
 
 
@@ -120,6 +119,10 @@ foreach ($modulesToInclude as $modcode) {
     
     $course_records = $course_endpoint->searchCourses($modcode, "searchable_ids", 100, 0, "false");
     
+    if ($course_endpoint->error) {
+        trigger_error($course_endpoint->error, E_USER_ERROR);
+    }
+    
     if (!isset($course_records["course"])) { 
         // modcode not found in Alma - create a dummy "citation" 
         $citations[] = Array("Course"=>$newCitationCourse); 
@@ -133,6 +136,9 @@ foreach ($modulesToInclude as $modcode) {
             usleep(200000); // to avoid hitting API too hard
             
             $list_records = $list_endpoint->retrieveReadingLists($course_id);
+            if ($list_endpoint->error) {
+                trigger_error($list_endpoint->error, E_USER_ERROR);
+            }
             
             $newCitationCourse["course_code"] = $course_code; 
             
@@ -147,6 +153,9 @@ foreach ($modulesToInclude as $modcode) {
                     $list_title = $list_record["name"];
                     
                     $list_full_record = $list_endpoint->retrieveReadingList($course_id, $list_record["id"], "full");
+                    if ($list_endpoint->error) {
+                        trigger_error($list_endpoint->error, E_USER_ERROR);
+                    }
                     
                     $citationNumber = 1; // NB start at one not zero 
                     

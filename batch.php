@@ -163,7 +163,7 @@ if ($stepsToInclude["export"]) {
     print "Initialising summary file\n\n"; 
     $resultCode = 0; 
     system("php simpleExport.php -i", $resultCode); // initialise a summary file with header row (will contain a row-per-reading-list)  
-    if ($resultCode) { print "Script ended with error\n"; exit; }
+    if ($resultCode) { print "\nScript simpleExport.php ended with error\n"; exit; }
 }
 
 
@@ -177,46 +177,66 @@ foreach ($modulesToInclude as $modcode) {
     if ($stepsToInclude["get"]) {
         print "Getting citations by module code\n"; 
         system("php getCitationsByModule.php -m {$modcode} >Data/tmp/{$modcode}_L.json", $resultCode);      // save data in temporary "Leganto" JSON file 
-        if ($resultCode) { print "Script ended with error\n"; exit; }
+        if ($resultCode) { print "\nScript getCitationsByModule.php ended with error\n"; exit; }
         copy("Data/tmp/{$modcode}_L.json", "Data/{$modcode}.json");                                         // if no errors, copy the "Leganto" JSON file to the current working file for this module  
     }
     
     if ($stepsToInclude["alma"]) {
         print "Enhancing citations from Alma\n";
+        if (!file_exists("Data/{$modcode}.json")) {
+            print "\nError: input file Data/{$modcode}.json missing: Something may have gone wrong in a previous step?\n";
+            exit; 
+        }
         system("php enhanceCitationsFromAlma.php <Data/{$modcode}.json >Data/tmp/{$modcode}_A.json", $resultCode);
                                                                                                             // source is current working file, target is temporary "Alma" file 
-        if ($resultCode) { print "Script ended with error\n"; exit; }
+        if ($resultCode) { print "\nScript enhanceCitationsFromAlma.php ended with error\n"; exit; }
         copy("Data/tmp/{$modcode}_A.json", "Data/{$modcode}.json");                                         // if no errors, copy the "Alma" JSON file over the current working file for this module
     }
     
     if ($stepsToInclude["scopus"]) {
         print "Enhancing citations from Scopus\n";
+        if (!file_exists("Data/{$modcode}.json")) {
+            print "\nError: input file Data/{$modcode}.json missing: Something may have gone wrong in a previous step?\n";
+            exit;
+        }
         system("php enhanceCitationsFromScopus.php <Data/{$modcode}.json >Data/tmp/{$modcode}_S.json", $resultCode);
-        if ($resultCode) { print "Script ended with error\n"; exit; }
+        if ($resultCode) { print "\nScript enhanceCitationsFromScopus.php ended with error\n"; exit; }
         copy("Data/tmp/{$modcode}_S.json", "Data/{$modcode}.json");
     }
     
     if ($stepsToInclude["wos"]) {
         print "Enhancing citations from WoS\n";
+        if (!file_exists("Data/{$modcode}.json")) {
+            print "\nError: input file Data/{$modcode}.json missing: Something may have gone wrong in a previous step?\n";
+            exit;
+        }
         system("php enhanceCitationsFromWoS.php <Data/{$modcode}.json >Data/tmp/{$modcode}_W.json", $resultCode);
-        if ($resultCode) { print "Script ended with error\n"; exit; }
+        if ($resultCode) { print "\nScript enhanceCitationsFromWoS.php ended with error\n"; exit; }
         copy("Data/tmp/{$modcode}_W.json", "Data/{$modcode}.json");
     }
     
     if ($stepsToInclude["viaf"]) {
         print "Enhancing citations from VIAF\n";
+        if (!file_exists("Data/{$modcode}.json")) {
+            print "\nError: input file Data/{$modcode}.json missing: Something may have gone wrong in a previous step?\n";
+            exit;
+        }
         system("php enhanceCitationsFromViaf.php <Data/{$modcode}.json >Data/tmp/{$modcode}_V.json", $resultCode);
-        if ($resultCode) { print "Script ended with error\n"; exit; }
+        if ($resultCode) { print "\nScript enhanceCitationsFromViaf.php ended with error\n"; exit; }
         copy("Data/tmp/{$modcode}_V.json", "Data/{$modcode}.json");
     }
     
     if ($stepsToInclude["export"]) {
         print "Exporting shorter digested data\n";
+        if (!file_exists("Data/{$modcode}.json")) {
+            print "\nError: input file Data/{$modcode}.json missing: Something may have gone wrong in a previous step?\n";
+            exit;
+        }
         system("php simpleExport.php -a <Data/{$modcode}.json", $resultCode);   // -a option appends rows to summary file for this module's reading lists  
-        if ($resultCode) { print "Script ended with error\n"; exit; }
+        if ($resultCode) { print "\nScript simpleExport.php ended with error\n"; exit; }
         print "Exporting longer digested data\n";
         system("php longExport.php <Data/{$modcode}.json", $resultCode);        // no -a option for this script 
-        if ($resultCode) { print "Script ended with error\n"; exit; }
+        if ($resultCode) { print "\nScript longExport.php ended with error\n"; exit; }
     }
     
     print "Done module $modcode\n\n"; 

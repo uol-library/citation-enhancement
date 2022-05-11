@@ -105,7 +105,9 @@ require_once("utils.php");                  // contains helper functions
 
 // fetch the data from STDIN  
 $citations = json_decode(file_get_contents("php://stdin"), TRUE);
-
+if ($citations===NULL) {
+    trigger_error("Error: No valid data passed to enhacement script: Something may have gone wrong in a previous step?", E_USER_ERROR);
+}
 
 // main loop: process each citation 
 foreach ($citations as &$citation) { 

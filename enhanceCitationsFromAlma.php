@@ -74,6 +74,9 @@ $bib_endpoint = new AlmaBibs('bibs');                // we'll use this in any ca
 
 // fetch the data from STDIN
 $citations = json_decode(file_get_contents("php://stdin"), TRUE);
+if ($citations===NULL) { 
+    trigger_error("Error: No valid data passed to enhacement script: Something may have gone wrong in a previous step?", E_USER_ERROR);
+}
 
 
 // main loop: process each citation
@@ -89,7 +92,10 @@ foreach ($citations as &$citation) {
             
             $bib_record = $bib_endpoint->retrieveBib($citation["Leganto"]["metadata"]["mms_id"]);
             // print_r($bib_record);
-            
+            if ($bib_endpoint->error) {
+                print $bib_endpoint->error."\n";
+                trigger_error($bib_endpoint->error, E_USER_ERROR);
+            }
             
             $citation["Alma"]["titles"] = Array();
             $citation["Alma"]["creators"] = Array();

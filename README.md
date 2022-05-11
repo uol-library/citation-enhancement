@@ -48,7 +48,7 @@ We have initially extended this to also work against the VIAF and Scopus APIs an
 
 ## 3. Latest releases
 
-v3.2.6
+v3.3.1
 
 ## 4. APIs
 

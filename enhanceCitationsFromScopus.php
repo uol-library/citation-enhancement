@@ -90,7 +90,9 @@ require_once("utils.php");                  // contains helper functions
 
 // fetch the data from STDIN  
 $citations = json_decode(file_get_contents("php://stdin"), TRUE);
-
+if ($citations===NULL) {
+    trigger_error("Error: No valid data passed to enhacement script: Something may have gone wrong in a previous step?", E_USER_ERROR);
+}
 
 // main loop: process each citation 
 foreach ($citations as &$citation) { 
@@ -571,9 +573,9 @@ foreach ($citations as &$citation) {
                 }
             }
             
-
         }
         
+
     }
     }
 }
@@ -631,73 +633,34 @@ function scopusApiQuery($URL, &$citationScopus, $type="default", $checkRateLimit
     }
     
     if (!$scopusResponse) {
-        if (!isset($citationScopus["errors"])) {
-            $citationScopus["errors"] = Array();
-        }
-        if (!isset($citationScopus["errors"][$type])) {
-            $citationScopus["errors"][$type] = Array();
-        }
-        $citationScopus["errors"][$type][] = Array("link"=>$URL, "error"=>"No response from API");
-        $scopusCache[$URL] = FALSE; 
-        return FALSE;
+        trigger_error("Error: No response from Scopus API for [".$URL."]", E_USER_ERROR);
     }
     
     $scopusData = json_decode($scopusResponse,TRUE);
     
     if ($scopusData===null) {
-        if (!isset($citationScopus["errors"])) {
-            $citationScopus["errors"] = Array();
-        }
-        if (!isset($citationScopus["errors"][$type])) {
-            $citationScopus["errors"][$type] = Array();
-        }
-        $citationScopus["errors"][$type][] = Array("link"=>$URL, "error"=>"Response from API cannot be decoded as JSON");
-        $scopusCache[$URL] = FALSE;
-        return FALSE;
+        trigger_error("Error: Response from Scopus API annot be decoded as JSON: $scopusResponse [".$URL."]", E_USER_ERROR);
     }
     if (isset($scopusData["service-error"])) {
-        if (!isset($citationScopus["errors"])) {
-            $citationScopus["errors"] = Array();
-        }
-        if (!isset($citationScopus["errors"][$type])) {
-            $citationScopus["errors"][$type] = Array();
-        }
         $serviceError = $scopusData["service-error"];
-        $errorMessage = (isset($serviceError["status"]) && isset($serviceError["status"]["statusCode"])) ? $serviceError["status"]["statusCode"] : "Unknown error code";
+        $errorMessage = (isset($serviceError["status"]) && isset($serviceError["status"]["statusCode"])) ? $serviceError["status"]["statusCode"] : "Unknown status code";
         $errorMessage .= " (";
-        $errorMessage .= (isset($serviceError["status"]) && isset($serviceError["status"]["statusText"])) ? $serviceError["status"]["statusText"] : "Unknown error text";
+        $errorMessage .= (isset($serviceError["status"]) && isset($serviceError["status"]["statusText"])) ? $serviceError["status"]["statusText"] : "Unknown status text";
         $errorMessage .= ")";
-        $citationScopus["errors"][$type][] = Array("link"=>$URL, "error"=>$errorMessage);
-        $scopusCache[$URL] = FALSE;
-        return FALSE;
+        trigger_error("Error: Service error from Scopus API: $errorMessage [".$URL."]", E_USER_ERROR);
     }
     if (isset($scopusData["error-response"])) {
-        if (!isset($citationScopus["errors"])) {
-            $citationScopus["errors"] = Array();
-        }
-        if (!isset($citationScopus["errors"][$type])) {
-            $citationScopus["errors"][$type] = Array();
-        }
         $serviceError = $scopusData["error-response"];
         $errorMessage = (isset($serviceError["error-code"])) ? $serviceError["error-code"] : "Unknown error code";
         $errorMessage .= " (";
-        $errorMessage = (isset($serviceError["error-message"])) ? $serviceError["error-message"] : "Unknown error text";
+        $errorMessage .= (isset($serviceError["error-message"])) ? $serviceError["error-message"] : "Unknown error message";
         $errorMessage .= ")";
         $citationScopus["errors"][$type][] = Array("link"=>$URL, "error"=>$errorMessage);
-        $scopusCache[$URL] = FALSE;
-        return FALSE;
+        trigger_error("Error: Error response from Scopus API: $errorMessage [".$URL."]", E_USER_ERROR);
     }
     if ($require!==NULL) { 
         if (!isset($scopusData[$require])) { 
-            if (!isset($citationScopus["errors"])) {
-                $citationScopus["errors"] = Array();
-            }
-            if (!isset($citationScopus["errors"][$type])) {
-                $citationScopus["errors"][$type] = Array();
-            }
-            $citationScopus["errors"][$type][] = Array("link"=>$URL, "error"=>"Required key missing from response: $require");
-            $scopusCache[$URL] = FALSE;
-            return FALSE;
+            trigger_error("Error: Expected data field (".$require.") not present in response from Scopus API [".$URL."]", E_USER_ERROR);
         }
     }
     

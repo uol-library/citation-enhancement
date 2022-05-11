@@ -78,11 +78,24 @@
 			}else {
 				$decoded = json_decode($response,true);
 				$this->debugMessage($decoded);
-				if (is_array($decoded) && 
+
+				if ($decoded===NULL) {
+				    // invalid JSON - may be an error in an XML message?
+				    try {
+				        $responseXml = new SimpleXMLElement($response);
+				        if (strtolower($responseXml->errorsExist->__toString())=="true") {
+				            $ret = Array();
+				            $this->error = "Error: API returned error: ".$responseXml->errorList->error->errorCode->__toString().": ".$responseXml->errorList->error->errorMessage->__toString();
+				        }
+				    } catch (Exception $e) {
+				        $ret = Array();
+				        $this->error = "Error: Could not decode API response: $response";
+				    }
+				} else if (is_array($decoded) &&
 				    ( array_key_exists('course',$decoded) || array_key_exists('code',$decoded) ) 
 				) {
 					$ret = $decoded;
-				}else {
+				} else {
 					$err = '';
 					if (is_array($decoded) &&
 						array_key_exists('errorsExist',$decoded) &&
