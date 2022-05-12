@@ -97,8 +97,14 @@ foreach ($citations as &$citation) {
             $bib_record = $bib_endpoint->retrieveBib($citation["Leganto"]["metadata"]["mms_id"]);
             // print_r($bib_record);
             if ($bib_endpoint->error) {
-                print $bib_endpoint->error."\n";
-                trigger_error($bib_endpoint->error, E_USER_ERROR);
+                if (preg_match('/:\s40220[34]\s-\s/', $bib_endpoint->error)) {    
+                    // kludge - we probably don't want to crash out just because a citation contains an invalid MMS ID
+                    // do nothing and we'll just move on to the next citation 
+                } else { 
+                    // error we *do* need to worry about 
+                    print $bib_endpoint->error."\n";
+                    trigger_error($bib_endpoint->error, E_USER_ERROR);
+                }
             }
             
             $citation["Alma"]["titles"] = Array();
