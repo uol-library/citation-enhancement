@@ -39,7 +39,7 @@
  *    - Fetch the contemporary affiliation of the author 
  *    - Fetch the author profile which includes current affiliation   
  *  - Calculate string similarities between source and Scopus authors and titles 
- *  - Save all the data (including any Scopus rate-limit data and errors) in the citation object 
+ *  - Save all the data (including any Scopus rate-limit data) in the citation object 
  *  
  * Export the enhanced citations 
  * 
@@ -64,7 +64,7 @@
  * API calls use the function utils.php:curl_get_file_contents() rather than the more natural file_get_contents  
  * Because the http wrappers for the latter are not enabled on lib5hv, where development has been carried out 
  * 
- * Double-quote characters should to be encoded within phrase searches {like \"this\"} or "like \"this\"" 
+ * Double-quote characters should be encoded within phrase searches {like \"this\"} or "like \"this\"" 
  * But even with this, I am still seeing errors from some searches including double-quotes 
  * For now I am removing double-quotes altogether from titles - looks like things are still found, 
  * but possibly via a looser search than would be ideal 
@@ -83,6 +83,7 @@
 
 error_reporting(E_ALL);                     // we want to know about all problems
 
+//TODO implement a batch-wide cache to reduce unnecessary API calls 
 $scopusCache = Array();                     // because of rate limit, don't fetch unless we have to 
 
 require_once("utils.php");                  // contains helper functions  
@@ -410,6 +411,9 @@ foreach ($citations as &$citation) {
                 
                 $scopusAuthorAffiliationData = scopusApiQuery($linkAuthorAffiliation, $citation["Scopus"], "abstract-retrieval", TRUE);
                 if (!$scopusAuthorAffiliationData) { continue; }
+                if (!isset($scopusAuthorAffiliationData["abstracts-retrieval-response"]["authors"])) { 
+                    trigger_error("Error: Authors not present in Abstract from Scopus API: You may be running this script from a machine outside your organisation's network?", E_USER_ERROR);
+                }
                 
                 
                 $citation["Scopus"]["first-match"]["authors"] = Array(); 
@@ -592,9 +596,9 @@ print json_encode($citations, JSON_PRETTY_PRINT);
  * 
  * @param String  $URL              API URL without httpAccept, apiKey and reqId 
  * @param Array   $citationScopus   The value of the Scopus entry in the citation - modified by this function as a side effect
- * @param String  $type             Used e.g. to identify the source of any errors  
+ * @param String  $type             To distinguish the different individual APIs   
  * @param Boolean $checkRateLimit   Whether to check and log the rate-limit data in the response 
- * @param String  $require          Key which we require to have in the returned array, otehrwise log error and return FALSE 
+ * @param String  $require          Key which we require to have in the returned array, otherwise log error and return FALSE 
  */
 function scopusApiQuery($URL, &$citationScopus, $type="default", $checkRateLimit=FALSE, $require=NULL) { 
      
@@ -614,7 +618,10 @@ function scopusApiQuery($URL, &$citationScopus, $type="default", $checkRateLimit
     
     $apiURL = $URL."&httpAccept=".urlencode($httpAccept)."&reqId=".urlencode($reqId)."&apiKey=".urlencode($apiKey); 
    
-    usleep(500000); // so as not to hammer the API 
+    usleep(500000); // because of per-second throttling rates on Scopus API 
+                    // see https://dev.elsevier.com/api_key_settings.html
+                    //TODO could improve performance by using a different delay for different types of request 
+                    // e.g. we can only make three author retrievals per second but we can make 9 Scopus searches per second  
     
     $scopusResponse = curl_get_file_contents($apiURL);
     
@@ -655,7 +662,6 @@ function scopusApiQuery($URL, &$citationScopus, $type="default", $checkRateLimit
         $errorMessage .= " (";
         $errorMessage .= (isset($serviceError["error-message"])) ? $serviceError["error-message"] : "Unknown error message";
         $errorMessage .= ")";
-        $citationScopus["errors"][$type][] = Array("link"=>$URL, "error"=>$errorMessage);
         trigger_error("Error: Error response from Scopus API: $errorMessage [".$URL."]", E_USER_ERROR);
     }
     if ($require!==NULL) { 

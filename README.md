@@ -48,7 +48,7 @@ We have initially extended this to also work against the VIAF and Scopus APIs an
 
 ## 3. Latest releases
 
-v3.3.1
+v3.3.2
 
 ## 4. APIs
 
@@ -256,10 +256,40 @@ php batch.php -f Config/Modules/modcodes.txt -s scopus,wos,viaf
 
 # Possible errors 
 
-Currently error handling is rudimentary - errors in each enhancement are saved in the JSON citation files, and then if the export scripts encounter any they exit, displaying the error found. 
+Currently error handling is rudimentary - known possible issues with the data from the APIs is checked for and **trigger_error(message, E_USER_ERROR)** is used to suspend processing (the batch script exits as soon as any individual script ends with an error). There may also be uncaught exceptions which likewise would cause the batch script to end. 
 
-One possible error in the Scopus integration is that the rate-limit is hit - each endpoint in the API allows a limitted number of requests per week, and processing a large number of lists might hit these limits. At Leeds we are able to run the scripts against 50 modules around three times a week before we hit the limit, but this obviously depends on the length of lists, the number of citations which are present in Scopus, the numbers of authors of these citations etc. 
+This has the disadvantage that a relatively minor problem with one citation would prevent processing of a large batch of citations, and it may be better to accept and ignore occasional minor errors. A possible improvement would be to add error logging (with different severities) and to only terminate scripts in the case of the most serious errors.  
 
-# Other issues to note 
+Issues to look out for: 
 
-The individual enhancement scripts contain specific notes about interaction with these APIs and the issues that might arise. 
+- Invalid API keys would cause problems in Leganto, Alma, Scopus and WoS - if this happens, the scripts will terminate with a relevant message 
+
+- Scopus occasionally has temporary problems with its Solr service ["GENERAL_SYSTEM_ERROR (Error calling Solr Search Service)"] - try again later if this happens 
+
+- APIs generally have rate limits - 
+
+    - Scopus has weekly and per-second limits outlined at https://dev.elsevier.com/api_key_settings.html 
+    
+    - WoS has per-year and per-second limits outlined at https://developer.clarivate.com/apis/wos  
+    
+    - Ex Libris (Alma and Leganto) has a per-second limit on API calls outlined at https://developers.exlibrisgroup.com/alma/apis/
+    
+    - Delays in the script should (more than) protect against Ex Lbris, Scopus and WoS per-second limits 
+    
+    - I can't find a documented limit on the VIAF API but a small delay has been built into the script to avoid hitting it too hard    
+    
+    - The Scopus weekly limit might be hit if processing a large number of citations, as might the WoS yearly limit (depending on the subscription plan) 
+    
+        - The scripts record in the JSON output file the number of requests remaining per-week (Scopus) or per-year (WoS) to allow this to be regularly monitored 
+        
+        - In the output citations.json file, look at an individual citation's **CITATION.WoS.rate-limit** and **CITATION.Scopus.rate-limit** values *NB for Scopus there are different limits for different individual APIs, and from experience author-retrieval is the one most likely to be a problem*    
+
+    - The number of requests could be reduced by using a batch-wide cache (there is a per-run cache but since the same resources may appear on multiple lists, a batch-wide cache would be more efficient) 
+   
+    - The scripts could be made to run faster by decreasing the delays (e.g. "usleep(500000)") before API calls - these are set to cautious values and there may be scope to reduce them - using a batch-wide cache would also improve processing time
+    
+- The Scopus API only returns limitted data when called from a machine outside the network of a subscribing organisation - the script ends with an error in this case        
+
+- Special characters (e.g. " * = ' { }) and reserved words (e.g. AND OR) may cause problems with some API searches - documentation on the APIs' behaviours is thin and not always consistent with observed behaviour - I have tried to escape or remove this content as appropriate but there is scope for further improvement    
+
+- The individual enhancement scripts contain specific notes about interaction with these APIs and the issues that might arise  

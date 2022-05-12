@@ -36,7 +36,7 @@
  *    TODO: may need an intelligent way of picking the best record where multiple records are returned 
  *  - Fetch the relevant metadata from this record    
  *  - Calculate string similarities between source and WoS authors and titles 
- *  - Save all the data (including any WoS rate-limit data and errors) in the citation object 
+ *  - Save all the data (including any WoS rate-limit data) in the citation object 
  *  
  * Export the enhanced citations 
  * 
@@ -98,6 +98,7 @@
 
 error_reporting(E_ALL);                     // we want to know about all problems
 
+//TODO implement a batch-wide cache to reduce unnecessary API calls
 $wosCache = Array();                     // because of rate limit, don't fetch unless we have to 
 
 require_once("utils.php");                  // contains helper functions  
@@ -649,7 +650,7 @@ function wosQuote($parameter, $keepParentheses=FALSE) {
  * 
  * @param String  $URL              API URL without httpAccept, apiKey and reqId 
  * @param Array   $citationWos      The value of the WoS entry in the citation - modified by this function as a side effect
- * @param String  $type             Used e.g. to identify the source of any errors  
+ * @param String  $type             To distinguish the different individual APIs
  * @param Boolean $checkRateLimit   Whether to check and log the rate-limit data in the response   
  * @param String  $require          Key which we require to have in the returned array, otehrwise log error and return FALSE 
  */
@@ -704,50 +705,24 @@ function wosApiQuery($usrQuery, &$citationWos, $type="default", $checkRateLimit=
         $wosCache[$URL] = $wosData;
         
         if ($wosData) {
-            
             if (isset($wosData["Data"])) {
                 // OK 
             } else { 
-                if (!isset($citationWos["errors"])) {
-                    $citationWos["errors"] = Array();
-                }
-                if (!isset($citationWos["errors"][$type])) {
-                    $citationWos["errors"][$type] = Array();
-                }
-                $citationWos["errors"][$type][] = Array("message"=>"No Data element in response");
-                
                 if (isset($citationWos["code"])) {
-                    $citationWos["errors"][$type][] = $wosData; // returned data *is* the error object 
+                    trigger_error("Error: Error response from WoS API Expanded: ".print_r($citationWos, TRUE)." [".$URL."]", E_USER_ERROR);
+                } else { 
+                    trigger_error("Error: No Data element present in response from WoS API Expanded [".$URL."]", E_USER_ERROR);
                 }
-                
             }
-            
         } else {
-            if (!isset($citationWos["errors"])) {
-                $citationWos["errors"] = Array();
-            }
-            if (!isset($citationWos["errors"][$type])) {
-                $citationWos["errors"][$type] = Array();
-            }
-            $citationWos["errors"][$type][] = Array("message"=>"Response can't be decoded from JSON"); 
+            trigger_error("Error: Response from WoS API Expanded can't be decoded from JSON: $body [".$URL."]", E_USER_ERROR);
         }
         
         return $wosData;
         
         
     } else { 
-        
-        if (!isset($citationWos["errors"])) {
-            $citationWos["errors"] = Array();
-        }
-        if (!isset($citationWos["errors"][$type])) {
-            $citationWos["errors"][$type] = Array();
-        }
-        $citationWos["errors"][$type][] = Array("message"=>"Empty response"); 
-        
-        $wosCache[$URL] = FALSE; //TODO need a way to feed error messages back as well to subsequent calls for this URL 
-        return FALSE;
-        
+        trigger_error("Error: Empty response from WoS API Expanded [".$URL."]", E_USER_ERROR);
     }
     
 }

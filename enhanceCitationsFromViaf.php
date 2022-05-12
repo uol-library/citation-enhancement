@@ -82,6 +82,9 @@
 error_reporting(E_ALL);                     // we want to know about all problems
 
 
+//TODO implement a batch-wide cache to reduce unnecessary API calls
+
+
 require_once("utils.php"); 
 
 
@@ -310,17 +313,6 @@ foreach ($citations as &$citation) {
         
         $searchStrategies = Array(); 
         
-        /*
-        $searchStrategies[] = Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"exact", "search-pref"=>1, "data-source"=>$searchDataSource, "search-term-source"=>"collated"); 
-        $searchStrategies[] = Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"exact", "search-pref"=>2, "data-source"=>$searchDataSource, "search-term-source"=>"a");
-        $searchStrategies[] = Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"all",   "search-pref"=>3, "data-source"=>$searchDataSource, "search-term-source"=>"collated");
-        $searchStrategies[] = Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"all",   "search-pref"=>4, "data-source"=>$searchDataSource, "search-term-source"=>"a");
-        $searchStrategies[] = Array("search-fields"=>"local.personalNames", "search-relation"=>"exact", "search-pref"=>5, "data-source"=>$searchDataSource, "search-term-source"=>"collated");
-        $searchStrategies[] = Array("search-fields"=>"local.personalNames", "search-relation"=>"exact", "search-pref"=>6, "data-source"=>$searchDataSource, "search-term-source"=>"a");
-        $searchStrategies[] = Array("search-fields"=>"local.personalNames", "search-relation"=>"all",   "search-pref"=>7, "data-source"=>$searchDataSource, "search-term-source"=>"collated");
-        $searchStrategies[] = Array("search-fields"=>"local.personalNames", "search-relation"=>"all",   "search-pref"=>8, "data-source"=>$searchDataSource, "search-term-source"=>"a");
-        */ 
-        
         $searchStrategies[] = Array(
             "searches"=>array(
                 "AU"=>Array("search-fields"=>"local.mainHeadingEl", "search-relation"=>"all", "search-term-source"=>"collated"),
@@ -376,8 +368,8 @@ foreach ($citations as &$citation) {
 
             foreach ($searchStrategies as $searchStrategy) {
                 
-                $searchStrategyAU = isset($searchStrategy["searches"]) ? $searchStrategy["searches"]["AU"] : $searchStrategy; 
-                $searchStrategyTI = isset($searchStrategy["searches"] ) ? $searchStrategy["searches"]["TI"] : null;
+                $searchStrategyAU = $searchStrategy["searches"]["AU"]; 
+                $searchStrategyTI = $searchStrategy["searches"]["TI"];
                 
                 if (!isset($creator[$searchStrategyAU["search-term-source"]]) || !$creator[$searchStrategyAU["search-term-source"]]) { continue; } // we can't do anything if this strategy uses a field that isn't there 
                 
@@ -392,27 +384,8 @@ foreach ($citations as &$citation) {
                     $citationViaf["search-term-ti"] = null; 
                 }
                 usleep(150000);
-                try {
-                    if (isset($searchStrategy["searches"])) { 
-                        $viafSearchData = viafApiQuery2($searchStrategyAU, $citationViaf["search-term-au"], $searchStrategyTI, $citationViaf["search-term-ti"]);
-                    } else {
-                        $viafSearchData = viafApiQuery($citationViaf["search-fields"], $citationViaf["search-relation"], $citationViaf["search-term-au"]);
-                    }
-                    $citationViaf["records"] = $viafSearchData->records->record ? count($viafSearchData->records->record) : FALSE;
-                } catch (Exception $e) {
-                    if (!isset($citationViaf["errors"])) {
-                        $citationViaf["errors"] = Array();
-                    }
-                    $citationViaf["records"] = FALSE;
-                    
-                    if (isset($searchStrategy["searches"])) {
-                        $citationViaf["errors"][] = Array("search"=>$searchStrategy["searches"], "search-term-au"=>$citationViaf["search-term-au"], "search-term-ti"=>$citationViaf["search-term-ti"], "message"=>$e->getMessage());
-                    } else {
-                        $citationViaf["errors"][] = Array("search-fields"=>$citationViaf["search-fields"], "search-term"=>$citationViaf["search-term"], "message"=>$e->getMessage());
-                    }
-                    
-                    
-                }
+                $viafSearchData = viafApiQuery($searchStrategyAU, $citationViaf["search-term-au"], $searchStrategyTI, $citationViaf["search-term-ti"]);
+                $citationViaf["records"] = $viafSearchData->records->record ? count($viafSearchData->records->record) : FALSE;
                 if ($citationViaf["records"]) {
                     // first, we need to double-check whether there is at least one personal name record here
                     foreach ($viafSearchData->records->record as $record) {
@@ -675,25 +648,8 @@ print json_encode($citations, JSON_PRETTY_PRINT);
 
 
 
-function viafApiQuery($fields, $relation, $term) { 
-    
-    global $http_response_header; // latter needed to allow curl_get_file_contents to mimic file_get_contents side-effect
-    
-    $viafSearchURL = "http://viaf.org/viaf/search?query=".$fields."+".$relation."+%22".urlencode($term)."%22&maximumRecords=10&startRecord=1&sortKeys=holdingscount&httpAccept=text/xml";
-    $viafSearchResponse = curl_get_file_contents($viafSearchURL);
 
-    
-    //TODO error checking
-    $viafSearchResponse = preg_replace('/(<\/?)ns\d+:/', "$1", $viafSearchResponse); // kludge - need to parse namespaced document properly
-    try { 
-        return new SimpleXmlElement($viafSearchResponse);
-    }
-    catch (Exception $e) { 
-        throw new Exception("Could not parse response: $viafSearchResponse"); 
-    }
-}
-
-function viafApiQuery2($searchStrategyAU, $searchTermAU, $searchStrategyTI, $searchTermTI) { 
+function viafApiQuery($searchStrategyAU, $searchTermAU, $searchStrategyTI, $searchTermTI) { 
 
     global $http_response_header; // latter needed to allow curl_get_file_contents to mimic file_get_contents side-effect
     
@@ -707,14 +663,18 @@ function viafApiQuery2($searchStrategyAU, $searchTermAU, $searchStrategyTI, $sea
     usleep(50000); // to avoid hitting API too hard 
     
     $viafSearchResponse = curl_get_file_contents($viafSearchURL);
+    if(!$viafSearchResponse) { 
+        trigger_error("Error: Empty response from VIAF API [".$viafSearchURL."]", E_USER_ERROR);
+    }
     
-    //TODO error checking
+    //TODO more error checking
+    
     $viafSearchResponse = preg_replace('/(<\/?)ns\d+:/', "$1", $viafSearchResponse); // kludge - need to parse namespaced document properly
     try {
         return new SimpleXmlElement($viafSearchResponse);
     }
     catch (Exception $e) {
-        throw new Exception("Could not parse response: $viafSearchResponse");
+        trigger_error("Error: Could not parse response from VIAF API: ".$viafSearchResponse." [".$viafSearchURL."]", E_USER_ERROR);
     }
     
     

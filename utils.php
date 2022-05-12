@@ -148,7 +148,8 @@ function similarity($string1, $string2, $type="Levenshtein", $crop=FALSE, $alpha
         return floor($pc);
     }
     
-    throw new Exception("Similarity type $type nort implemented"); 
+    // shouldn't ever happen but... 
+    throw new Exception("Similarity type $type not implemented in utils.php::similarity()"); 
     
 }
 

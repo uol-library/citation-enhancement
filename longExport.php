@@ -275,12 +275,7 @@ foreach ($citations as $citation) {
                     $maxCitationSimilaritiesIndex = 0;
                     
                     if (isset($citation["Scopus"])) {
-                        
-                        //TODO allow a "force" option to bypass errors
-                        if (isset($citation["Scopus"]["errors"])) {
-                            trigger_error("Error from Scopus integration: ".print_r($citation["Scopus"]["errors"], TRUE), E_USER_ERROR);
-                            exit;
-                        }
+
                         
                         if (isset($citation["Scopus"]["first-match"]) && isset($citation["Scopus"]["first-match"]["authors"])) {
                             
@@ -380,12 +375,7 @@ foreach ($citations as $citation) {
                     
                     
                     if (isset($citation["WoS"])) {
-                        
-                        //TODO allow a "force" option to bypass errors
-                        if (isset($citation["WoS"]["errors"])) {
-                            trigger_error("Error from WoS integration: ".print_r($citation["WoS"]["errors"], TRUE), E_USER_ERROR);
-                            exit;
-                        }
+
                         
                         $totalSimilarity = 0;
                         $countSimilarity = 0;
@@ -533,13 +523,7 @@ foreach ($citations as $citation) {
                     
                     if (isset($citation["VIAF"])) {
                         
-                        //TODO allow a "force" option to bypass errors
-                        if (isset($citation["VIAF"]["errors"])) {
-                            trigger_error("Error from VIAF integration: ".print_r($citation["VIAF"]["errors"], TRUE), E_USER_ERROR);
-                            exit;
-                        }
-                        
-                        
+
                         
                         foreach ($citation["VIAF"] as $viafCitation) {
                             

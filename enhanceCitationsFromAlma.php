@@ -63,6 +63,10 @@
 
 error_reporting(E_ALL);                     // we want to know about all problems
 
+
+//TODO implement a batch-wide cache to reduce unnecessary API calls
+
+
 require_once("utils.php");                  // helper functions 
 
 
