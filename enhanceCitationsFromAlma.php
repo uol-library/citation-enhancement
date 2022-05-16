@@ -120,10 +120,20 @@ foreach ($citations as &$citation) {
                 foreach ($xmlrecord->datafield as $field) {
                     
                     $tag = $field["tag"]->__toString();
+                    $originalTag = $tag;
+                    
+                    // kludge translate 880s to equivalents
+                    if ($originalTag=="880") {
+                        foreach ($field->subfield as $subfield) {
+                            if ($subfield["code"]->__toString()=="6" && preg_match('/^(\d+)-/', $subfield->__toString(), $tagMatches)) { // linking subfield
+                                $tag = $tagMatches[1];
+                            }
+                        }
+                    }
                     
                     if (in_array($tag, Array("245", "210", "240", "242", "243", "246", "247", "730", "740"))) {
                         $acceptedSubfields = Array("a","b");
-                        $title = Array("tag"=>$tag, "collated"=>"");
+                        $title = Array("tag"=>$tag, "originalTag"=>$originalTag, "collated"=>"");
                         foreach ($acceptedSubfields as $acceptedSubfield) { $title[$acceptedSubfield] = ""; }
                         foreach ($field->subfield as $subfield) {
                             $subfieldCode = $subfield["code"]->__toString();
@@ -176,7 +186,7 @@ foreach ($citations as &$citation) {
                     
                     if (in_array($tag, Array("100", "700"))) {
                         $acceptedSubfields = Array("a","b","c","d","q");
-                        $creator = Array("tag"=>$tag, "collated"=>"");
+                        $creator = Array("tag"=>$tag, "originalTag"=>$originalTag, "collated"=>"");
                         foreach ($acceptedSubfields as $acceptedSubfield) { $creator[$acceptedSubfield] = ""; }
                         foreach ($field->subfield as $subfield) {
                             $subfieldCode = $subfield["code"]->__toString();

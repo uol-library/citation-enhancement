@@ -134,7 +134,7 @@ foreach ($citations as &$citation) {
                     $titles[] = $titleAlma;
                     $titlesSeen[] = $titleAlmaSerialised;
                     if ($firstTitle===null) { $firstTitle = $titleAlma; } 
-                    if ($titleAlma["tag"]=="245" && $primaryTitle===null) { 
+                    if ($titleAlma["originalTag"]=="245" && $primaryTitle===null) { 
                         $primaryTitle = $titleAlma; 
                     }
                 }
@@ -358,7 +358,7 @@ foreach ($citations as &$citation) {
                 "AU"=>Array("search-fields"=>"local.personalNames", "search-relation"=>"all", "search-term-source"=>"a"),
                 "TI"=>Array("search-fields"=>"local.title", "search-relation"=>"any", "search-term-source"=>"collated"),
             ),
-            "search-pref"=>5,
+            "search-pref"=>6,
             "data-source"=>$searchDataSource
         );
         

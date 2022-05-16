@@ -229,7 +229,7 @@ foreach ($citations as $citation) {
                 count($citation["Alma"]["titles"])
                 ) {
                     foreach ($citation["Alma"]["titles"] as $almaTitle) {
-                        if ($almaTitle["tag"]=="245" && $almaTitle["collated"]) {
+                        if ($almaTitle["originalTag"]=="245" && $almaTitle["collated"]) {
                             $outputRecordBase["CIT-TITLE"] = $almaTitle["collated"];
                             $foundAlmaCitTitle = TRUE;
                             break; // stop at the first one
