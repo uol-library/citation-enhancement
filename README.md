@@ -48,7 +48,7 @@ We have initially extended this to also work against the VIAF and Scopus APIs an
 
 ## 3. Latest releases
 
-v3.3.4
+v3.3.5
 
 ## 4. APIs
 
@@ -186,9 +186,9 @@ php enhanceCitationsFromWoS.php <Data/tmp/PSYC3505_S.json >Data/tmp/PSYC3505_W.j
 php enhanceCitationsFromViaf.php   <Data/tmp/PSYC3505_W.json >Data/tmp/PSYC3505_V.json 
 ```
 
-fEach script reads a JSON-encoded list of citations from STDIN, and writes an enhanced list of citations to STDOUT, so use the input filename from the previous step and write to a new file ready for the next step.  
+Each script reads a JSON-encoded list of citations from STDIN, and writes an enhanced list of citations to STDOUT, so use the input filename from the previous step and write to a new file ready for the next step.  
 
-### (3) Process data and export spreadsheet  
+### (3) Process data and export spreadsheets  
 
 These scripts could be modified independently of the collection of raw data in the previous steps, and re-run. 
 
