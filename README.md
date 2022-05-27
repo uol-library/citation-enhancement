@@ -11,24 +11,11 @@ We have initially extended this to also work against the VIAF and Scopus APIs an
 
 # Getting Started
 
-## 1. Installation process
-
-- Identify a suitable machine, with permission to use the Scopus API (for University of Leeds users, this means a machine on the 129.11.0.0 network – other Universities will have their own ranges) 
-
-- (If necessary) install PHP installed (code tested against versions 8.0.7, 8.1.5)
-
-- (If necessary) in PHP enable the system function enabled, enable http wrappers and openssl enabled, and cURL support including support for https and up-to-date cacert file
-
-- In a suitable folder, checkout a copy of this project:  
-[https://dev.azure.com/uol-support/Reading%20Lists/_git/Citation%20enhancement?path=%2F&version=GBlibjmh_dev&_a=contents](https://dev.azure.com/uol-support/Reading%20Lists/_git/Citation%20enhancement?path=%2F&version=GBlibjmh_dev&_a=contents)  
-
-- Configure the software as desribed in **Configuration** (below) 
-
-## 2. Dependencies
+## 1. Dependencies
 
 - Alma Library Management System and Leganto Reading List Management System to query against 
 
-- Ex Libris api keys with read access to courses, reading lists and bibliographic data  
+- Ex Libris API keys with read access to Courses and Bibs  
 
 - Host machine must have permission to use the Scopus API (for University of Leeds users, this means it must be on the 129.11.0.0 network) 
 
@@ -46,9 +33,18 @@ We have initially extended this to also work against the VIAF and Scopus APIs an
 
 - Subscription to WoS Expanded API, and developer API key  
 
+## 2. Installation process
+
+- Identify a suitable machine, with PHP installed and configured - see Dependencies above 
+
+- In a suitable folder, checkout a copy of this project:  
+[https://dev.azure.com/uol-support/Reading%20Lists/_git/Citation%20enhancement?path=%2F&version=GBlibjmh_dev&_a=contents](https://dev.azure.com/uol-support/Reading%20Lists/_git/Citation%20enhancement?path=%2F&version=GBlibjmh_dev&_a=contents)  
+
+- Configure the software as described in **Configuration** (below) 
+
 ## 3. Latest releases
 
-v3.3.5
+v3.3.6
 
 ## 4. APIs
 
@@ -127,17 +123,17 @@ Data/Summary.CSV
 
 - Obtain developer API keys for the following Alma APIs from https://developers.exlibrisgroup.com/alma/apis/ - these need permission to the APIs on the production server, and only need read-only access: 
 
-    - Bibiographic Records 
+    - Bibs
 
     - Courses
 
 - Obtain a developer API key for the Scopus API from https://dev.elsevier.com/api_docs.html 
 
-- Make a developer account on the Clarivate Portal https://developer.clarivate.com/ create your own Application and subscribe it to the WoS API Expanded, and obtain an API key for that 
+- Obtain a developer API key for the WoS API Expanded from https://developer.clarivate.com/
 
 - In your local copy of the project, copy the template file config.template.ini to become your configuration file config.ini 
 
-- Edit this new config.ini to contain your Alma, Scopus and WoS api keys e.g. 
+- Edit this new config.ini to contain your Alma, Scopus and WoS API keys e.g. 
 
 ```ini
 [Alma-Keys]
@@ -148,6 +144,8 @@ apiKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 [WoS]
 apiKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 ```
+- If your institution is an Ex Libris customer outside Europe, modify the values of apiHost and apiURL in the Alma section of config.ini - 
+see the table in Calling Alma APIs in https://developers.exlibrisgroup.com/alma/apis/
 
 # Running process 
 
