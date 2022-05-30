@@ -9,6 +9,8 @@ https://osf.io/cyj2x/
 
 We have initially extended this to also work against the VIAF and Scopus APIs and further integrations are possible. 
 
+Further documentation on specific aspects of the process is in the directory Docs/ 
+
 # Getting Started
 
 ## 1. Dependencies
@@ -38,13 +40,13 @@ We have initially extended this to also work against the VIAF and Scopus APIs an
 - Identify a suitable machine, with PHP installed and configured - see Dependencies above 
 
 - In a suitable folder, checkout a copy of this project:  
-[https://dev.azure.com/uol-support/Reading%20Lists/_git/Citation%20enhancement?path=%2F&version=GBlibjmh_dev&_a=contents](https://dev.azure.com/uol-support/Reading%20Lists/_git/Citation%20enhancement?path=%2F&version=GBlibjmh_dev&_a=contents)  
+[https://dev.azure.com/uol-support/Reading%20Lists/_git/Citation%20enhancement](https://dev.azure.com/uol-support/Reading%20Lists/_git/Citation%20enhancement)  
 
 - Configure the software as described in **Configuration** (below) 
 
 ## 3. Latest releases
 
-v3.3.6
+v3.4.1
 
 ## 4. APIs
 
