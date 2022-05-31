@@ -136,7 +136,7 @@ if ($steps) {
     }
     // unless we ask it to 
     foreach (preg_split('/\s*[,;:\.\s]+\s*/', $steps) as $step) {
-        if (preg_match('/\w+/', $steps)) {
+        if (preg_match('/\w+/', $step)) {
             $stepsToInclude[strtolower($step)] = TRUE;
         }
     }
