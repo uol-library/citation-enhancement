@@ -46,7 +46,7 @@ Further documentation on specific aspects of the process is in the directory Doc
 
 ## 3. Latest releases
 
-v3.4.1
+v3.4.2
 
 ## 4. APIs
 
@@ -142,9 +142,9 @@ Data/Summary.CSV
 bibs    = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
 courses = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx 
 [Scopus]
-apiKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+apiKey = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 [WoS]
-apiKey = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+apiKey = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 - If your institution is an Ex Libris customer outside Europe, modify the values of apiHost and apiURL in the Alma section of config.ini - 
 see the table in Calling Alma APIs in https://developers.exlibrisgroup.com/alma/apis/
