@@ -44,9 +44,11 @@ Further documentation on specific aspects of the process is in the directory Doc
 
 - Configure the software as described in **Configuration** (below) 
 
+- If space is at a premium, you can delete the directory Docs/ and its contents without affecting software operation (although the documents may be helpful) 
+
 ## 3. Latest releases
 
-v3.4.5
+v3.4.6
 
 ## 4. APIs
 
