@@ -124,7 +124,11 @@ foreach ($citations as $citation) {
     
     if (!isset($citation["Leganto"])) {
         
-        if (isset($citation["Course"]["course_code"]) && $citation["Course"]["course_code"]) {
+        if (isset($citation["Course"]["list_code"])) {
+            if (CONFIG["General"]["Debug"]) {
+                trigger_error("Notice: Course ".$citation["Course"]["course_code"]." has an empty reading list: ".$citation["Course"]["list_code"], E_USER_NOTICE);
+            }
+        } else if (isset($citation["Course"]["course_code"]) && $citation["Course"]["course_code"]) {
             trigger_error("Error: Course ".$citation["Course"]["course_code"]." has no reading list in Leganto", E_USER_ERROR);
             exit;
         } else {

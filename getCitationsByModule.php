@@ -157,6 +157,13 @@ foreach ($modulesToInclude as $modcode) {
                         trigger_error($list_endpoint->error, E_USER_ERROR);
                     }
                     
+                    // kludge - in case there are zero citations we need to also save this at the course level
+                    $newCitationCourse["list_code"] = $list_code;
+                    if (!isset($list_full_record["citations"]["citation"])) {
+                        $citations[] = Array("Course"=>$newCitationCourse);
+                        continue;
+                    }
+                    
                     $citationNumber = 1; // NB start at one not zero 
                     
                     foreach ($list_full_record["citations"]["citation"] as $citation) {
