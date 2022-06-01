@@ -134,7 +134,7 @@ foreach ($citations as &$citation) {
                     $titles[] = $titleAlma;
                     $titlesSeen[] = $titleAlmaSerialised;
                     if ($firstTitle===null) { $firstTitle = $titleAlma; } 
-                    if ($titleAlma["originalTag"]=="245" && $primaryTitle===null) { 
+					if ($titleAlma["originalTag"]=="245" && $primaryTitle===null) { 
                         $primaryTitle = $titleAlma; 
                     }
                 }
@@ -533,14 +533,28 @@ foreach ($citations as &$citation) {
                     foreach ($viaf5xxData as $viaf5xxDataItem) {
                         
                         $dataField = $viaf5xxDataItem->datafield;
+                        $dataLink = isset($viaf5xxDataItem["viafLink"]) ? $viaf5xxDataItem["viafLink"]->__toString() : null; 
                         
                         if ($dataField["tag"]=="551") {
+                            $viafDataParsedItemLocation = Array();
                             foreach ($dataField->subfield as $subfield) {
-                                if ($subfield["code"]=="a") {
-                                    if (!isset($viafDataParsedItem["locations"])) { $viafDataParsedItem["locations"] = Array(); }
-                                    $viafDataParsedItem["locations"][] = Array("value"=>trim($subfield->__toString()));
-                                    break;
+                                if ($subfield["code"]=="a" && !isset($viafDataParsedItemLocation["value"])) {
+                                    $viafDataParsedItemLocation["value"] = trim($subfield->__toString());
                                 }
+                                if ($subfield["code"]=="g" && !isset($viafDataParsedItemLocation["\$g"])) {
+                                    $viafDataParsedItemLocation["\$g"] = trim($subfield->__toString());
+                                }
+                                if ($subfield["code"]=="4") {
+                                    if (!isset($viafDataParsedItemLocation["\$4"])) { $viafDataParsedItemLocation["\$4"] = Array(); }
+                                    $viafDataParsedItemLocation["\$4"][] = trim($subfield->__toString());
+                                }
+                                if ($dataLink) {
+                                    $viafDataParsedItemLocation["link"] = $dataLink;
+                                }
+                            }
+                            if (count($viafDataParsedItemLocation)) {
+                                if (!isset($viafDataParsedItem["locations"])) { $viafDataParsedItem["locations"] = Array(); }
+                                $viafDataParsedItem["locations"][] = $viafDataParsedItemLocation;
                             }
                         }
                         if ($dataField["tag"]=="510" && $dataField["ind1"]=="2" && $dataField["ind2"]==" ") {
@@ -551,6 +565,16 @@ foreach ($citations as &$citation) {
                                 }
                                 if ($subfield["code"]=="e" && !isset($viafDataParsedItemAffiliation["\$e"])) {
                                     $viafDataParsedItemAffiliation["\$e"] = trim($subfield->__toString());
+                                }
+                                if ($subfield["code"]=="g" && !isset($viafDataParsedItemAffiliation["\$g"])) {
+                                    $viafDataParsedItemAffiliation["\$g"] = trim($subfield->__toString());
+                                }
+                                if ($subfield["code"]=="4") {
+                                    if (!isset($viafDataParsedItemAffiliation["\$4"])) { $viafDataParsedItemAffiliation["\$4"] = Array(); }
+                                    $viafDataParsedItemAffiliation["\$4"][] = trim($subfield->__toString());
+                                }
+                                if ($dataLink) {
+                                    $viafDataParsedItemAffiliation["link"] = $dataLink;  
                                 }
                             }
                             if (count($viafDataParsedItemAffiliation)) {
