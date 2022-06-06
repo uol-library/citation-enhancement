@@ -600,14 +600,17 @@ if (!$initialise) {
                                     $thisSimilarity = floor($viafCitation["best-match"]["similarity-title"]*$viafCitation["best-match"]["similarity-author"]/100);
                                     $totalSimilarity += $thisSimilarity;
                                     $countSimilarity++;
-                                    if ($maxSimilarity===FALSE || $thisSimilarity>$maxSimilarity) { $maxSimilarity = $thisSimilarity; }
+                                    $isCurrentMaxSimilarity = FALSE; 
+                                    if ($maxSimilarity===FALSE || $thisSimilarity>$maxSimilarity) { $maxSimilarity = $thisSimilarity; $isCurrentMaxSimilarity = TRUE;  }
                                     if ($minSimilarity===FALSE || $thisSimilarity<$minSimilarity) { $minSimilarity = $thisSimilarity; }
                                     
                                     if ($thisSimilarity>=$inclusionThreshold) {     // we need to test this here in contrast to WoS and Scopus 
                                                                                     // because each author search is independent - some may be "right" and some "wrong" 
 
-                                        
-                                        $outputRecord["VIAF-TITLE"] = isset($viafCitation["best-match"]["best-matching-title"]) ? $viafCitation["best-match"]["best-matching-title"] : "";
+                                        // if we're the best match yet, or if we don't yet have a VIAF title, make this title the VIAF title 
+                                        if ($isCurrentMaxSimilarity || !isset($outputRecord["VIAF-TITLE"]) || !$outputRecord["VIAF-TITLE"]) { 
+                                            $outputRecord["VIAF-TITLE"] = isset($viafCitation["best-match"]["best-matching-title"]) ? $viafCitation["best-match"]["best-matching-title"] : "";
+                                        }
                                         $outputRecord["VIAF-CONTAINER"] = ""; // always - we have no possible value for this 
                                         
                                         

@@ -48,7 +48,7 @@ Further documentation on specific aspects of the process is in the directory Doc
 
 ## 3. Latest releases
 
-v3.4.9
+v3.4.10
 
 ## 4. APIs
 
