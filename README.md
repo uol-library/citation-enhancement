@@ -40,7 +40,7 @@ Further documentation on specific aspects of the process is in the directory Doc
 - Identify a suitable machine, with PHP installed and configured - see Dependencies above 
 
 - In a suitable folder, checkout a copy of this project:  
-[https://dev.azure.com/uol-support/Reading%20Lists/_git/Citation%20enhancement](https://dev.azure.com/uol-support/Reading%20Lists/_git/Citation%20enhancement)  
+[https://github.com/uol-library/citation-enhancement/](https://github.com/uol-library/citation-enhancement/) 
 
 - Configure the software as described in **Configuration** (below) 
 
