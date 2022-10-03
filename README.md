@@ -9,7 +9,7 @@ https://osf.io/cyj2x/
 
 We have initially extended this to also work against the VIAF and Scopus APIs and further integrations are possible. 
 
-Further documentation on specific aspects of the process is in the directory Docs/ 
+Further documentation on specific aspects of the process is in the directory `Docs/` and [in the repository Wiki](https://github.com/uol-library/citation-enhancement/wiki/)
 
 # Getting Started
 
