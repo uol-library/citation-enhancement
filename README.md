@@ -46,11 +46,7 @@ Further documentation on specific aspects of the process is in the directory `Do
 
 - If space is at a premium, you can delete the directory Docs/ and its contents without affecting software operation (although the documents may be helpful) 
 
-## 3. Latest releases
-
-v3.4.10
-
-## 4. APIs
+## 3. APIs
 
 - Scopus: [https://dev.elsevier.com/api_docs.html](https://dev.elsevier.com/api_docs.html)
 
